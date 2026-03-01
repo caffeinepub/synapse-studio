@@ -51,7 +51,7 @@ function ChakraCard({ chakra }: { chakra: ChakraEntry }) {
       onClick={() => setExpanded(!expanded)}
     >
       {/* Header */}
-      <div className="p-5 flex items-start gap-4">
+      <div className="p-4 sm:p-5 flex items-start gap-3 sm:gap-4">
         {/* Orb */}
         <div
           className="w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center text-xl border-2"
@@ -241,7 +241,7 @@ export default function EnergyLibraryPage() {
   } = useGetBeliefSystems();
 
   return (
-    <div className="container max-w-5xl mx-auto px-4 py-10 space-y-16">
+    <div className="container max-w-5xl mx-auto px-3 sm:px-4 py-6 sm:py-10 space-y-10 sm:space-y-16">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -249,10 +249,10 @@ export default function EnergyLibraryPage() {
         transition={{ duration: 0.5 }}
         className="text-center space-y-4"
       >
-        <h1 className="font-display text-4xl md:text-5xl font-bold gradient-text glow-text-primary">
+        <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold gradient-text glow-text-primary">
           Energy & Consciousness Library
         </h1>
-        <p className="text-muted-foreground text-base max-w-xl mx-auto leading-relaxed">
+        <p className="text-muted-foreground text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
           A philosophical and psychological exploration of energy systems,
           consciousness frameworks, and inner development models.
         </p>
@@ -283,7 +283,7 @@ export default function EnergyLibraryPage() {
         </div>
 
         {chakrasLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {["c-1", "c-2", "c-3", "c-4", "c-5", "c-6", "c-7"].map((k) => (
               <Skeleton key={k} className="h-40 rounded-2xl" />
             ))}
@@ -299,7 +299,7 @@ export default function EnergyLibraryPage() {
         )}
 
         {chakras && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {chakras.map((chakra, i) => (
               <motion.div
                 key={chakra.name}

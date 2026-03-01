@@ -255,7 +255,7 @@ export default function KinesisArchivePage() {
   };
 
   return (
-    <div className="container max-w-6xl mx-auto px-4 py-10 space-y-10">
+    <div className="container max-w-6xl mx-auto px-3 sm:px-4 py-6 sm:py-10 space-y-6 sm:space-y-10">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -263,10 +263,10 @@ export default function KinesisArchivePage() {
         transition={{ duration: 0.5 }}
         className="text-center space-y-4"
       >
-        <h1 className="font-display text-4xl md:text-5xl font-bold gradient-text glow-text-primary">
+        <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold gradient-text glow-text-primary">
           Kinesis Archive
         </h1>
-        <p className="text-muted-foreground text-base max-w-xl mx-auto leading-relaxed">
+        <p className="text-muted-foreground text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
           An encyclopedia of elemental manipulation abilities from mythology,
           folklore, and fiction — translated into psychological metaphors.
         </p>

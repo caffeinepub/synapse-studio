@@ -29,6 +29,7 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  CircleDot,
   Copy,
   Download,
   Droplets,
@@ -71,7 +72,6 @@ import {
 } from "../utils/audioEngine";
 
 const CHAKRAS = [
-  "None",
   "Root",
   "Sacral",
   "Solar Plexus",
@@ -91,7 +91,7 @@ const CHAKRA_COLORS: Record<string, string> = {
   Crown: "oklch(0.55 0.22 310)",
 };
 
-type ModeKey = "booster" | "fantasy" | "protection";
+type ModeKey = "booster" | "fantasy" | "protection" | "chakraAlignment";
 
 interface ModeConfig {
   key: ModeKey;
@@ -102,13 +102,6 @@ interface ModeConfig {
 }
 
 const MODES: ModeConfig[] = [
-  {
-    key: "booster",
-    label: "Booster",
-    description: "Amplify intensity and repetition density",
-    icon: Zap,
-    color: "oklch(0.78 0.18 90)",
-  },
   {
     key: "fantasy",
     label: "Fantasy-to-Reality",
@@ -123,6 +116,20 @@ const MODES: ModeConfig[] = [
     description: "Add grounding and resilience affirmations",
     icon: Shield,
     color: "oklch(0.62 0.2 145)",
+  },
+  {
+    key: "chakraAlignment",
+    label: "Chakra Alignment",
+    description: "Harmonize selected chakras into a unified energy alignment",
+    icon: CircleDot,
+    color: "oklch(0.62 0.22 295)",
+  },
+  {
+    key: "booster",
+    label: "Booster",
+    description: "Amplify intensity and repetition density",
+    icon: Zap,
+    color: "oklch(0.78 0.18 90)",
   },
 ];
 
@@ -186,9 +193,24 @@ const WAVEFORMS: { type: OscillatorType; label: string }[] = [
   { type: "sawtooth", label: "Sawtooth" },
 ];
 
+export interface SubliminalContext {
+  topic: string;
+  affirmations: string[];
+  modes: {
+    booster: boolean;
+    fantasy: boolean;
+    protection: boolean;
+    chakraAlignment: boolean;
+  };
+  selectedChakras: string[];
+  colorPalette: string;
+  themeStyle: string;
+}
+
 interface GeneratorPageProps {
   injectedTopic?: string;
   onInjectedTopicConsumed?: () => void;
+  onSubliminalUpdate?: (ctx: SubliminalContext) => void;
 }
 
 // ── Canvas subliminal video preview ──────────────────────────────────────────
@@ -510,7 +532,7 @@ function VideoPreview({
       ctx.textBaseline = "bottom";
       ctx.font = "14px 'Segoe UI', system-ui, sans-serif";
       ctx.fillStyle = "#ffffff";
-      const label = chakra !== "None" ? `${topic} · ${chakra} Chakra` : topic;
+      const label = chakra ? `${topic} · ${chakra} Chakra` : topic;
       ctx.fillText(label.toUpperCase(), W / 2, H - 14);
       ctx.restore();
     },
@@ -779,11 +801,11 @@ function VideoPreview({
           </div>
         )}
 
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <Button
             onClick={handleRecord}
             variant={isRecording ? "destructive" : "outline"}
-            className={`gap-2 font-heading font-semibold ${
+            className={`gap-2 font-heading font-semibold w-full sm:w-auto ${
               isRecording
                 ? "border-red-500/60"
                 : "border-accent/40 text-accent hover:bg-accent/10 hover:border-accent/70"
@@ -805,7 +827,7 @@ function VideoPreview({
           {downloadUrl && (
             <Button
               asChild
-              className="gap-2 bg-primary/90 hover:bg-primary font-heading font-semibold"
+              className="gap-2 bg-primary/90 hover:bg-primary font-heading font-semibold w-full sm:w-auto"
             >
               <a href={downloadUrl} download="synapse-subliminal.webm">
                 <Download className="w-4 h-4" />
@@ -830,6 +852,7 @@ function VideoPreview({
 export default function GeneratorPage({
   injectedTopic,
   onInjectedTopicConsumed,
+  onSubliminalUpdate,
 }: GeneratorPageProps = {}) {
   // Step 1 state
   const [topic, setTopic] = useState("");
@@ -837,8 +860,9 @@ export default function GeneratorPage({
     booster: false,
     fantasy: false,
     protection: false,
+    chakraAlignment: false,
   });
-  const [selectedChakra, setSelectedChakra] = useState("None");
+  const [selectedChakras, setSelectedChakras] = useState<string[]>([]);
 
   // Step 2 state
   const [affirmationCount, setAffirmationCount] = useState(50);
@@ -928,6 +952,18 @@ export default function GeneratorPage({
   const toggleMode = useCallback((key: ModeKey) => {
     setModes((prev) => ({ ...prev, [key]: !prev[key] }));
   }, []);
+
+  const handleToggleChakra = useCallback((name: string) => {
+    setSelectedChakras((prev) =>
+      prev.includes(name) ? prev.filter((c) => c !== name) : [...prev, name],
+    );
+  }, []);
+
+  const allChakrasSelected = selectedChakras.length === CHAKRAS.length;
+
+  const handleAllChakras = useCallback(() => {
+    setSelectedChakras(allChakrasSelected ? [] : [...CHAKRAS]);
+  }, [allChakrasSelected]);
 
   const handleToggleNatureSound = useCallback(() => {
     if (isNaturePlaying) {
@@ -1116,7 +1152,7 @@ export default function GeneratorPage({
         modes.booster,
         modes.fantasy,
         modes.protection,
-        selectedChakra === "None" ? "" : selectedChakra,
+        selectedChakras.join(", "),
       );
 
       if (aiResult && aiResult.length > 0) {
@@ -1124,6 +1160,14 @@ export default function GeneratorPage({
         setAffirmations(expanded);
         setGenerationSource("ai");
         toast.success(`Generated ${expanded.length} affirmations (AI)`);
+        onSubliminalUpdate?.({
+          topic,
+          affirmations: expanded,
+          modes,
+          selectedChakras,
+          colorPalette,
+          themeStyle,
+        });
         return;
       }
 
@@ -1132,12 +1176,20 @@ export default function GeneratorPage({
         boosterEnabled: modes.booster,
         fantasyEnabled: modes.fantasy,
         protectionEnabled: modes.protection,
-        chakraName: selectedChakra === "None" ? "" : selectedChakra,
+        chakraName: selectedChakras.join(", "),
       });
       const expanded = expandToCount(result, affirmationCount);
       setAffirmations(expanded);
       setGenerationSource("rule-based");
       toast.success(`Generated ${expanded.length} affirmations`);
+      onSubliminalUpdate?.({
+        topic,
+        affirmations: expanded,
+        modes,
+        selectedChakras,
+        colorPalette,
+        themeStyle,
+      });
     } catch (_e) {
       toast.error("Failed to generate affirmations. Please try again.");
     } finally {
@@ -1178,7 +1230,7 @@ export default function GeneratorPage({
           fantasy_to_reality: modes.fantasy,
           protection: modes.protection,
         },
-        chakra: selectedChakra === "None" ? null : selectedChakra,
+        chakra: selectedChakras,
         voice: {
           type: voiceType,
           pitch: voicePitch,
@@ -1301,7 +1353,7 @@ export default function GeneratorPage({
   };
 
   return (
-    <div className="container max-w-4xl mx-auto px-4 py-10 space-y-10">
+    <div className="container max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-10 space-y-6 sm:space-y-10">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -1309,10 +1361,10 @@ export default function GeneratorPage({
         transition={{ duration: 0.5 }}
         className="text-center space-y-3"
       >
-        <h1 className="font-display text-4xl md:text-5xl font-bold gradient-text glow-text-primary">
+        <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold gradient-text glow-text-primary">
           Subliminal Generator
         </h1>
-        <p className="text-muted-foreground text-base max-w-lg mx-auto">
+        <p className="text-muted-foreground text-sm sm:text-base max-w-lg mx-auto">
           Program your subconscious with precision-crafted affirmations, layered
           audio, and cinematic visuals.
         </p>
@@ -1323,7 +1375,7 @@ export default function GeneratorPage({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.4 }}
-        className="glass-card rounded-2xl p-6 space-y-6"
+        className="glass-card rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-6"
         aria-label="Step 1: Intent Panel"
       >
         <div className="flex items-center gap-3 mb-2">
@@ -1354,7 +1406,7 @@ export default function GeneratorPage({
           <Label className="text-sm text-muted-foreground">
             Enhancement Modes
           </Label>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {MODES.map((mode) => {
               const Icon = mode.icon;
               const active = modes[mode.key];
@@ -1415,17 +1467,41 @@ export default function GeneratorPage({
         {/* Chakra selector */}
         <div className="space-y-3">
           <Label className="text-sm text-muted-foreground">
-            Chakra Alignment
+            Chakra Selection
           </Label>
           <div className="flex flex-wrap gap-2">
+            {/* All Chakras pill */}
+            <button
+              type="button"
+              onClick={handleAllChakras}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+                allChakrasSelected
+                  ? "text-white"
+                  : "text-muted-foreground bg-secondary/50 hover:bg-secondary border border-border/50 hover:border-border"
+              }`}
+              style={
+                allChakrasSelected
+                  ? {
+                      background:
+                        "linear-gradient(135deg, oklch(0.58 0.22 25), oklch(0.65 0.2 48), oklch(0.78 0.18 90), oklch(0.62 0.2 145), oklch(0.58 0.2 220), oklch(0.5 0.22 270), oklch(0.55 0.22 310))",
+                      borderColor: "transparent",
+                    }
+                  : undefined
+              }
+              aria-pressed={allChakrasSelected}
+            >
+              All Chakras
+            </button>
+
+            {/* Individual chakra pills */}
             {CHAKRAS.map((chakra) => {
-              const isSelected = selectedChakra === chakra;
+              const isSelected = selectedChakras.includes(chakra);
               const color = CHAKRA_COLORS[chakra];
               return (
                 <button
                   type="button"
                   key={chakra}
-                  onClick={() => setSelectedChakra(chakra)}
+                  onClick={() => handleToggleChakra(chakra)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
                     isSelected
                       ? "text-white"
@@ -1443,6 +1519,13 @@ export default function GeneratorPage({
               );
             })}
           </div>
+          {selectedChakras.length > 0 && (
+            <p className="text-xs text-muted-foreground">
+              {selectedChakras.length === CHAKRAS.length
+                ? "All 7 chakras selected — full alignment mode"
+                : `${selectedChakras.length} chakra${selectedChakras.length > 1 ? "s" : ""} selected`}
+            </p>
+          )}
         </div>
       </motion.section>
 
@@ -1451,7 +1534,7 @@ export default function GeneratorPage({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.4 }}
-        className="glass-card rounded-2xl p-6 space-y-6"
+        className="glass-card rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-6"
         aria-label="Step 2: Generate Affirmations"
       >
         <div className="flex items-center gap-3 mb-2">
@@ -1480,7 +1563,7 @@ export default function GeneratorPage({
                     Math.max(1, Math.min(4000, Number(e.target.value) || 1)),
                   )
                 }
-                className="w-20 h-8 text-sm text-center bg-input/50 border-border/50 focus:border-primary/50"
+                className="w-16 sm:w-20 h-8 text-sm text-center bg-input/50 border-border/50 focus:border-primary/50"
               />
               <span className="text-xs text-muted-foreground">/ 4000 max</span>
             </div>
@@ -1638,7 +1721,7 @@ export default function GeneratorPage({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3, duration: 0.4 }}
-        className="glass-card rounded-2xl p-6"
+        className="glass-card rounded-2xl p-4 sm:p-6"
         aria-label="Step 3: Project Configuration"
       >
         <div className="flex items-center gap-3 mb-6">
@@ -2022,7 +2105,7 @@ export default function GeneratorPage({
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-background/40 border border-border/30">
                   <Label htmlFor="waveform" className="text-sm cursor-pointer">
                     Waveform Overlay
@@ -2445,7 +2528,7 @@ export default function GeneratorPage({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4, duration: 0.4 }}
-        className="glass-card rounded-2xl p-6 space-y-6"
+        className="glass-card rounded-2xl p-4 sm:p-6 space-y-4 sm:space-y-6"
         aria-label="Step 4: Build Project JSON"
       >
         <div className="flex items-center gap-3 mb-2">
@@ -2529,7 +2612,7 @@ export default function GeneratorPage({
                   <VideoPreview
                     affirmations={affirmations}
                     topic={topic}
-                    chakra={selectedChakra}
+                    chakra={selectedChakras.join(", ")}
                     palette={colorPalette}
                     theme={themeStyle}
                     duration={duration}
@@ -2546,18 +2629,18 @@ export default function GeneratorPage({
               </AnimatePresence>
 
               {/* Save project */}
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Input
                   value={saveTitle}
                   onChange={(e) => setSaveTitle(e.target.value)}
                   placeholder="Project title..."
-                  className="bg-input/50 border-border/50 focus:border-primary/50"
+                  className="bg-input/50 border-border/50 focus:border-primary/50 w-full"
                   onKeyDown={(e) => e.key === "Enter" && handleSave()}
                 />
                 <Button
                   onClick={handleSave}
                   disabled={saveMutation.isPending || !saveTitle.trim()}
-                  className="shrink-0 bg-primary/90 hover:bg-primary"
+                  className="shrink-0 bg-primary/90 hover:bg-primary w-full sm:w-auto"
                 >
                   {saveMutation.isPending ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -2581,7 +2664,7 @@ export default function GeneratorPage({
         aria-label="Saved Projects"
       >
         <Collapsible open={projectsOpen} onOpenChange={setProjectsOpen}>
-          <CollapsibleTrigger className="w-full flex items-center justify-between p-6 hover:bg-white/5 transition-colors">
+          <CollapsibleTrigger className="w-full flex items-center justify-between p-4 sm:p-6 hover:bg-white/5 transition-colors">
             <div className="flex items-center gap-3">
               <FolderOpen className="w-4 h-4 text-accent" />
               <h2 className="font-heading text-lg font-semibold">
@@ -2604,7 +2687,7 @@ export default function GeneratorPage({
           </CollapsibleTrigger>
 
           <CollapsibleContent>
-            <div className="px-6 pb-6 space-y-3">
+            <div className="px-3 sm:px-6 pb-4 sm:pb-6 space-y-3">
               {projectsLoading && (
                 <div className="space-y-2">
                   {["p-sk-1", "p-sk-2", "p-sk-3"].map((k) => (

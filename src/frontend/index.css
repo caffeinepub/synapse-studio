@@ -206,6 +206,15 @@
     border: 1px solid oklch(var(--border) / 0.5);
   }
 
+  /* Hide scrollbar utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Scrollbar */
   ::-webkit-scrollbar {
     width: 6px;

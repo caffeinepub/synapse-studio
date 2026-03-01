@@ -5,11 +5,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BookOpen,
   ExternalLink,
+  Info,
   Loader2,
   Search,
   Sparkles,
+  Tag,
   User,
   Wand2,
+  X,
   Zap,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -1257,6 +1260,66 @@ const POWER_WIKIS: WikiInfo[] = [
   },
 ];
 
+// ── Tag-scoped search utilities ─────────────────────────────────────────────
+
+interface TagScopeInfo {
+  tag: string;
+  wikis: WikiInfo[];
+  label: string;
+}
+
+function parseTaggedQuery(input: string): {
+  tag: string | null;
+  query: string;
+} {
+  // Match: "Tag Name": query  OR  "Tag Name":query
+  const match = input.match(/^"([^"]+)"\s*:\s*(.+)$/);
+  if (match) {
+    return { tag: match[1].trim(), query: match[2].trim() };
+  }
+  return { tag: null, query: input.trim() };
+}
+
+function getWikisForTag(
+  tag: string,
+  pool: WikiInfo[],
+): { wikis: WikiInfo[]; label: string } {
+  const lower = tag.toLowerCase();
+  const matched = pool.filter(
+    (w) =>
+      w.name.toLowerCase().includes(lower) ||
+      w.hub?.toLowerCase().includes(lower) ||
+      w.id.toLowerCase().includes(lower),
+  );
+  if (matched.length === 0) {
+    return { wikis: pool, label: `No wiki matched "${tag}" — searching all` };
+  }
+  if (matched.length === 1) {
+    return { wikis: matched, label: `Scoped to: ${matched[0].name}` };
+  }
+  return {
+    wikis: matched,
+    label: `Scoped to: ${matched.length} wikis matching "${tag}"`,
+  };
+}
+
+function resolveSearchScope(
+  rawQuery: string,
+  pool: WikiInfo[],
+): { query: string; scope: TagScopeInfo | null } {
+  const parsed = parseTaggedQuery(rawQuery);
+  if (!parsed.tag) {
+    return { query: parsed.query, scope: null };
+  }
+  const { wikis, label } = getWikisForTag(parsed.tag, pool);
+  return {
+    query: parsed.query,
+    scope: { tag: parsed.tag, wikis, label },
+  };
+}
+
+// ── End tag-scoped search utilities ──────────────────────────────────────────
+
 function stripHtml(html: string): string {
   return html
     .replace(/<[^>]*>/g, "")
@@ -1427,6 +1490,7 @@ export default function WikiSearchPage({
   const [unifiedResults, setUnifiedResults] = useState<WikiResult[]>([]);
   const [unifiedLoading, setUnifiedLoading] = useState(false);
   const [unifiedSearched, setUnifiedSearched] = useState(false);
+  const [unifiedScope, setUnifiedScope] = useState<TagScopeInfo | null>(null);
 
   // Tab-specific search state
   const [characterQuery, setCharacterQuery] = useState("");
@@ -1437,19 +1501,26 @@ export default function WikiSearchPage({
   const [powersLoading, setPowersLoading] = useState(false);
   const [characterSearched, setCharacterSearched] = useState(false);
   const [powersSearched, setPowersSearched] = useState(false);
+  const [characterScope, setCharacterScope] = useState<TagScopeInfo | null>(
+    null,
+  );
+  const [powersScope, setPowersScope] = useState<TagScopeInfo | null>(null);
 
   const handleUnifiedSearch = useCallback(async () => {
     if (!unifiedQuery.trim()) {
       toast.error("Enter a search term.");
       return;
     }
+    const { query, scope } = resolveSearchScope(
+      unifiedQuery.trim(),
+      POWER_WIKIS,
+    );
+    const searchPool = scope ? scope.wikis : POWER_WIKIS;
+    setUnifiedScope(scope);
     setUnifiedLoading(true);
     setUnifiedSearched(true);
     try {
-      const results = await searchMultipleWikis(
-        POWER_WIKIS,
-        unifiedQuery.trim(),
-      );
+      const results = await searchMultipleWikis(searchPool, query);
       setUnifiedResults(results);
       if (results.length === 0)
         toast.info("No results found. Try a different term.");
@@ -1465,13 +1536,16 @@ export default function WikiSearchPage({
       toast.error("Enter a character name to search.");
       return;
     }
+    const { query, scope } = resolveSearchScope(
+      characterQuery.trim(),
+      CHARACTER_WIKIS,
+    );
+    const searchPool = scope ? scope.wikis : CHARACTER_WIKIS;
+    setCharacterScope(scope);
     setCharacterLoading(true);
     setCharacterSearched(true);
     try {
-      const results = await searchMultipleWikis(
-        CHARACTER_WIKIS,
-        characterQuery.trim(),
-      );
+      const results = await searchMultipleWikis(searchPool, query);
       setCharacterResults(results);
       if (results.length === 0)
         toast.info("No results found. Try a different name.");
@@ -1487,13 +1561,16 @@ export default function WikiSearchPage({
       toast.error("Enter a power or ability to search.");
       return;
     }
+    const { query, scope } = resolveSearchScope(
+      powersQuery.trim(),
+      POWERS_WIKIS,
+    );
+    const searchPool = scope ? scope.wikis : POWERS_WIKIS;
+    setPowersScope(scope);
     setPowersLoading(true);
     setPowersSearched(true);
     try {
-      const results = await searchMultipleWikis(
-        POWERS_WIKIS,
-        powersQuery.trim(),
-      );
+      const results = await searchMultipleWikis(searchPool, query);
       setPowersResults(results);
       if (results.length === 0)
         toast.info("No results found. Try a different term.");
@@ -1505,7 +1582,7 @@ export default function WikiSearchPage({
   }, [powersQuery]);
 
   return (
-    <div className="container max-w-4xl mx-auto px-4 py-10 space-y-10">
+    <div className="container max-w-4xl mx-auto px-3 sm:px-4 py-6 sm:py-10 space-y-6 sm:space-y-10">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -1513,10 +1590,10 @@ export default function WikiSearchPage({
         transition={{ duration: 0.5 }}
         className="text-center space-y-3"
       >
-        <h1 className="font-display text-4xl md:text-5xl font-bold gradient-text glow-text-primary">
+        <h1 className="font-display text-2xl sm:text-4xl md:text-5xl font-bold gradient-text glow-text-primary">
           Wiki Search
         </h1>
-        <p className="text-muted-foreground text-base max-w-lg mx-auto">
+        <p className="text-muted-foreground text-sm sm:text-base max-w-lg mx-auto">
           Search characters, powers, and abilities across {POWER_WIKIS.length}+
           official Fandom wikis — then send results straight to the subliminal
           generator.
@@ -1545,25 +1622,46 @@ export default function WikiSearchPage({
           </div>
         </div>
 
-        <div className="flex gap-2">
+        {/* Tag syntax tip */}
+        <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/15">
+          <Info className="w-3.5 h-3.5 text-primary/60 mt-0.5 shrink-0" />
+          <p className="text-xs text-muted-foreground">
+            <span className="text-primary/80 font-medium">Tip:</span> Use{" "}
+            <code className="px-1 py-0.5 rounded bg-primary/10 text-primary text-[11px]">
+              "Wiki Name": search term
+            </code>{" "}
+            to scope results, e.g.{" "}
+            <code className="px-1 py-0.5 rounded bg-primary/10 text-primary text-[11px]">
+              "Hazbin Hotel": Alastor
+            </code>
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-2">
           <Input
             value={unifiedQuery}
-            onChange={(e) => setUnifiedQuery(e.target.value)}
+            onChange={(e) => {
+              setUnifiedQuery(e.target.value);
+              if (unifiedSearched) {
+                setUnifiedScope(null);
+                setUnifiedSearched(false);
+              }
+            }}
             onKeyDown={(e) => e.key === "Enter" && handleUnifiedSearch()}
-            placeholder="e.g. Naruto, Telekinesis, Thor, Sharingan, One For All..."
-            className="bg-input/50 border-border/50 focus:border-primary/50 text-base h-12"
+            placeholder={`e.g. "Hazbin Hotel": Alastor  or  Telekinesis, Goku...`}
+            className="bg-input/50 border-border/50 focus:border-primary/50 text-base h-12 w-full"
           />
           <Button
             onClick={handleUnifiedSearch}
             disabled={unifiedLoading}
-            className="shrink-0 bg-primary/90 hover:bg-primary h-12 px-5"
+            className="shrink-0 bg-primary/90 hover:bg-primary h-12 px-5 w-full sm:w-auto"
           >
             {unifiedLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <Search className="w-4 h-4" />
             )}
-            <span className="ml-2 hidden sm:inline">Search</span>
+            <span className="ml-2">Search All Wikis</span>
           </Button>
         </div>
 
@@ -1626,6 +1724,32 @@ export default function WikiSearchPage({
               animate={{ opacity: 1 }}
               className="space-y-3"
             >
+              {/* Scope badge */}
+              {unifiedScope && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex items-center gap-2 flex-wrap"
+                >
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/25 text-xs text-primary font-medium">
+                    <Tag className="w-3 h-3" />
+                    {unifiedScope.label}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setUnifiedQuery("");
+                      setUnifiedScope(null);
+                      setUnifiedSearched(false);
+                      setUnifiedResults([]);
+                    }}
+                    className="flex items-center gap-1 px-2 py-1 rounded-full text-xs text-muted-foreground hover:text-foreground border border-border/40 hover:border-border/70 transition-all"
+                  >
+                    <X className="w-3 h-3" />
+                    Clear
+                  </button>
+                </motion.div>
+              )}
               {unifiedResults.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-8">
                   No results found. Try a different term.
@@ -1633,7 +1757,10 @@ export default function WikiSearchPage({
               ) : (
                 <>
                   <p className="text-xs text-muted-foreground">
-                    {unifiedResults.length} results across all wikis
+                    {unifiedResults.length} results
+                    {unifiedScope
+                      ? ` in ${unifiedScope.wikis.length === 1 ? unifiedScope.wikis[0].name : `${unifiedScope.wikis.length} wikis`}`
+                      : " across all wikis"}
                   </p>
                   <ResultList
                     results={unifiedResults}
@@ -1688,27 +1815,48 @@ export default function WikiSearchPage({
                 </div>
               </div>
 
-              <div className="flex gap-2">
+              {/* Tag syntax tip */}
+              <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/15">
+                <Info className="w-3.5 h-3.5 text-primary/60 mt-0.5 shrink-0" />
+                <p className="text-xs text-muted-foreground">
+                  <span className="text-primary/80 font-medium">Tip:</span> Use{" "}
+                  <code className="px-1 py-0.5 rounded bg-primary/10 text-primary text-[11px]">
+                    "Wiki Name": search term
+                  </code>{" "}
+                  to scope results, e.g.{" "}
+                  <code className="px-1 py-0.5 rounded bg-primary/10 text-primary text-[11px]">
+                    "Naruto": Sasuke
+                  </code>
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Input
                   value={characterQuery}
-                  onChange={(e) => setCharacterQuery(e.target.value)}
+                  onChange={(e) => {
+                    setCharacterQuery(e.target.value);
+                    if (characterSearched) {
+                      setCharacterScope(null);
+                      setCharacterSearched(false);
+                    }
+                  }}
                   onKeyDown={(e) =>
                     e.key === "Enter" && handleCharacterSearch()
                   }
-                  placeholder="e.g. Naruto Uzumaki, Spider-Man, Goku..."
-                  className="bg-input/50 border-border/50 focus:border-primary/50"
+                  placeholder={`e.g. "Naruto": Sasuke  or  Spider-Man, Goku...`}
+                  className="bg-input/50 border-border/50 focus:border-primary/50 w-full"
                 />
                 <Button
                   onClick={handleCharacterSearch}
                   disabled={characterLoading}
-                  className="shrink-0 bg-primary/90 hover:bg-primary"
+                  className="shrink-0 bg-primary/90 hover:bg-primary w-full sm:w-auto"
                 >
                   {characterLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <Search className="w-4 h-4" />
                   )}
-                  <span className="ml-2 hidden sm:inline">Search</span>
+                  <span className="ml-2">Search</span>
                 </Button>
               </div>
 
@@ -1721,7 +1869,11 @@ export default function WikiSearchPage({
                     className="flex items-center gap-2 text-sm text-muted-foreground py-4"
                   >
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Searching across {CHARACTER_WIKIS.length} Fandom wikis...
+                    Searching across{" "}
+                    {characterScope
+                      ? characterScope.wikis.length
+                      : CHARACTER_WIKIS.length}{" "}
+                    Fandom wikis...
                   </motion.div>
                 )}
 
@@ -1731,6 +1883,32 @@ export default function WikiSearchPage({
                     animate={{ opacity: 1 }}
                     className="space-y-3"
                   >
+                    {/* Scope badge */}
+                    {characterScope && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex items-center gap-2 flex-wrap"
+                      >
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/25 text-xs text-primary font-medium">
+                          <Tag className="w-3 h-3" />
+                          {characterScope.label}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCharacterQuery("");
+                            setCharacterScope(null);
+                            setCharacterSearched(false);
+                            setCharacterResults([]);
+                          }}
+                          className="flex items-center gap-1 px-2 py-1 rounded-full text-xs text-muted-foreground hover:text-foreground border border-border/40 hover:border-border/70 transition-all"
+                        >
+                          <X className="w-3 h-3" />
+                          Clear
+                        </button>
+                      </motion.div>
+                    )}
                     {characterResults.length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-8">
                         No results found. Try a different character name.
@@ -1739,6 +1917,9 @@ export default function WikiSearchPage({
                       <>
                         <p className="text-xs text-muted-foreground">
                           {characterResults.length} results found
+                          {characterScope
+                            ? ` in ${characterScope.wikis.length === 1 ? characterScope.wikis[0].name : `${characterScope.wikis.length} wikis`}`
+                            : ""}
                         </p>
                         <ResultList
                           results={characterResults}
@@ -1770,25 +1951,46 @@ export default function WikiSearchPage({
                 </div>
               </div>
 
-              <div className="flex gap-2">
+              {/* Tag syntax tip */}
+              <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-accent/5 border border-accent/15">
+                <Info className="w-3.5 h-3.5 text-accent/60 mt-0.5 shrink-0" />
+                <p className="text-xs text-muted-foreground">
+                  <span className="text-accent/80 font-medium">Tip:</span> Use{" "}
+                  <code className="px-1 py-0.5 rounded bg-accent/10 text-accent text-[11px]">
+                    "Wiki Name": search term
+                  </code>{" "}
+                  to scope results, e.g.{" "}
+                  <code className="px-1 py-0.5 rounded bg-accent/10 text-accent text-[11px]">
+                    "Dragon Ball": Ki Blast
+                  </code>
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Input
                   value={powersQuery}
-                  onChange={(e) => setPowersQuery(e.target.value)}
+                  onChange={(e) => {
+                    setPowersQuery(e.target.value);
+                    if (powersSearched) {
+                      setPowersScope(null);
+                      setPowersSearched(false);
+                    }
+                  }}
                   onKeyDown={(e) => e.key === "Enter" && handlePowersSearch()}
-                  placeholder="e.g. Telekinesis, Sharingan, Super strength, Energy manipulation..."
-                  className="bg-input/50 border-border/50 focus:border-accent/50"
+                  placeholder={`e.g. "Dragon Ball": Ki Blast  or  Telekinesis, Sharingan...`}
+                  className="bg-input/50 border-border/50 focus:border-accent/50 w-full"
                 />
                 <Button
                   onClick={handlePowersSearch}
                   disabled={powersLoading}
-                  className="shrink-0 bg-accent/90 hover:bg-accent text-white"
+                  className="shrink-0 bg-accent/90 hover:bg-accent text-white w-full sm:w-auto"
                 >
                   {powersLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
                     <Search className="w-4 h-4" />
                   )}
-                  <span className="ml-2 hidden sm:inline">Search</span>
+                  <span className="ml-2">Search</span>
                 </Button>
               </div>
 
@@ -1836,7 +2038,11 @@ export default function WikiSearchPage({
                     className="flex items-center gap-2 text-sm text-muted-foreground py-4"
                   >
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Searching across {POWERS_WIKIS.length} Fandom wikis...
+                    Searching across{" "}
+                    {powersScope
+                      ? powersScope.wikis.length
+                      : POWERS_WIKIS.length}{" "}
+                    Fandom wikis...
                   </motion.div>
                 )}
 
@@ -1846,6 +2052,32 @@ export default function WikiSearchPage({
                     animate={{ opacity: 1 }}
                     className="space-y-3"
                   >
+                    {/* Scope badge */}
+                    {powersScope && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="flex items-center gap-2 flex-wrap"
+                      >
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/25 text-xs text-accent font-medium">
+                          <Tag className="w-3 h-3" />
+                          {powersScope.label}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPowersQuery("");
+                            setPowersScope(null);
+                            setPowersSearched(false);
+                            setPowersResults([]);
+                          }}
+                          className="flex items-center gap-1 px-2 py-1 rounded-full text-xs text-muted-foreground hover:text-foreground border border-border/40 hover:border-border/70 transition-all"
+                        >
+                          <X className="w-3 h-3" />
+                          Clear
+                        </button>
+                      </motion.div>
+                    )}
                     {powersResults.length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-8">
                         No results found. Try a different power name.
@@ -1854,6 +2086,9 @@ export default function WikiSearchPage({
                       <>
                         <p className="text-xs text-muted-foreground">
                           {powersResults.length} results found
+                          {powersScope
+                            ? ` in ${powersScope.wikis.length === 1 ? powersScope.wikis[0].name : `${powersScope.wikis.length} wikis`}`
+                            : ""}
                         </p>
                         <ResultList
                           results={powersResults}
@@ -1937,9 +2172,9 @@ function ResultList({
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.03 }}
-          className="p-4 rounded-xl bg-secondary/20 border border-border/40 hover:border-border/70 transition-all group"
+          className="p-3 sm:p-4 rounded-xl bg-secondary/20 border border-border/40 hover:border-border/70 transition-all group"
         >
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
             <div className="flex-1 min-w-0 space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
                 <h4 className="font-heading text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate">
@@ -1958,16 +2193,16 @@ function ResultList({
                 </p>
               )}
             </div>
-            <div className="flex flex-col gap-1.5 shrink-0 items-end">
+            <div className="flex flex-row gap-2 sm:flex-col sm:gap-1.5 shrink-0 sm:items-end">
               <a
                 href={r.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1 text-xs text-accent hover:text-accent/80 transition-colors"
+                className="flex items-center gap-1 text-xs text-accent hover:text-accent/80 transition-colors px-2 py-1 rounded-lg border border-accent/20 hover:border-accent/40 min-h-[32px]"
                 aria-label={`Open ${r.title} on ${r.wikiName}`}
               >
                 <ExternalLink className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">View</span>
+                <span>View</span>
               </a>
               {onUseForSubliminal && (
                 <button
@@ -1977,11 +2212,11 @@ function ResultList({
                     onUseForSubliminal(topic);
                     toast.success(`"${r.title}" sent to generator`);
                   }}
-                  className="flex items-center gap-1 text-xs text-primary/80 hover:text-primary transition-colors"
+                  className="flex items-center gap-1 text-xs text-primary/80 hover:text-primary transition-colors px-2 py-1 rounded-lg border border-primary/20 hover:border-primary/40 min-h-[32px]"
                   title="Use this result as subliminal topic"
                 >
                   <Wand2 className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Use</span>
+                  <span>Use</span>
                 </button>
               )}
             </div>

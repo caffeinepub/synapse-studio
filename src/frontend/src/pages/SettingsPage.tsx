@@ -152,7 +152,7 @@ export default function SettingsPage() {
   const currentModels = provider === "groq" ? GROQ_MODELS : GEMINI_MODELS;
 
   return (
-    <div className="container max-w-3xl mx-auto px-4 py-10 space-y-8">
+    <div className="container max-w-3xl mx-auto px-3 sm:px-4 py-6 sm:py-10 space-y-6 sm:space-y-8">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -214,7 +214,7 @@ export default function SettingsPage() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3">
           {PROVIDERS.map((p) => {
             const Icon = p.icon;
             const isSelected = provider === p.id;
@@ -426,7 +426,7 @@ export default function SettingsPage() {
           How It Works
         </h2>
         <Separator className="bg-border/40" />
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm mt-2">
           <div className="space-y-1.5">
             <div className="w-7 h-7 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center">
               <span className="text-[11px] font-mono text-primary">1</span>

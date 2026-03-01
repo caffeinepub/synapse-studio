@@ -2,16 +2,44 @@ import { Toaster } from "@/components/ui/sonner";
 import { useState } from "react";
 import NavBar from "./components/NavBar";
 import EnergyLibraryPage from "./pages/EnergyLibraryPage";
-import GeneratorPage from "./pages/GeneratorPage";
+import GeneratorPage, { type SubliminalContext } from "./pages/GeneratorPage";
 import KinesisArchivePage from "./pages/KinesisArchivePage";
+import ReligionsPage from "./pages/ReligionsPage";
+import RitualsPage from "./pages/RitualsPage";
 import SettingsPage from "./pages/SettingsPage";
+import SpellsPage from "./pages/SpellsPage";
+import SpiritualEntitiesPage from "./pages/SpiritualEntitiesPage";
 import WikiSearchPage from "./pages/WikiSearchPage";
+import YouTubePage from "./pages/YouTubePage";
 
-type Page = "generator" | "energy" | "kinesis" | "wiki" | "settings";
+type Page =
+  | "generator"
+  | "energy"
+  | "kinesis"
+  | "wiki"
+  | "religions"
+  | "entities"
+  | "spells"
+  | "rituals"
+  | "settings"
+  | "youtube";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("generator");
   const [wikiInjectedTopic, setWikiInjectedTopic] = useState<string>("");
+  const [subliminalCtx, setSubliminalCtx] = useState<SubliminalContext>({
+    topic: "",
+    affirmations: [],
+    modes: {
+      booster: false,
+      fantasy: false,
+      protection: false,
+      chakraAlignment: false,
+    },
+    selectedChakras: [],
+    colorPalette: "Violet/Indigo",
+    themeStyle: "Dark Cosmic",
+  });
 
   const handleUseForSubliminal = (topic: string) => {
     setWikiInjectedTopic(topic);
@@ -49,6 +77,7 @@ export default function App() {
             <GeneratorPage
               injectedTopic={wikiInjectedTopic}
               onInjectedTopicConsumed={() => setWikiInjectedTopic("")}
+              onSubliminalUpdate={setSubliminalCtx}
             />
           )}
           {currentPage === "energy" && <EnergyLibraryPage />}
@@ -56,10 +85,31 @@ export default function App() {
           {currentPage === "wiki" && (
             <WikiSearchPage onUseForSubliminal={handleUseForSubliminal} />
           )}
+          {currentPage === "religions" && (
+            <ReligionsPage onUseForSubliminal={handleUseForSubliminal} />
+          )}
+          {currentPage === "entities" && (
+            <SpiritualEntitiesPage
+              onUseForSubliminal={handleUseForSubliminal}
+            />
+          )}
+          {currentPage === "spells" && (
+            <SpellsPage onUseForSubliminal={handleUseForSubliminal} />
+          )}
+          {currentPage === "rituals" && (
+            <RitualsPage onUseForSubliminal={handleUseForSubliminal} />
+          )}
           {currentPage === "settings" && <SettingsPage />}
+          {currentPage === "youtube" && (
+            <YouTubePage
+              injectedTopic={wikiInjectedTopic}
+              onInjectedTopicConsumed={() => setWikiInjectedTopic("")}
+              subliminalCtx={subliminalCtx}
+            />
+          )}
         </main>
 
-        <footer className="text-center py-6 text-muted-foreground text-xs border-t border-border/40 mt-12">
+        <footer className="text-center py-4 sm:py-6 text-muted-foreground text-xs border-t border-border/40 mt-8 sm:mt-12 px-4">
           <span>
             © {new Date().getFullYear()}. Built with{" "}
             <span className="text-primary">♥</span> using{" "}
