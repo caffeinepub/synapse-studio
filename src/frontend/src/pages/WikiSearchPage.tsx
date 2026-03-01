@@ -1341,8 +1341,10 @@ async function searchWiki(
     list: "search",
     srsearch: query,
     srlimit: String(limit),
+    srnamespace: "0", // main article namespace only — no categories, files, talk pages
     srinfo: "totalhits",
-    srprop: "snippet|titlesnippet",
+    srprop: "snippet|titlesnippet|size|wordcount",
+    srsort: "relevance",
     format: "json",
     origin: "*",
   });
@@ -1366,6 +1368,35 @@ async function searchWiki(
   }
 }
 
+/** Score a result by how closely the title matches the query. Higher = better. */
+function scoreResult(result: WikiResult, query: string): number {
+  const queryLower = query.toLowerCase();
+  const titleLower = result.title.toLowerCase();
+  let score = 0;
+
+  // Exact title match is highest priority
+  if (titleLower === queryLower) score += 100;
+  // Title starts with query
+  else if (titleLower.startsWith(queryLower)) score += 60;
+  // Title contains query as whole word
+  else if (
+    new RegExp(
+      `\\b${queryLower.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
+    ).test(titleLower)
+  )
+    score += 40;
+  // Title contains query substring
+  else if (titleLower.includes(queryLower)) score += 20;
+
+  // Penalize disambiguation, list, and namespace pages
+  if (/\(disambiguation\)/i.test(result.title)) score -= 30;
+  if (/^list of/i.test(result.title)) score -= 20;
+  if (/^category:/i.test(result.title)) score -= 50;
+  if (/^talk:/i.test(result.title)) score -= 50;
+
+  return score;
+}
+
 async function searchMultipleWikis(
   wikis: WikiInfo[],
   query: string,
@@ -1379,14 +1410,29 @@ async function searchMultipleWikis(
       results.push(...r.value);
     }
   }
+
   // Deduplicate by title+domain
   const seen = new Set<string>();
-  return results.filter((r) => {
+  const deduped = results.filter((r) => {
     const key = `${r.wikiDomain}::${r.title}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
   });
+
+  return deduped
+    .filter((r) => {
+      const t = r.title;
+      // Remove namespace pages that slipped through
+      if (/^(category|file|template|talk|user|help|mediawiki):/i.test(t))
+        return false;
+      // Remove meta content pages (season, episode, volume, chapter entries)
+      if (/\((season|episode|volume|chapter|arc|part)\s*\d*/i.test(t))
+        return false;
+      return true;
+    })
+    .sort((a, b) => scoreResult(b, query) - scoreResult(a, query))
+    .slice(0, 50); // max 50 results
 }
 
 const CHARACTER_WIKIS = POWER_WIKIS.filter((w) => w.id !== "powerlisting");
