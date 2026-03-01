@@ -40,12 +40,14 @@ import {
   Leaf,
   Loader2,
   Music,
+  Package,
   Play,
   Save,
   Shield,
   Square,
   Star,
   Trash2,
+  User,
   Video,
   Volume2,
   VolumeX,
@@ -106,7 +108,7 @@ const MODES: ModeConfig[] = [
     key: "fantasy",
     label: "Fantasy-to-Reality",
     description:
-      "Opens the subconscious to symbolic empowerment and reality expansion",
+      "Physically brings fictional powers, characters, and items into your reality",
     icon: Star,
     color: "oklch(0.62 0.22 295)",
   },
@@ -259,10 +261,20 @@ function VideoPreview({
     null,
   );
   const stopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ffmpegRef = useRef<any | null>(null);
+  const ttsRecorderRef = useRef<MediaRecorder | null>(null);
+  const ttsChunksRef = useRef<Blob[]>([]);
+  const ttsMicStreamRef = useRef<MediaStream | null>(null);
 
   const [isRecording, setIsRecording] = useState(false);
   const [progress, setProgress] = useState(0);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [isConverting, setIsConverting] = useState(false);
+  const [mp4Url, setMp4Url] = useState<string | null>(null);
+  const [webmFallbackUrl, setWebmFallbackUrl] = useState<string | null>(null);
+  const [isTTSRecording, setIsTTSRecording] = useState(false);
+  const [ttsAudioUrl, setTtsAudioUrl] = useState<string | null>(null);
 
   const previewDuration = Math.min(duration, 120);
   const colors = PALETTE_COLORS[palette] ?? PALETTE_COLORS["Violet/Indigo"];
@@ -611,6 +623,9 @@ function VideoPreview({
 
     chunksRef.current = [];
     setDownloadUrl(null);
+    setMp4Url(null);
+    setWebmFallbackUrl(null);
+    setIsConverting(false);
     setProgress(0);
 
     // ── Build combined stream (canvas video + synthesized audio) ──
@@ -704,7 +719,7 @@ function VideoPreview({
       if (e.data.size > 0) chunksRef.current.push(e.data);
     };
 
-    recorder.onstop = () => {
+    recorder.onstop = async () => {
       setIsRecording(false);
       setProgress(100);
       // Stop audio after recorder stops
@@ -720,9 +735,69 @@ function VideoPreview({
       }
       window.speechSynthesis?.cancel();
       const blob = new Blob(chunksRef.current, { type: mimeType });
-      const url = URL.createObjectURL(blob);
-      setDownloadUrl(url);
-      toast.success("Video ready! Click Download to save your subliminal.");
+
+      // ── Convert WebM → MP4 via ffmpeg.wasm ──
+      setIsConverting(true);
+      setMp4Url(null);
+      setWebmFallbackUrl(null);
+
+      try {
+        // Dynamically import ffmpeg to avoid bundling it up front
+        const { FFmpeg } = await import("@ffmpeg/ffmpeg");
+        const { fetchFile, toBlobURL } = await import("@ffmpeg/util");
+
+        if (!ffmpegRef.current) {
+          ffmpegRef.current = new FFmpeg();
+        }
+        const ffmpeg = ffmpegRef.current;
+
+        if (!ffmpeg.loaded) {
+          const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+          await ffmpeg.load({
+            coreURL: await toBlobURL(
+              `${baseURL}/ffmpeg-core.js`,
+              "text/javascript",
+            ),
+            wasmURL: await toBlobURL(
+              `${baseURL}/ffmpeg-core.wasm`,
+              "application/wasm",
+            ),
+          });
+        }
+
+        await ffmpeg.writeFile("input.webm", await fetchFile(blob));
+        await ffmpeg.exec([
+          "-i",
+          "input.webm",
+          "-c:v",
+          "copy",
+          "-c:a",
+          "aac",
+          "output.mp4",
+        ]);
+        const data = await ffmpeg.readFile("output.mp4");
+        // @ffmpeg/ffmpeg readFile returns Uint8Array | string; convert to safe BlobPart
+        const rawData = data as Uint8Array | string;
+        const mp4BlobParts: BlobPart[] =
+          typeof rawData === "string"
+            ? [rawData]
+            : [new Uint8Array(rawData.buffer as ArrayBuffer)];
+        const mp4Blob = new Blob(mp4BlobParts, { type: "video/mp4" });
+        const mp4ObjectUrl = URL.createObjectURL(mp4Blob);
+        setMp4Url(mp4ObjectUrl);
+        setDownloadUrl(mp4ObjectUrl);
+        toast.success("MP4 ready! Click Download to save your subliminal.");
+      } catch (err) {
+        console.error("FFmpeg conversion failed, falling back to WebM:", err);
+        const webmUrl = URL.createObjectURL(blob);
+        setWebmFallbackUrl(webmUrl);
+        setDownloadUrl(webmUrl);
+        toast.warning(
+          "MP4 conversion unavailable — downloading as .webm instead.",
+        );
+      } finally {
+        setIsConverting(false);
+      }
     };
 
     recorder.start(100);
@@ -763,12 +838,147 @@ function VideoPreview({
     };
   }, [stopRecording]);
 
-  // Cleanup blob URL on unmount
+  // Cleanup blob URLs on unmount
   useEffect(() => {
     return () => {
       if (downloadUrl) URL.revokeObjectURL(downloadUrl);
     };
   }, [downloadUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (mp4Url) URL.revokeObjectURL(mp4Url);
+    };
+  }, [mp4Url]);
+
+  useEffect(() => {
+    return () => {
+      if (webmFallbackUrl) URL.revokeObjectURL(webmFallbackUrl);
+    };
+  }, [webmFallbackUrl]);
+
+  useEffect(() => {
+    return () => {
+      if (ttsAudioUrl) URL.revokeObjectURL(ttsAudioUrl);
+    };
+  }, [ttsAudioUrl]);
+
+  // ── TTS Export: getUserMedia + speechSynthesis + MediaRecorder ──
+  const handleTTSExport = useCallback(async () => {
+    if (isTTSRecording) {
+      // Stop current TTS recording
+      window.speechSynthesis?.cancel();
+      if (
+        ttsRecorderRef.current &&
+        ttsRecorderRef.current.state !== "inactive"
+      ) {
+        ttsRecorderRef.current.stop();
+      }
+      if (ttsMicStreamRef.current) {
+        for (const track of ttsMicStreamRef.current.getTracks()) track.stop();
+        ttsMicStreamRef.current = null;
+      }
+      setIsTTSRecording(false);
+      return;
+    }
+
+    try {
+      // Request microphone/system audio (works with loopback on Windows/Mac)
+      const micStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+        },
+      });
+      ttsMicStreamRef.current = micStream;
+      ttsChunksRef.current = [];
+      setTtsAudioUrl(null);
+
+      const mimeTypeAudio = MediaRecorder.isTypeSupported(
+        "audio/webm;codecs=opus",
+      )
+        ? "audio/webm;codecs=opus"
+        : "audio/webm";
+
+      const ttsRecorder = new MediaRecorder(micStream, {
+        mimeType: mimeTypeAudio,
+      });
+      ttsRecorderRef.current = ttsRecorder;
+
+      ttsRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) ttsChunksRef.current.push(e.data);
+      };
+
+      ttsRecorder.onstop = () => {
+        setIsTTSRecording(false);
+        if (ttsMicStreamRef.current) {
+          for (const track of ttsMicStreamRef.current.getTracks()) track.stop();
+          ttsMicStreamRef.current = null;
+        }
+        const audioBlob = new Blob(ttsChunksRef.current, {
+          type: mimeTypeAudio,
+        });
+        const url = URL.createObjectURL(audioBlob);
+        setTtsAudioUrl(url);
+        toast.success("TTS audio recorded! Click Download TTS to save.");
+      };
+
+      ttsRecorder.start(100);
+      setIsTTSRecording(true);
+
+      // Speak all affirmations sequentially
+      const voices = window.speechSynthesis.getVoices();
+      const femVoice = voices.find(
+        (v) =>
+          v.name.toLowerCase().includes("female") ||
+          v.name.includes("Samantha") ||
+          v.name.includes("Victoria"),
+      );
+      const maleVoice = voices.find(
+        (v) =>
+          v.name.toLowerCase().includes("male") ||
+          v.name.includes("Daniel") ||
+          v.name.includes("Alex"),
+      );
+      const selectedVoice = voiceType.includes("Female")
+        ? femVoice
+        : voiceType.includes("Male")
+          ? maleVoice
+          : undefined;
+
+      const speakAll = () => {
+        const text = affirmations.join(". ");
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.rate = 0.9;
+        utter.volume = 1;
+        utter.pitch = 1 + voicePitch * 0.1;
+        if (selectedVoice) utter.voice = selectedVoice;
+        utter.onend = () => {
+          if (
+            ttsRecorderRef.current &&
+            ttsRecorderRef.current.state !== "inactive"
+          ) {
+            ttsRecorderRef.current.stop();
+          }
+        };
+        window.speechSynthesis.speak(utter);
+      };
+
+      // Wait for voices to load if needed
+      if (window.speechSynthesis.getVoices().length === 0) {
+        window.speechSynthesis.onvoiceschanged = speakAll;
+      } else {
+        speakAll();
+      }
+    } catch (err) {
+      console.error("TTS export failed:", err);
+      toast.error(
+        "Microphone permission denied. Enable mic (or a loopback device like Stereo Mix) to capture TTS audio.",
+      );
+      setIsTTSRecording(false);
+    }
+  }, [isTTSRecording, affirmations, voiceType, voicePitch]);
 
   return (
     <motion.div
@@ -801,9 +1011,30 @@ function VideoPreview({
           </div>
         )}
 
+        {isConverting && (
+          <div className="flex items-center gap-2 text-xs text-amber-400/90 bg-amber-400/10 border border-amber-400/20 rounded-lg px-3 py-2">
+            <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
+            <span>
+              Converting to MP4… this may take a moment on first run (loading
+              codec)
+            </span>
+          </div>
+        )}
+
+        {isTTSRecording && (
+          <div className="flex items-center gap-2 text-xs text-rose-400/90 bg-rose-400/10 border border-rose-400/20 rounded-lg px-3 py-2">
+            <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse shrink-0" />
+            <span>
+              Recording TTS via microphone — speak affirmations are playing…
+            </span>
+          </div>
+        )}
+
+        {/* Row 1: record + download video */}
         <div className="flex flex-col sm:flex-row gap-3">
           <Button
             onClick={handleRecord}
+            disabled={isConverting}
             variant={isRecording ? "destructive" : "outline"}
             className={`gap-2 font-heading font-semibold w-full sm:w-auto ${
               isRecording
@@ -824,12 +1055,24 @@ function VideoPreview({
             )}
           </Button>
 
-          {downloadUrl && (
+          {mp4Url && !isConverting && (
             <Button
               asChild
               className="gap-2 bg-primary/90 hover:bg-primary font-heading font-semibold w-full sm:w-auto"
             >
-              <a href={downloadUrl} download="synapse-subliminal.webm">
+              <a href={mp4Url} download="synapse-subliminal.mp4">
+                <Download className="w-4 h-4" />
+                Download Video (.mp4)
+              </a>
+            </Button>
+          )}
+
+          {webmFallbackUrl && !isConverting && !mp4Url && (
+            <Button
+              asChild
+              className="gap-2 bg-primary/90 hover:bg-primary font-heading font-semibold w-full sm:w-auto"
+            >
+              <a href={webmFallbackUrl} download="synapse-subliminal.webm">
                 <Download className="w-4 h-4" />
                 Download Video (.webm)
               </a>
@@ -837,11 +1080,56 @@ function VideoPreview({
           )}
         </div>
 
-        <p className="text-xs text-muted-foreground leading-relaxed">
-          Records up to {previewDuration}s with your frequency tone and nature
-          sound mixed directly into the video audio track. TTS plays alongside
-          the recording. Use the JSON config above for full FFmpeg MP4
-          production.
+        {/* Row 2: TTS export */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button
+            onClick={handleTTSExport}
+            disabled={isRecording || isConverting || affirmations.length === 0}
+            variant="outline"
+            className={`gap-2 font-heading font-semibold w-full sm:w-auto ${
+              isTTSRecording
+                ? "border-rose-500/60 text-rose-400 hover:bg-rose-500/10"
+                : "border-border/50 text-muted-foreground hover:text-foreground hover:border-border"
+            }`}
+          >
+            {isTTSRecording ? (
+              <>
+                <Square className="w-4 h-4" />
+                Stop TTS Recording
+              </>
+            ) : (
+              <>
+                <Music className="w-4 h-4" />
+                Export TTS Audio
+              </>
+            )}
+          </Button>
+
+          {ttsAudioUrl && !isTTSRecording && (
+            <Button
+              asChild
+              variant="outline"
+              className="gap-2 border-border/50 text-muted-foreground hover:text-foreground font-heading font-semibold w-full sm:w-auto"
+            >
+              <a href={ttsAudioUrl} download="synapse-tts.webm">
+                <Download className="w-4 h-4" />
+                Download TTS (.webm)
+              </a>
+            </Button>
+          )}
+        </div>
+
+        <p className="text-xs text-muted-foreground leading-relaxed space-y-1">
+          <span className="block">
+            Video records up to {previewDuration}s with frequency tone and
+            nature sound baked in — downloads as <strong>.mp4</strong>.
+          </span>
+          <span className="block">
+            <strong>Export TTS Audio</strong> captures your spoken affirmations
+            via microphone. For best results, enable a loopback device (Windows:
+            Stereo Mix · Mac: BlackHole/Soundflower) so TTS plays into the
+            recording without needing an external mic.
+          </span>
         </p>
       </div>
     </motion.div>
@@ -863,6 +1151,14 @@ export default function GeneratorPage({
     chakraAlignment: false,
   });
   const [selectedChakras, setSelectedChakras] = useState<string[]>([]);
+
+  // Fantasy-to-Reality sub-functions
+  const [characterEnabled, setCharacterEnabled] = useState(false);
+  const [characterName, setCharacterName] = useState("");
+  const [characterSource, setCharacterSource] = useState("");
+  const [itemEnabled, setItemEnabled] = useState(false);
+  const [itemName, setItemName] = useState("");
+  const [itemSource, setItemSource] = useState("");
 
   // Step 2 state
   const [affirmationCount, setAffirmationCount] = useState(50);
@@ -1153,6 +1449,10 @@ export default function GeneratorPage({
         modes.fantasy,
         modes.protection,
         selectedChakras.join(", "),
+        modes.fantasy && characterEnabled ? characterName : undefined,
+        modes.fantasy && characterEnabled ? characterSource : undefined,
+        modes.fantasy && itemEnabled ? itemName : undefined,
+        modes.fantasy && itemEnabled ? itemSource : undefined,
       );
 
       if (aiResult && aiResult.length > 0) {
@@ -1171,13 +1471,43 @@ export default function GeneratorPage({
         return;
       }
 
-      const result = await generateMutation.mutateAsync({
+      const backendResult = await generateMutation.mutateAsync({
         topic,
         boosterEnabled: modes.booster,
         fantasyEnabled: modes.fantasy,
         protectionEnabled: modes.protection,
         chakraName: selectedChakras.join(", "),
       });
+      // Append character/item manifestation lines from local engine when applicable
+      const hasCharacter =
+        modes.fantasy && characterEnabled && characterName.trim();
+      const hasItem = modes.fantasy && itemEnabled && itemName.trim();
+      let result = [...backendResult];
+      if (hasCharacter || hasItem) {
+        const { generateAffirmations: genLocal } = await import(
+          "../utils/affirmationUtils"
+        );
+        const extra = genLocal(
+          topic,
+          false,
+          true,
+          false,
+          "",
+          hasCharacter ? characterName : undefined,
+          hasCharacter ? characterSource : undefined,
+          hasItem ? itemName : undefined,
+          hasItem ? itemSource : undefined,
+        );
+        // Only take lines that reference the character or item names
+        const filterTerms = [
+          ...(hasCharacter ? [characterName.trim().toLowerCase()] : []),
+          ...(hasItem ? [itemName.trim().toLowerCase()] : []),
+        ];
+        const manifestLines = extra.filter((line) =>
+          filterTerms.some((t) => line.toLowerCase().includes(t)),
+        );
+        result = [...result, ...manifestLines];
+      }
       const expanded = expandToCount(result, affirmationCount);
       setAffirmations(expanded);
       setGenerationSource("rule-based");
@@ -1229,6 +1559,18 @@ export default function GeneratorPage({
           booster: modes.booster,
           fantasy_to_reality: modes.fantasy,
           protection: modes.protection,
+          character_manifestation:
+            modes.fantasy && characterEnabled
+              ? {
+                  enabled: true,
+                  character: characterName,
+                  source: characterSource || null,
+                }
+              : { enabled: false },
+          item_manifestation:
+            modes.fantasy && itemEnabled
+              ? { enabled: true, item: itemName, source: itemSource || null }
+              : { enabled: false },
         },
         chakra: selectedChakras,
         voice: {
@@ -1463,6 +1805,129 @@ export default function GeneratorPage({
             })}
           </div>
         </div>
+
+        {/* Fantasy-to-Reality sub-functions */}
+        <AnimatePresence>
+          {modes.fantasy && (
+            <motion.div
+              key="fantasy-subpanel"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden"
+            >
+              <div className="space-y-3 p-4 rounded-xl border border-[oklch(0.62_0.22_295)/40] bg-[oklch(0.62_0.22_295)/5]">
+                <div className="flex items-center gap-2 mb-1">
+                  <Star
+                    className="w-4 h-4"
+                    style={{ color: "oklch(0.62 0.22 295)" }}
+                  />
+                  <span
+                    className="text-sm font-heading font-semibold"
+                    style={{ color: "oklch(0.62 0.22 295)" }}
+                  >
+                    Fantasy-to-Reality: Manifestation
+                  </span>
+                </div>
+
+                {/* Character Manifestation */}
+                <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-border/30">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <User className="w-3.5 h-3.5 text-violet-400" />
+                      <Label
+                        className="text-sm font-semibold text-violet-300 cursor-pointer"
+                        htmlFor="char-toggle"
+                      >
+                        Character Manifestation
+                      </Label>
+                    </div>
+                    <Switch
+                      id="char-toggle"
+                      checked={characterEnabled}
+                      onCheckedChange={setCharacterEnabled}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-snug">
+                    Physically bring a specific character into your reality —
+                    they cross from their world into yours.
+                  </p>
+                  <AnimatePresence>
+                    {characterEnabled && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="space-y-2 overflow-hidden"
+                      >
+                        <Input
+                          value={characterName}
+                          onChange={(e) => setCharacterName(e.target.value)}
+                          placeholder="Character name (e.g. Naruto, Goku, Alastor)..."
+                          className="bg-input/50 border-border/50 focus:border-violet-500/50 text-sm"
+                        />
+                        <Input
+                          value={characterSource}
+                          onChange={(e) => setCharacterSource(e.target.value)}
+                          placeholder="Source / series (optional — e.g. Naruto, Hazbin Hotel)..."
+                          className="bg-input/50 border-border/50 focus:border-violet-500/50 text-sm"
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Item Manifestation */}
+                <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-border/30">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Package className="w-3.5 h-3.5 text-amber-400" />
+                      <Label
+                        className="text-sm font-semibold text-amber-300 cursor-pointer"
+                        htmlFor="item-toggle"
+                      >
+                        Item Manifestation
+                      </Label>
+                    </div>
+                    <Switch
+                      id="item-toggle"
+                      checked={itemEnabled}
+                      onCheckedChange={setItemEnabled}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-snug">
+                    Pull a specific item, artifact, or ability from fiction into
+                    your physical reality.
+                  </p>
+                  <AnimatePresence>
+                    {itemEnabled && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="space-y-2 overflow-hidden"
+                      >
+                        <Input
+                          value={itemName}
+                          onChange={(e) => setItemName(e.target.value)}
+                          placeholder="Item name (e.g. Excalibur, Sharingan, Death Note)..."
+                          className="bg-input/50 border-border/50 focus:border-amber-500/50 text-sm"
+                        />
+                        <Input
+                          value={itemSource}
+                          onChange={(e) => setItemSource(e.target.value)}
+                          placeholder="Source / origin (optional — e.g. Naruto, Arthurian legend)..."
+                          className="bg-input/50 border-border/50 focus:border-amber-500/50 text-sm"
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Chakra selector */}
         <div className="space-y-3">

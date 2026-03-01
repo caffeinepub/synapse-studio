@@ -22,6 +22,10 @@ export async function generateAffirmationsWithAI(
   fantasyEnabled: boolean,
   protectionEnabled: boolean,
   chakraName: string,
+  characterName?: string,
+  characterSource?: string,
+  itemName?: string,
+  itemSource?: string,
 ): Promise<string[] | null> {
   const settings = getAISettings();
   if (!settings) return null;
@@ -36,9 +40,24 @@ export async function generateAffirmationsWithAI(
   }
 
   if (fantasyEnabled) {
-    modeLines.push(
-      "FANTASY-TO-REALITY MODE is active: Generate 5–7 additional affirmations that frame the topic as a real, active, tangible ability or manifestation the listener possesses or is actively developing. Use language like 'I possess the ability to...', 'This is real, present, and undeniable', 'Reality reshapes itself around my...', 'I carry within me the essence of...'. Make them feel genuinely powerful and real — not symbolic disclaimers.",
-    );
+    let fantasyInstruction =
+      "FANTASY-TO-REALITY MODE is active: Generate 5–7 additional affirmations that frame the topic as something that has physically crossed into the listener's real world. The fabric of reality has opened and this ability, power, or thing is now physically present and real — not symbolic, not metaphorical. Use language like 'I possess [topic] — it is physically real', 'The fabric of reality has opened and [topic] is now part of my physical world', 'I have broken the boundary between fiction and reality', 'Reality itself has shifted to accommodate my [topic]', '[topic] exists in my physical reality right now'. These must feel like the listener genuinely has this in their physical reality.";
+
+    if (characterName?.trim()) {
+      const C = characterName.trim();
+      const src = characterSource?.trim()
+        ? ` from ${characterSource.trim()}`
+        : "";
+      fantasyInstruction += `\n\nCHARACTER MANIFESTATION is active: Also generate 5–7 affirmations specifically about physically bringing the character "${C}"${src} into the listener's reality. The character has crossed from their world into the listener's physical reality. Use phrases like '${C} has been brought into my physical reality — they exist here now', 'I have opened reality for ${C} and they have crossed into this world', '${C} is physically here beside me — their presence is real', 'The barrier between ${C}'s world and mine has dissolved', 'I have manifested ${C} into my life and they are physically present'. These should feel like the character is genuinely, physically here in the listener's world.`;
+    }
+
+    if (itemName?.trim()) {
+      const I2 = itemName.trim();
+      const isrc = itemSource?.trim() ? ` from ${itemSource.trim()}` : "";
+      fantasyInstruction += `\n\nITEM MANIFESTATION is active: Also generate 5–7 affirmations specifically about physically possessing or manifesting the item "${I2}"${isrc} in the listener's real world. The item has physically crossed into their reality. Use phrases like '${I2} is physically in my reality — I hold it, I use it, it is real', 'I have opened the fabric of reality and pulled ${I2} through into my physical world', '${I2} exists as a physical object in my life right now', 'The reality-barrier for ${I2} no longer exists — it is here with me', 'I physically possess ${I2}${isrc} — it has manifested into my world'. These should feel like the item is genuinely, physically present.`;
+    }
+
+    modeLines.push(fantasyInstruction);
   }
 
   if (protectionEnabled) {

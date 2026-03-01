@@ -65,6 +65,10 @@ export function generateAffirmations(
   fantasyEnabled: boolean,
   protectionEnabled: boolean,
   chakraName: string,
+  characterName?: string,
+  characterSource?: string,
+  itemName?: string,
+  itemSource?: string,
 ): string[] {
   const intent = extractIntent(topic);
   const T = intent; // short alias
@@ -111,18 +115,50 @@ export function generateAffirmations(
   const result: string[] = [...base];
 
   // ── Fantasy-to-Reality mode ──────────────────────────────────────────
-  // Generates affirmations that directly tie the topic to real manifestations
+  // Generates affirmations about physically bringing fictional elements into reality
   if (fantasyEnabled) {
     result.push(
-      `I possess the ability to manifest ${T} — this is real, present, and undeniable.`,
-      `My ${T} operates with the precision of someone who has mastered forces beyond ordinary perception.`,
-      `I am connected to a source of ${T} that transcends limitation — it flows through me fully.`,
-      `Reality reshapes itself around my ${T} — I have witnessed this and I trust it completely.`,
-      `I carry within me the essence of those who embody ${T} at the highest level — it is now mine.`,
-      `My ${T} is not a hope or a wish — it is an active force operating in my life right now.`,
-      `I open the fabric of my reality to receive ${T} in ways that exceed my expectations.`,
-      `The universe has engineered me specifically to embody and express ${T} — I accept this fully.`,
+      `I possess ${T} — it is physically real, active, and fully present in my life right now.`,
+      `The fabric of reality has opened and ${T} is now a tangible, physical part of my world.`,
+      `${cap(T)} exists in my physical reality — I can see it, feel it, and access it at will.`,
+      `I have broken the boundary between fiction and reality — ${T} is mine in the physical world.`,
+      `Reality itself has shifted to accommodate my ${T} — it is no longer a concept, it is fact.`,
+      `I live in a reality where ${T} is physically possible and completely real for me.`,
+      `The laws of my reality have expanded — ${T} is now a natural part of my physical existence.`,
+      `What was once fictional has become physical — ${T} has crossed into my reality completely.`,
     );
+
+    // ── Character Manifestation ────────────────────────────────────────
+    if (characterName?.trim()) {
+      const C = characterName.trim();
+      const src = characterSource?.trim()
+        ? ` from ${characterSource.trim()}`
+        : "";
+      result.push(
+        `${C}${src} has been brought into my physical reality — they exist here, now, alongside me.`,
+        `I have opened reality for ${C}${src} — they have crossed into this world and their presence is real.`,
+        `${C} is physically here in my reality — I feel their presence, their power, their existence beside me.`,
+        `The barrier between ${C}'s world and mine has dissolved — they are now part of my physical reality.`,
+        `I have successfully manifested ${C}${src} into my life — their physical existence in my reality is real.`,
+        `${C} walks in my reality now — brought through by my intention, fully present and physically real.`,
+        `My reality has expanded to include ${C}${src} — they are here, tangible, alive in my world.`,
+      );
+    }
+
+    // ── Item Manifestation ────────────────────────────────────────────
+    if (itemName?.trim()) {
+      const I2 = itemName.trim();
+      const isrc = itemSource?.trim() ? ` from ${itemSource.trim()}` : "";
+      result.push(
+        `${I2}${isrc} is physically in my reality right now — I hold it, I use it, it is real.`,
+        `I have opened the fabric of reality and pulled ${I2}${isrc} through into my physical world.`,
+        `${I2} exists as a physical object in my life — it has manifested and I possess it completely.`,
+        `The reality-barrier for ${I2} no longer exists — it is here with me in my physical world.`,
+        `I physically possess ${I2}${isrc} — it crossed from fiction into my reality and it is mine.`,
+        `${I2} is no longer beyond reach — it has materialized in my world and responds to me fully.`,
+        `My reality now includes ${I2}${isrc} as a physical presence — I have made this real.`,
+      );
+    }
   }
 
   // ── Protection mode ──────────────────────────────────────────────────
