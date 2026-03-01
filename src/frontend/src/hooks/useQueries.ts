@@ -1,9 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  BELIEF_SYSTEMS_DATA,
+  CHAKRA_DATA,
+  KINESIS_DATA,
+} from "../data/energyData";
+import { generateAffirmations } from "../utils/affirmationUtils";
 import { useActor } from "./useActor";
 
 /* ── Affirmations ─────────────────────────────────── */
 export function useGenerateAffirmations() {
-  const { actor } = useActor();
   return useMutation({
     mutationFn: async ({
       topic,
@@ -18,8 +23,8 @@ export function useGenerateAffirmations() {
       protectionEnabled: boolean;
       chakraName: string;
     }) => {
-      if (!actor) throw new Error("Backend not ready");
-      return actor.generateAffirmations(
+      // Generate entirely client-side so topic intent is extracted properly
+      return generateAffirmations(
         topic,
         boosterEnabled,
         fantasyEnabled,
@@ -159,42 +164,30 @@ export function useDeleteProject() {
 
 /* ── Energy Library ───────────────────────────────── */
 export function useGetAllChakras() {
-  const { actor, isFetching } = useActor();
+  // Served from local static data — backend returns stubs only
   return useQuery({
     queryKey: ["chakras"],
-    queryFn: async () => {
-      if (!actor) return [];
-      const raw = await actor.getAllChakras();
-      return JSON.parse(raw) as ChakraEntry[];
-    },
-    enabled: !!actor && !isFetching,
+    queryFn: async (): Promise<ChakraEntry[]> => CHAKRA_DATA,
+    staleTime: Number.POSITIVE_INFINITY,
   });
 }
 
 export function useGetBeliefSystems() {
-  const { actor, isFetching } = useActor();
+  // Served from local static data — backend returns stubs only
   return useQuery({
     queryKey: ["beliefSystems"],
-    queryFn: async () => {
-      if (!actor) return [];
-      const raw = await actor.getBeliefSystems();
-      return JSON.parse(raw) as BeliefSystem[];
-    },
-    enabled: !!actor && !isFetching,
+    queryFn: async (): Promise<BeliefSystem[]> => BELIEF_SYSTEMS_DATA,
+    staleTime: Number.POSITIVE_INFINITY,
   });
 }
 
 /* ── Kinesis Archive ──────────────────────────────── */
 export function useGetAllKinesisEntries() {
-  const { actor, isFetching } = useActor();
+  // Served from local static data — backend returns stubs only
   return useQuery({
     queryKey: ["kinesisEntries"],
-    queryFn: async () => {
-      if (!actor) return [];
-      const raw = await actor.getAllKinesisEntries();
-      return JSON.parse(raw) as KinesisEntry[];
-    },
-    enabled: !!actor && !isFetching,
+    queryFn: async (): Promise<KinesisEntry[]> => KINESIS_DATA,
+    staleTime: Number.POSITIVE_INFINITY,
   });
 }
 

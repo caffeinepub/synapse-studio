@@ -1,7 +1,7 @@
-import { Archive, BookOpen, Brain, Zap } from "lucide-react";
+import { Archive, BookOpen, Brain, Search, Settings, Zap } from "lucide-react";
 import { motion } from "motion/react";
 
-type Page = "generator" | "energy" | "kinesis";
+type Page = "generator" | "energy" | "kinesis" | "wiki" | "settings";
 
 interface NavBarProps {
   currentPage: Page;
@@ -26,6 +26,18 @@ const navItems = [
     label: "Kinesis Archive",
     icon: Archive,
     description: "Encyclopedia of Powers",
+  },
+  {
+    id: "wiki" as Page,
+    label: "Wiki Search",
+    icon: Search,
+    description: "Fandom Character & Powers Search",
+  },
+  {
+    id: "settings" as Page,
+    label: "Settings",
+    icon: Settings,
+    description: "AI Configuration",
   },
 ];
 

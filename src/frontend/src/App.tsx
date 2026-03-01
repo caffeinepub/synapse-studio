@@ -4,11 +4,19 @@ import NavBar from "./components/NavBar";
 import EnergyLibraryPage from "./pages/EnergyLibraryPage";
 import GeneratorPage from "./pages/GeneratorPage";
 import KinesisArchivePage from "./pages/KinesisArchivePage";
+import SettingsPage from "./pages/SettingsPage";
+import WikiSearchPage from "./pages/WikiSearchPage";
 
-type Page = "generator" | "energy" | "kinesis";
+type Page = "generator" | "energy" | "kinesis" | "wiki" | "settings";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("generator");
+  const [wikiInjectedTopic, setWikiInjectedTopic] = useState<string>("");
+
+  const handleUseForSubliminal = (topic: string) => {
+    setWikiInjectedTopic(topic);
+    setCurrentPage("generator");
+  };
 
   return (
     <div className="min-h-screen bg-shimmer relative overflow-x-hidden">
@@ -37,9 +45,18 @@ export default function App() {
         <NavBar currentPage={currentPage} onNavigate={setCurrentPage} />
 
         <main className="flex-1">
-          {currentPage === "generator" && <GeneratorPage />}
+          {currentPage === "generator" && (
+            <GeneratorPage
+              injectedTopic={wikiInjectedTopic}
+              onInjectedTopicConsumed={() => setWikiInjectedTopic("")}
+            />
+          )}
           {currentPage === "energy" && <EnergyLibraryPage />}
           {currentPage === "kinesis" && <KinesisArchivePage />}
+          {currentPage === "wiki" && (
+            <WikiSearchPage onUseForSubliminal={handleUseForSubliminal} />
+          )}
+          {currentPage === "settings" && <SettingsPage />}
         </main>
 
         <footer className="text-center py-6 text-muted-foreground text-xs border-t border-border/40 mt-12">

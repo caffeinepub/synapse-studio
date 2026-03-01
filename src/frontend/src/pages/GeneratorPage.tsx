@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -29,30 +30,45 @@ import {
   ChevronDown,
   ChevronUp,
   Copy,
+  Download,
+  Droplets,
   Eye,
   Film,
+  Flame,
   FolderOpen,
+  Leaf,
   Loader2,
   Music,
+  Play,
   Save,
   Shield,
+  Square,
   Star,
   Trash2,
+  Video,
   Volume2,
+  VolumeX,
   Wand2,
+  Wind,
   Zap,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
-  useBuildProjectJSON,
   useDeleteProject,
   useGenerateAffirmations,
   useGetProject,
   useListProjects,
   useSaveProject,
 } from "../hooks/useQueries";
+import { generateAffirmationsWithAI } from "../utils/aiGenerate";
+import {
+  connectFrequencyToneToCtx,
+  connectNatureSoundToCtx,
+  startFrequencyTone,
+  startNatureSound,
+} from "../utils/audioEngine";
 
 const CHAKRAS = [
   "None",
@@ -110,7 +126,711 @@ const MODES: ModeConfig[] = [
   },
 ];
 
-export default function GeneratorPage() {
+// ── Palette map → canvas gradient stops (literal hex for Canvas API) ──
+const PALETTE_COLORS: Record<string, [string, string, string]> = {
+  "Violet/Indigo": ["#0d0014", "#1a0035", "#2d0060"],
+  "Gold/Amber": ["#0d0800", "#1a1000", "#2d1800"],
+  "Teal/Cyan": ["#000d0d", "#001a1a", "#00282d"],
+  "Rose/Crimson": ["#0d0005", "#1a0010", "#2d001a"],
+  "Emerald/Green": ["#000d02", "#001a05", "#002d0a"],
+  Monochrome: ["#080808", "#111111", "#1a1a1a"],
+};
+
+const PALETTE_ACCENT: Record<string, string> = {
+  "Violet/Indigo": "#a855f7",
+  "Gold/Amber": "#f59e0b",
+  "Teal/Cyan": "#06b6d4",
+  "Rose/Crimson": "#f43f5e",
+  "Emerald/Green": "#10b981",
+  Monochrome: "#e2e8f0",
+};
+
+// ── Nature sound options ──────────────────────────────────────────────────────
+interface NatureSoundOption {
+  label: string;
+  icon: React.ElementType;
+  color: string;
+}
+
+const NATURE_SOUNDS: NatureSoundOption[] = [
+  { label: "None", icon: VolumeX, color: "oklch(0.45 0.02 270)" },
+  { label: "Rain", icon: Droplets, color: "oklch(0.58 0.18 220)" },
+  { label: "Campfire", icon: Flame, color: "oklch(0.65 0.2 40)" },
+  { label: "Forest / Birds", icon: Leaf, color: "oklch(0.62 0.2 145)" },
+  { label: "Ocean Waves", icon: Droplets, color: "oklch(0.58 0.2 200)" },
+  { label: "Thunder Storm", icon: Zap, color: "oklch(0.65 0.18 260)" },
+  { label: "Flowing River", icon: Droplets, color: "oklch(0.55 0.2 210)" },
+  { label: "Wind", icon: Wind, color: "oklch(0.6 0.12 200)" },
+];
+
+// ── Frequency presets ─────────────────────────────────────────────────────────
+const FREQUENCY_PRESETS = [
+  { hz: 40, label: "40Hz", sublabel: "Gamma" },
+  { hz: 174, label: "174Hz", sublabel: "Foundation" },
+  { hz: 285, label: "285Hz", sublabel: "Tissue" },
+  { hz: 396, label: "396Hz", sublabel: "Liberation" },
+  { hz: 417, label: "417Hz", sublabel: "Change" },
+  { hz: 432, label: "432Hz", sublabel: "Earth" },
+  { hz: 528, label: "528Hz", sublabel: "DNA" },
+  { hz: 639, label: "639Hz", sublabel: "Connection" },
+  { hz: 741, label: "741Hz", sublabel: "Awakening" },
+  { hz: 852, label: "852Hz", sublabel: "Intuition" },
+  { hz: 963, label: "963Hz", sublabel: "Crown" },
+  { hz: 1111, label: "1111Hz", sublabel: "Angelic" },
+];
+
+const WAVEFORMS: { type: OscillatorType; label: string }[] = [
+  { type: "sine", label: "Sine" },
+  { type: "triangle", label: "Triangle" },
+  { type: "square", label: "Square" },
+  { type: "sawtooth", label: "Sawtooth" },
+];
+
+interface GeneratorPageProps {
+  injectedTopic?: string;
+  onInjectedTopicConsumed?: () => void;
+}
+
+// ── Canvas subliminal video preview ──────────────────────────────────────────
+interface VideoPreviewProps {
+  affirmations: string[];
+  topic: string;
+  chakra: string;
+  palette: string;
+  theme: string;
+  duration: number; // seconds (capped at 120 for browser preview)
+  // Audio settings
+  natureSound: string;
+  natureSoundVolume: number;
+  frequencyHz: string;
+  frequencyWaveform: OscillatorType;
+  frequencyToneVolume: number;
+  audioLayers: { enabled: boolean; speed: number; volume: number }[];
+  voiceType: string;
+  voicePitch: number;
+}
+
+function VideoPreview({
+  affirmations,
+  topic,
+  chakra,
+  palette,
+  theme,
+  duration,
+  natureSound,
+  natureSoundVolume,
+  frequencyHz,
+  frequencyWaveform,
+  frequencyToneVolume,
+  audioLayers,
+  voiceType,
+  voicePitch,
+}: VideoPreviewProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animRef = useRef<number | null>(null);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const audioStopFnsRef = useRef<(() => void)[]>([]);
+  const chunksRef = useRef<Blob[]>([]);
+  const startTimeRef = useRef<number>(0);
+  const progressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null,
+  );
+  const stopTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [isRecording, setIsRecording] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+
+  const previewDuration = Math.min(duration, 120);
+  const colors = PALETTE_COLORS[palette] ?? PALETTE_COLORS["Violet/Indigo"];
+  const accent = PALETTE_ACCENT[palette] ?? "#a855f7";
+
+  // Particle state for theme effects
+  const particlesRef = useRef<
+    { x: number; y: number; vx: number; vy: number; r: number; a: number }[]
+  >([]);
+
+  // Init particles once
+  useEffect(() => {
+    particlesRef.current = Array.from({ length: 60 }, () => ({
+      x: Math.random() * 1280,
+      y: Math.random() * 720,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      r: Math.random() * 2 + 0.5,
+      a: Math.random(),
+    }));
+  }, []);
+
+  // Affirmation cycling state
+  const affIndexRef = useRef(0);
+  const lastSwapRef = useRef(0);
+  const textAlphaRef = useRef(0);
+  const fadingInRef = useRef(true);
+
+  const drawFrame = useCallback(
+    (ctx: CanvasRenderingContext2D, elapsed: number) => {
+      const W = 1280;
+      const H = 720;
+
+      // Background gradient
+      const grad = ctx.createRadialGradient(
+        W / 2,
+        H / 2,
+        0,
+        W / 2,
+        H / 2,
+        W * 0.7,
+      );
+      grad.addColorStop(0, colors[1]);
+      grad.addColorStop(0.6, colors[0]);
+      grad.addColorStop(1, colors[0]);
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Theme-specific background effect
+      if (theme === "Dark Cosmic" || theme === "Ethereal Light") {
+        // Starfield / particles
+        const pts = particlesRef.current;
+        for (const p of pts) {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.x < 0) p.x = W;
+          if (p.x > W) p.x = 0;
+          if (p.y < 0) p.y = H;
+          if (p.y > H) p.y = 0;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,255,255,${p.a * 0.7})`;
+          ctx.fill();
+        }
+        if (theme === "Ethereal Light") {
+          // Bloom
+          const bloom = ctx.createRadialGradient(
+            W / 2,
+            H / 2,
+            0,
+            W / 2,
+            H / 2,
+            300,
+          );
+          bloom.addColorStop(0, `${accent}30`);
+          bloom.addColorStop(1, "transparent");
+          ctx.fillStyle = bloom;
+          ctx.fillRect(0, 0, W, H);
+        }
+      } else if (theme === "Ocean Void") {
+        // Slow wave
+        ctx.save();
+        ctx.globalAlpha = 0.12;
+        for (let i = 0; i < 4; i++) {
+          ctx.beginPath();
+          const phase = elapsed * 0.0005 + (i * Math.PI) / 2;
+          ctx.moveTo(0, H * 0.5);
+          for (let x = 0; x <= W; x += 4) {
+            ctx.lineTo(x, H * 0.5 + Math.sin(x * 0.008 + phase) * 40 * (i + 1));
+          }
+          ctx.strokeStyle = accent;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+        ctx.restore();
+      } else if (theme === "Fire Core") {
+        // Ember particles
+        const pts = particlesRef.current;
+        for (const p of pts) {
+          p.y -= 0.6 + p.r * 0.5;
+          p.x += Math.sin(elapsed * 0.001 + p.a * 10) * 0.5;
+          if (p.y < 0) {
+            p.y = H + 10;
+            p.x = Math.random() * W;
+          }
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          const heat = p.y / H;
+          ctx.fillStyle = `rgba(255,${Math.round(heat * 80)},0,${p.a * 0.6})`;
+          ctx.fill();
+        }
+      } else if (theme === "Crystal Grid") {
+        // Geometric grid
+        ctx.save();
+        ctx.globalAlpha = 0.08;
+        ctx.strokeStyle = accent;
+        ctx.lineWidth = 1;
+        const spacing = 60;
+        for (let x = 0; x < W; x += spacing) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, H);
+          ctx.stroke();
+        }
+        for (let y = 0; y < H; y += spacing) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(W, y);
+          ctx.stroke();
+        }
+        // Diagonal accents
+        ctx.globalAlpha = 0.05;
+        for (let i = -H; i < W + H; i += spacing * 2) {
+          ctx.beginPath();
+          ctx.moveTo(i, 0);
+          ctx.lineTo(i + H, H);
+          ctx.stroke();
+        }
+        ctx.restore();
+      } else if (theme === "Forest Depth") {
+        // Green mist
+        const mist = ctx.createLinearGradient(0, H * 0.4, 0, H);
+        mist.addColorStop(0, "transparent");
+        mist.addColorStop(1, `${accent}20`);
+        ctx.fillStyle = mist;
+        ctx.fillRect(0, 0, W, H);
+      }
+
+      // Subtle vignette
+      const vig = ctx.createRadialGradient(
+        W / 2,
+        H / 2,
+        H * 0.3,
+        W / 2,
+        H / 2,
+        H * 0.8,
+      );
+      vig.addColorStop(0, "transparent");
+      vig.addColorStop(1, "rgba(0,0,0,0.55)");
+      ctx.fillStyle = vig;
+      ctx.fillRect(0, 0, W, H);
+
+      // ── Affirmation text cycling ──
+      const DISPLAY_TIME = 1500; // ms per affirmation
+      const FADE_TIME = 400;
+
+      const timeSinceSwap = elapsed - lastSwapRef.current;
+
+      if (fadingInRef.current) {
+        textAlphaRef.current = Math.min(1, timeSinceSwap / FADE_TIME);
+        if (
+          textAlphaRef.current >= 1 &&
+          timeSinceSwap > DISPLAY_TIME - FADE_TIME
+        ) {
+          fadingInRef.current = false;
+        }
+      } else {
+        textAlphaRef.current = Math.max(
+          0,
+          1 - (timeSinceSwap - (DISPLAY_TIME - FADE_TIME)) / FADE_TIME,
+        );
+        if (textAlphaRef.current <= 0) {
+          affIndexRef.current = (affIndexRef.current + 1) % affirmations.length;
+          lastSwapRef.current = elapsed;
+          fadingInRef.current = true;
+          textAlphaRef.current = 0;
+        }
+      }
+
+      const currentAff = affirmations[affIndexRef.current] ?? "";
+      const alpha = textAlphaRef.current;
+
+      // Glow behind text
+      ctx.save();
+      ctx.globalAlpha = alpha * 0.25;
+      const glowGrad = ctx.createRadialGradient(
+        W / 2,
+        H / 2,
+        0,
+        W / 2,
+        H / 2,
+        300,
+      );
+      glowGrad.addColorStop(0, accent);
+      glowGrad.addColorStop(1, "transparent");
+      ctx.fillStyle = glowGrad;
+      ctx.fillRect(0, 0, W, H);
+      ctx.restore();
+
+      // Main affirmation text
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      // Word-wrap the affirmation
+      const maxWidth = W * 0.78;
+      const fontSize =
+        currentAff.length > 60 ? 28 : currentAff.length > 40 ? 34 : 40;
+      ctx.font = `600 ${fontSize}px 'Segoe UI', system-ui, sans-serif`;
+
+      const words = currentAff.split(" ");
+      const lines: string[] = [];
+      let line = "";
+      for (const word of words) {
+        const test = line ? `${line} ${word}` : word;
+        if (ctx.measureText(test).width > maxWidth && line) {
+          lines.push(line);
+          line = word;
+        } else {
+          line = test;
+        }
+      }
+      if (line) lines.push(line);
+
+      const lineHeight = fontSize * 1.4;
+      const totalHeight = lines.length * lineHeight;
+      const startY = H / 2 - totalHeight / 2 + lineHeight / 2;
+
+      // Shadow
+      ctx.shadowColor = accent;
+      ctx.shadowBlur = 24;
+
+      for (let li = 0; li < lines.length; li++) {
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(lines[li], W / 2, startY + li * lineHeight);
+      }
+      ctx.restore();
+
+      // Progress bar at bottom (if recording)
+      if (isRecording && startTimeRef.current > 0) {
+        const rec = (elapsed - startTimeRef.current) / (previewDuration * 1000);
+        const barW = W * Math.min(rec, 1);
+        ctx.save();
+        ctx.globalAlpha = 0.7;
+        ctx.fillStyle = `${accent}40`;
+        ctx.fillRect(0, H - 4, W, 4);
+        ctx.fillStyle = accent;
+        ctx.fillRect(0, H - 4, barW, 4);
+        ctx.restore();
+      }
+
+      // Bottom info strip
+      ctx.save();
+      ctx.globalAlpha = 0.5;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      ctx.font = "14px 'Segoe UI', system-ui, sans-serif";
+      ctx.fillStyle = "#ffffff";
+      const label = chakra !== "None" ? `${topic} · ${chakra} Chakra` : topic;
+      ctx.fillText(label.toUpperCase(), W / 2, H - 14);
+      ctx.restore();
+    },
+    [
+      colors,
+      accent,
+      theme,
+      affirmations,
+      topic,
+      chakra,
+      isRecording,
+      previewDuration,
+    ],
+  );
+
+  // Animation loop
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const startTime = performance.now();
+    affIndexRef.current = 0;
+    lastSwapRef.current = 0;
+    fadingInRef.current = true;
+    textAlphaRef.current = 0;
+
+    const loop = (now: number) => {
+      const elapsed = now - startTime;
+      drawFrame(ctx, elapsed);
+      animRef.current = requestAnimationFrame(loop);
+    };
+
+    animRef.current = requestAnimationFrame(loop);
+    return () => {
+      if (animRef.current !== null) cancelAnimationFrame(animRef.current);
+    };
+  }, [drawFrame]);
+
+  const stopRecording = useCallback(() => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+    if (stopTimeoutRef.current) {
+      clearTimeout(stopTimeoutRef.current);
+      stopTimeoutRef.current = null;
+    }
+    // Stop audio nodes
+    for (const fn of audioStopFnsRef.current) {
+      try {
+        fn();
+      } catch (_) {}
+    }
+    audioStopFnsRef.current = [];
+    // Close audio context
+    if (audioCtxRef.current) {
+      audioCtxRef.current.close().catch(() => {});
+      audioCtxRef.current = null;
+    }
+    window.speechSynthesis?.cancel();
+    if (recorderRef.current && recorderRef.current.state !== "inactive") {
+      recorderRef.current.stop();
+    }
+  }, []);
+
+  const handleRecord = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    if (isRecording) {
+      stopRecording();
+      return;
+    }
+
+    chunksRef.current = [];
+    setDownloadUrl(null);
+    setProgress(0);
+
+    // ── Build combined stream (canvas video + synthesized audio) ──
+    const videoStream = canvas.captureStream(30);
+
+    // Create a shared AudioContext and MediaStreamDestination for recording
+    const AudioCtxClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext;
+    const audioCtx = new AudioCtxClass();
+    audioCtxRef.current = audioCtx;
+    const dest = audioCtx.createMediaStreamDestination();
+    const stopFns: (() => void)[] = [];
+
+    // Connect nature sound
+    if (natureSound !== "None") {
+      const stopNature = connectNatureSoundToCtx(
+        natureSound,
+        natureSoundVolume,
+        audioCtx,
+        dest,
+      );
+      stopFns.push(stopNature);
+    }
+
+    // Connect frequency tone
+    const hz = Number.parseFloat(frequencyHz);
+    if (!Number.isNaN(hz) && hz > 0) {
+      const stopFreq = connectFrequencyToneToCtx(
+        hz,
+        frequencyWaveform,
+        frequencyToneVolume,
+        audioCtx,
+        dest,
+      );
+      stopFns.push(stopFreq);
+    }
+
+    audioStopFnsRef.current = stopFns;
+
+    // Start TTS cycling (Web Speech API — not capturable but plays during recording)
+    const startTTSCycle = () => {
+      if (!affirmations.length) return;
+      const voices = window.speechSynthesis.getVoices();
+      const femVoice = voices.find(
+        (v) =>
+          v.name.toLowerCase().includes("female") ||
+          v.name.includes("Samantha") ||
+          v.name.includes("Victoria"),
+      );
+      const maleVoice = voices.find(
+        (v) =>
+          v.name.toLowerCase().includes("male") ||
+          v.name.includes("Daniel") ||
+          v.name.includes("Alex"),
+      );
+      const selectedVoice = voiceType.includes("Female")
+        ? femVoice
+        : voiceType.includes("Male")
+          ? maleVoice
+          : undefined;
+      const enabledLayers = audioLayers.filter((l) => l.enabled);
+      for (const layer of enabledLayers) {
+        const text = affirmations.slice(0, 10).join(". ");
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.rate = layer.speed;
+        utter.volume = layer.volume;
+        utter.pitch = 1 + voicePitch * 0.1;
+        if (selectedVoice) utter.voice = selectedVoice;
+        window.speechSynthesis.speak(utter);
+      }
+    };
+    startTTSCycle();
+
+    // Combine video + audio tracks
+    const combinedStream = new MediaStream([
+      ...videoStream.getVideoTracks(),
+      ...dest.stream.getAudioTracks(),
+    ]);
+
+    const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
+      ? "video/webm;codecs=vp9,opus"
+      : MediaRecorder.isTypeSupported("video/webm;codecs=vp8,opus")
+        ? "video/webm;codecs=vp8,opus"
+        : "video/webm";
+    const recorder = new MediaRecorder(combinedStream, { mimeType });
+    recorderRef.current = recorder;
+
+    recorder.ondataavailable = (e) => {
+      if (e.data.size > 0) chunksRef.current.push(e.data);
+    };
+
+    recorder.onstop = () => {
+      setIsRecording(false);
+      setProgress(100);
+      // Stop audio after recorder stops
+      for (const fn of audioStopFnsRef.current) {
+        try {
+          fn();
+        } catch (_) {}
+      }
+      audioStopFnsRef.current = [];
+      if (audioCtxRef.current) {
+        audioCtxRef.current.close().catch(() => {});
+        audioCtxRef.current = null;
+      }
+      window.speechSynthesis?.cancel();
+      const blob = new Blob(chunksRef.current, { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      setDownloadUrl(url);
+      toast.success("Video ready! Click Download to save your subliminal.");
+    };
+
+    recorder.start(100);
+    setIsRecording(true);
+    startTimeRef.current = performance.now();
+
+    // Progress updater
+    progressIntervalRef.current = setInterval(() => {
+      const elapsed = (performance.now() - startTimeRef.current) / 1000;
+      setProgress(Math.min((elapsed / previewDuration) * 100, 99));
+    }, 300);
+
+    // Auto-stop
+    stopTimeoutRef.current = setTimeout(() => {
+      if (progressIntervalRef.current)
+        clearInterval(progressIntervalRef.current);
+      if (recorder.state !== "inactive") recorder.stop();
+    }, previewDuration * 1000);
+  }, [
+    isRecording,
+    previewDuration,
+    natureSound,
+    natureSoundVolume,
+    frequencyHz,
+    frequencyWaveform,
+    frequencyToneVolume,
+    affirmations,
+    audioLayers,
+    voiceType,
+    voicePitch,
+    stopRecording,
+  ]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      stopRecording();
+    };
+  }, [stopRecording]);
+
+  // Cleanup blob URL on unmount
+  useEffect(() => {
+    return () => {
+      if (downloadUrl) URL.revokeObjectURL(downloadUrl);
+    };
+  }, [downloadUrl]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      className="space-y-4 mt-4"
+    >
+      <div className="rounded-xl overflow-hidden border border-border/40 bg-black relative">
+        {/* 16:9 canvas wrapper */}
+        <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+          <canvas
+            ref={canvasRef}
+            width={1280}
+            height={720}
+            className="absolute inset-0 w-full h-full"
+          />
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div className="space-y-3">
+        {isRecording && (
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>Recording preview…</span>
+              <span>{Math.round(progress)}%</span>
+            </div>
+            <Progress value={progress} className="h-1.5" />
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-3">
+          <Button
+            onClick={handleRecord}
+            variant={isRecording ? "destructive" : "outline"}
+            className={`gap-2 font-heading font-semibold ${
+              isRecording
+                ? "border-red-500/60"
+                : "border-accent/40 text-accent hover:bg-accent/10 hover:border-accent/70"
+            }`}
+          >
+            {isRecording ? (
+              <>
+                <Square className="w-4 h-4" />
+                Stop Recording
+              </>
+            ) : (
+              <>
+                <Video className="w-4 h-4" />
+                Record Preview ({previewDuration}s)
+              </>
+            )}
+          </Button>
+
+          {downloadUrl && (
+            <Button
+              asChild
+              className="gap-2 bg-primary/90 hover:bg-primary font-heading font-semibold"
+            >
+              <a href={downloadUrl} download="synapse-subliminal.webm">
+                <Download className="w-4 h-4" />
+                Download Video (.webm)
+              </a>
+            </Button>
+          )}
+        </div>
+
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Records up to {previewDuration}s with your frequency tone and nature
+          sound mixed directly into the video audio track. TTS plays alongside
+          the recording. Use the JSON config above for full FFmpeg MP4
+          production.
+        </p>
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Main page ─────────────────────────────────────────────────────────────────
+export default function GeneratorPage({
+  injectedTopic,
+  onInjectedTopicConsumed,
+}: GeneratorPageProps = {}) {
   // Step 1 state
   const [topic, setTopic] = useState("");
   const [modes, setModes] = useState<Record<ModeKey, boolean>>({
@@ -121,13 +841,24 @@ export default function GeneratorPage() {
   const [selectedChakra, setSelectedChakra] = useState("None");
 
   // Step 2 state
+  const [affirmationCount, setAffirmationCount] = useState(50);
   const [affirmations, setAffirmations] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
+  const [generationSource, setGenerationSource] = useState<
+    "ai" | "rule-based" | null
+  >(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // Step 3 config
   const [voiceType, setVoiceType] = useState("Neural Female");
-  const [voiceSpeed, setVoiceSpeed] = useState(1.0);
   const [voicePitch, setVoicePitch] = useState(0);
+
+  // 3-Layer Audio Stack
+  const [audioLayers, setAudioLayers] = useState([
+    { enabled: true, speed: 1.0, volume: 0.8 }, // Layer 1 — Normal
+    { enabled: true, speed: 1.8, volume: 0.6 }, // Layer 2 — Fast
+    { enabled: true, speed: 0.55, volume: 0.6 }, // Layer 3 — Slow
+  ]);
   const [repetitionCount, setRepetitionCount] = useState(10);
   const [whisperOverlay, setWhisperOverlay] = useState(false);
   const [backgroundMusic, setBackgroundMusic] = useState("Theta Waves");
@@ -142,14 +873,53 @@ export default function GeneratorPage() {
   const [duration, setDuration] = useState(300);
   const [frameRate, setFrameRate] = useState(30);
 
+  // Nature sound
+  const [natureSound, setNatureSound] = useState("None");
+  const [natureSoundVolume, setNatureSoundVolume] = useState(0.5);
+  const [isNaturePlaying, setIsNaturePlaying] = useState(false);
+  const natureSoundStopRef = useRef<(() => void) | null>(null);
+
+  // Frequency tone
+  const [frequencyHz, setFrequencyHz] = useState("528");
+  const [frequencyWaveform, setFrequencyWaveform] =
+    useState<OscillatorType>("sine");
+  const [frequencyToneVolume, setFrequencyToneVolume] = useState(0.4);
+  const [isFrequencyPlaying, setIsFrequencyPlaying] = useState(false);
+  const frequencyStopRef = useRef<(() => void) | null>(null);
+
+  // TTS
+  const [isTTSPlaying, setIsTTSPlaying] = useState(false);
+
+  // Mix preview
+  const [isMixPlaying, setIsMixPlaying] = useState(false);
+
   // Step 4 state
   const [projectJSON, setProjectJSON] = useState("");
+  const [isBuilding, setIsBuilding] = useState(false);
+  const [showVideoPreview, setShowVideoPreview] = useState(false);
   const [saveTitle, setSaveTitle] = useState("");
   const [projectsOpen, setProjectsOpen] = useState(false);
   const [loadedJSON, setLoadedJSON] = useState<string | null>(null);
 
+  // Consume topic injected from Wiki Search
+  useEffect(() => {
+    if (injectedTopic?.trim()) {
+      setTopic(injectedTopic.trim());
+      onInjectedTopicConsumed?.();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [injectedTopic, onInjectedTopicConsumed]);
+
+  // Cleanup all audio on unmount
+  useEffect(() => {
+    return () => {
+      window.speechSynthesis?.cancel();
+      natureSoundStopRef.current?.();
+      frequencyStopRef.current?.();
+    };
+  }, []);
+
   const generateMutation = useGenerateAffirmations();
-  const buildMutation = useBuildProjectJSON();
   const saveMutation = useSaveProject();
   const deleteMutation = useDeleteProject();
   const getProjectMutation = useGetProject();
@@ -159,12 +929,204 @@ export default function GeneratorPage() {
     setModes((prev) => ({ ...prev, [key]: !prev[key] }));
   }, []);
 
+  const handleToggleNatureSound = useCallback(() => {
+    if (isNaturePlaying) {
+      natureSoundStopRef.current?.();
+      natureSoundStopRef.current = null;
+      setIsNaturePlaying(false);
+    } else {
+      if (natureSound === "None") return;
+      const stop = startNatureSound(natureSound, natureSoundVolume);
+      natureSoundStopRef.current = stop;
+      setIsNaturePlaying(true);
+    }
+  }, [isNaturePlaying, natureSound, natureSoundVolume]);
+
+  const handleToggleFrequency = useCallback(() => {
+    if (isFrequencyPlaying) {
+      frequencyStopRef.current?.();
+      frequencyStopRef.current = null;
+      setIsFrequencyPlaying(false);
+    } else {
+      const hz = Number.parseFloat(frequencyHz);
+      if (Number.isNaN(hz) || hz <= 0) return;
+      const stop = startFrequencyTone(
+        hz,
+        frequencyWaveform,
+        frequencyToneVolume,
+      );
+      frequencyStopRef.current = stop;
+      setIsFrequencyPlaying(true);
+    }
+  }, [isFrequencyPlaying, frequencyHz, frequencyWaveform, frequencyToneVolume]);
+
+  const handleTTSPlay = useCallback(() => {
+    if (!affirmations.length) {
+      toast.error("Generate affirmations first");
+      return;
+    }
+    if (isTTSPlaying) {
+      window.speechSynthesis.cancel();
+      setIsTTSPlaying(false);
+      return;
+    }
+    const text = affirmations.slice(0, 5).join(". ");
+    const voices = window.speechSynthesis.getVoices();
+    const femVoice = voices.find(
+      (v) =>
+        v.name.toLowerCase().includes("female") ||
+        v.name.includes("Samantha") ||
+        v.name.includes("Victoria"),
+    );
+    const maleVoice = voices.find(
+      (v) =>
+        v.name.toLowerCase().includes("male") ||
+        v.name.includes("Daniel") ||
+        v.name.includes("Alex"),
+    );
+    const selectedVoice = voiceType.includes("Female")
+      ? femVoice
+      : voiceType.includes("Male")
+        ? maleVoice
+        : undefined;
+
+    let completedCount = 0;
+    const enabledLayers = audioLayers.filter((l) => l.enabled);
+
+    for (const layer of enabledLayers) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = layer.speed;
+      utter.volume = layer.volume;
+      utter.pitch = 1 + voicePitch * 0.1;
+      if (selectedVoice) utter.voice = selectedVoice;
+      utter.onend = () => {
+        completedCount++;
+        if (completedCount >= enabledLayers.length) setIsTTSPlaying(false);
+      };
+      utter.onerror = () => {
+        completedCount++;
+        if (completedCount >= enabledLayers.length) setIsTTSPlaying(false);
+      };
+      window.speechSynthesis.speak(utter);
+    }
+
+    if (enabledLayers.length > 0) setIsTTSPlaying(true);
+  }, [affirmations, isTTSPlaying, audioLayers, voicePitch, voiceType]);
+
+  const handleToggleMix = useCallback(() => {
+    if (isMixPlaying) {
+      // Stop all
+      window.speechSynthesis.cancel();
+      natureSoundStopRef.current?.();
+      natureSoundStopRef.current = null;
+      frequencyStopRef.current?.();
+      frequencyStopRef.current = null;
+      setIsTTSPlaying(false);
+      setIsNaturePlaying(false);
+      setIsFrequencyPlaying(false);
+      setIsMixPlaying(false);
+    } else {
+      if (!affirmations.length) {
+        toast.error("Generate affirmations first");
+        return;
+      }
+      // Start all enabled TTS layers simultaneously
+      const text = affirmations.slice(0, 5).join(". ");
+      const voices = window.speechSynthesis.getVoices();
+      const femVoice = voices.find(
+        (v) =>
+          v.name.toLowerCase().includes("female") ||
+          v.name.includes("Samantha") ||
+          v.name.includes("Victoria"),
+      );
+      const selectedVoice = voiceType.includes("Female") ? femVoice : undefined;
+      let completedCount = 0;
+      const enabledLayers = audioLayers.filter((l) => l.enabled);
+      for (const layer of enabledLayers) {
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.rate = layer.speed;
+        utter.volume = layer.volume;
+        utter.pitch = 1 + voicePitch * 0.1;
+        if (selectedVoice) utter.voice = selectedVoice;
+        utter.onend = () => {
+          completedCount++;
+          if (completedCount >= enabledLayers.length) setIsTTSPlaying(false);
+        };
+        window.speechSynthesis.speak(utter);
+      }
+      if (enabledLayers.length > 0) setIsTTSPlaying(true);
+
+      // Start nature sound
+      if (natureSound !== "None") {
+        const stopNature = startNatureSound(natureSound, natureSoundVolume);
+        natureSoundStopRef.current = stopNature;
+        setIsNaturePlaying(true);
+      }
+
+      // Start frequency tone
+      const hz = Number.parseFloat(frequencyHz);
+      if (!Number.isNaN(hz) && hz > 0) {
+        const stopFreq = startFrequencyTone(
+          hz,
+          frequencyWaveform,
+          frequencyToneVolume,
+        );
+        frequencyStopRef.current = stopFreq;
+        setIsFrequencyPlaying(true);
+      }
+
+      setIsMixPlaying(true);
+    }
+  }, [
+    isMixPlaying,
+    affirmations,
+    audioLayers,
+    voicePitch,
+    voiceType,
+    natureSound,
+    natureSoundVolume,
+    frequencyHz,
+    frequencyWaveform,
+    frequencyToneVolume,
+  ]);
+
+  /** Expand a base set of affirmations to exactly `count` by cycling through them */
+  const expandToCount = useCallback(
+    (base: string[], count: number): string[] => {
+      if (base.length === 0) return [];
+      if (base.length >= count) return base.slice(0, count);
+      const expanded: string[] = [];
+      for (let i = 0; i < count; i++) {
+        expanded.push(base[i % base.length]);
+      }
+      return expanded;
+    },
+    [],
+  );
+
   const handleGenerate = async () => {
     if (!topic.trim()) {
       toast.error("Please enter a topic for your affirmations.");
       return;
     }
+    setIsGenerating(true);
     try {
+      const aiResult = await generateAffirmationsWithAI(
+        topic,
+        modes.booster,
+        modes.fantasy,
+        modes.protection,
+        selectedChakra === "None" ? "" : selectedChakra,
+      );
+
+      if (aiResult && aiResult.length > 0) {
+        const expanded = expandToCount(aiResult, affirmationCount);
+        setAffirmations(expanded);
+        setGenerationSource("ai");
+        toast.success(`Generated ${expanded.length} affirmations (AI)`);
+        return;
+      }
+
       const result = await generateMutation.mutateAsync({
         topic,
         boosterEnabled: modes.booster,
@@ -172,10 +1134,14 @@ export default function GeneratorPage() {
         protectionEnabled: modes.protection,
         chakraName: selectedChakra === "None" ? "" : selectedChakra,
       });
-      setAffirmations(result);
-      toast.success(`Generated ${result.length} affirmations`);
+      const expanded = expandToCount(result, affirmationCount);
+      setAffirmations(expanded);
+      setGenerationSource("rule-based");
+      toast.success(`Generated ${expanded.length} affirmations`);
     } catch (_e) {
       toast.error("Failed to generate affirmations. Please try again.");
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -187,41 +1153,103 @@ export default function GeneratorPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleBuild = async () => {
+  const handleBuild = () => {
     if (!affirmations.length) {
       toast.error("Please generate affirmations first.");
       return;
     }
+
+    setIsBuilding(true);
+    setShowVideoPreview(false);
+
     try {
-      const result = await buildMutation.mutateAsync({
-        topic,
+      const ffmpegCmd = `ffmpeg -loop 1 -i background.jpg -filter_complex "[0:a][1:a][2:a]amix=inputs=3:duration=longest" -c:v libx264 -t ${duration} output.mp4`;
+
+      const payload = {
+        project: {
+          topic,
+          version: "1.0",
+          format: "mp4",
+          generated_at: new Date().toISOString(),
+        },
         affirmations,
-        boosterEnabled: modes.booster,
-        fantasyEnabled: modes.fantasy,
-        fantasyInput: "",
-        protectionEnabled: modes.protection,
-        chakraName: selectedChakra === "None" ? "" : selectedChakra,
-        voiceType,
-        voiceSpeed,
-        voicePitch,
-        repetitionCount,
-        whisperOverlay,
-        backgroundMusicType: backgroundMusic,
-        subliminalFrequency: subliminalFreq,
-        musicVolume,
-        subliminalVolume,
-        waveformOverlay,
-        stereoMovement,
-        themeStyle,
-        colorPalette,
-        resolution,
-        durationSeconds: duration,
-        frameRate,
-      });
-      setProjectJSON(result);
+        modes: {
+          booster: modes.booster,
+          fantasy_to_reality: modes.fantasy,
+          protection: modes.protection,
+        },
+        chakra: selectedChakra === "None" ? null : selectedChakra,
+        voice: {
+          type: voiceType,
+          pitch: voicePitch,
+          repetition_count: repetitionCount,
+          whisper_overlay: whisperOverlay,
+          layers: [
+            {
+              layer: 1,
+              label: "Normal",
+              enabled: audioLayers[0].enabled,
+              speed: audioLayers[0].speed,
+              volume: audioLayers[0].volume,
+              alignment: "base",
+            },
+            {
+              layer: 2,
+              label: "Fast",
+              enabled: audioLayers[1].enabled,
+              speed: audioLayers[1].speed,
+              volume: audioLayers[1].volume,
+              alignment: "loops_to_match_duration",
+            },
+            {
+              layer: 3,
+              label: "Slow",
+              enabled: audioLayers[2].enabled,
+              speed: audioLayers[2].speed,
+              volume: audioLayers[2].volume,
+              alignment: "stretches_to_match_duration",
+            },
+          ],
+        },
+        audio: {
+          background_music: backgroundMusic,
+          subliminal_frequency: subliminalFreq,
+          music_volume: musicVolume,
+          subliminal_volume: subliminalVolume,
+          waveform_overlay: waveformOverlay,
+          stereo_movement: stereoMovement,
+          nature_sound: {
+            type: natureSound,
+            volume: natureSoundVolume,
+          },
+          frequency_tone: {
+            hz: Number.parseFloat(frequencyHz),
+            waveform: frequencyWaveform,
+            volume: frequencyToneVolume,
+          },
+        },
+        visual: {
+          theme: themeStyle,
+          color_palette: colorPalette,
+          waveform_overlay: waveformOverlay,
+        },
+        render: {
+          resolution,
+          duration_seconds: duration,
+          frame_rate: frameRate,
+          output_format: "mp4",
+          encoder: "h264",
+          audio_codec: "aac",
+        },
+        ffmpeg_command: ffmpegCmd,
+      };
+
+      setProjectJSON(JSON.stringify(payload));
       toast.success("Project JSON built successfully");
     } catch (_e) {
       toast.error("Failed to build project JSON.");
+    } finally {
+      setIsBuilding(false);
     }
   };
 
@@ -435,13 +1463,83 @@ export default function GeneratorPage() {
           </h2>
         </div>
 
+        {/* Affirmation Count Control */}
+        <div className="space-y-3 p-4 rounded-xl bg-secondary/20 border border-border/40">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <Label className="text-sm font-heading font-semibold">
+              Affirmation Count
+            </Label>
+            <div className="flex items-center gap-2">
+              <Input
+                type="number"
+                min={1}
+                max={4000}
+                value={affirmationCount}
+                onChange={(e) =>
+                  setAffirmationCount(
+                    Math.max(1, Math.min(4000, Number(e.target.value) || 1)),
+                  )
+                }
+                className="w-20 h-8 text-sm text-center bg-input/50 border-border/50 focus:border-primary/50"
+              />
+              <span className="text-xs text-muted-foreground">/ 4000 max</span>
+            </div>
+          </div>
+          <Slider
+            min={1}
+            max={4000}
+            step={1}
+            value={[affirmationCount]}
+            onValueChange={([v]) => setAffirmationCount(v)}
+            className="w-full"
+          />
+          {/* Quick presets */}
+          <div className="flex flex-wrap gap-1.5">
+            {[
+              { label: "25", value: 25 },
+              { label: "50", value: 50 },
+              { label: "100", value: 100 },
+              { label: "250", value: 250 },
+              { label: "500", value: 500 },
+              { label: "15 min", value: 900 },
+              { label: "1000", value: 1000 },
+              { label: "2000", value: 2000 },
+              { label: "4000 max", value: 4000 },
+            ].map((preset) => (
+              <button
+                key={preset.label}
+                type="button"
+                onClick={() => setAffirmationCount(preset.value)}
+                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all border ${
+                  affirmationCount === preset.value
+                    ? "bg-primary/20 text-primary border-primary/50"
+                    : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-primary/40 hover:text-primary"
+                }`}
+              >
+                {preset.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {affirmationCount === 900
+              ? "~15 minutes of subliminal cycling at 1 affirmation/sec"
+              : affirmationCount <= 50
+                ? "Compact set — good for short sessions"
+                : affirmationCount <= 500
+                  ? "Standard set — suitable for 5–10 min sessions"
+                  : affirmationCount <= 1000
+                    ? "Extended set — ideal for 15–20 min sessions"
+                    : "Maximum density — ultra-deep subliminal saturation"}
+          </p>
+        </div>
+
         <Button
           onClick={handleGenerate}
-          disabled={generateMutation.isPending || !topic.trim()}
+          disabled={isGenerating || generateMutation.isPending || !topic.trim()}
           className="w-full h-14 text-base font-heading font-semibold glow-primary bg-primary/90 hover:bg-primary transition-all"
           size="lg"
         >
-          {generateMutation.isPending ? (
+          {isGenerating || generateMutation.isPending ? (
             <>
               <Loader2 className="w-5 h-5 mr-2 animate-spin" />
               Generating Affirmations...
@@ -455,7 +1553,7 @@ export default function GeneratorPage() {
         </Button>
 
         {/* Loading skeleton */}
-        {generateMutation.isPending && (
+        {(isGenerating || generateMutation.isPending) && (
           <div className="space-y-2">
             {["sk-1", "sk-2", "sk-3", "sk-4", "sk-5", "sk-6"].map((k, i) => (
               <Skeleton
@@ -469,45 +1567,69 @@ export default function GeneratorPage() {
 
         {/* Results */}
         <AnimatePresence>
-          {affirmations.length > 0 && !generateMutation.isPending && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="space-y-3"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
-                  {affirmations.length} affirmations generated
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleCopyAffirmations}
-                  className="text-xs gap-1.5 hover:text-primary"
-                >
-                  {copied ? (
-                    <Check className="w-3.5 h-3.5 text-green-400" />
-                  ) : (
-                    <Copy className="w-3.5 h-3.5" />
-                  )}
-                  {copied ? "Copied!" : "Copy All"}
-                </Button>
-              </div>
-              <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
-                {affirmations.map((line, i) => (
-                  <motion.div
-                    key={`aff-${line.slice(0, 20)}-${i}`}
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.04 }}
-                    className="affirmation-line text-sm"
+          {affirmations.length > 0 &&
+            !isGenerating &&
+            !generateMutation.isPending && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="space-y-3"
+              >
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm text-muted-foreground">
+                      {affirmations.length} affirmations generated
+                    </span>
+                    {generationSource === "ai" && (
+                      <Badge className="text-[10px] px-2 py-0 h-5 bg-primary/20 text-primary border-primary/40">
+                        AI
+                      </Badge>
+                    )}
+                    {generationSource === "rule-based" && (
+                      <Badge
+                        variant="secondary"
+                        className="text-[10px] px-2 py-0 h-5 bg-muted/50 text-muted-foreground border-border/40"
+                      >
+                        Rule-Based
+                      </Badge>
+                    )}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleCopyAffirmations}
+                    className="text-xs gap-1.5 hover:text-primary"
                   >
-                    {line}
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          )}
+                    {copied ? (
+                      <Check className="w-3.5 h-3.5 text-green-400" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                    {copied ? "Copied!" : "Copy All"}
+                  </Button>
+                </div>
+                <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                  {affirmations.slice(0, 100).map((line, i) => (
+                    <motion.div
+                      key={`aff-${line.slice(0, 20)}-${i}`}
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: Math.min(i * 0.04, 1.2) }}
+                      className="affirmation-line text-sm"
+                    >
+                      {line}
+                    </motion.div>
+                  ))}
+                  {affirmations.length > 100 && (
+                    <div className="text-xs text-muted-foreground text-center py-3 border border-border/30 rounded-lg bg-secondary/20">
+                      Showing 100 of {affirmations.length} affirmations — all{" "}
+                      {affirmations.length} are included in the video and JSON
+                      export
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
         </AnimatePresence>
       </motion.section>
 
@@ -577,18 +1699,172 @@ export default function GeneratorPage() {
                     className="w-full"
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">
-                    Speed: {voiceSpeed.toFixed(1)}x
-                  </Label>
-                  <Slider
-                    min={0.5}
-                    max={2.0}
-                    step={0.1}
-                    value={[voiceSpeed]}
-                    onValueChange={([v]) => setVoiceSpeed(v)}
-                    className="w-full"
-                  />
+                <div className="space-y-2 col-span-1 sm:col-span-2">
+                  {/* ── 3-Layer Audio Stack ── */}
+                  <div className="p-4 rounded-xl bg-background/40 border border-border/30 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Volume2 className="w-4 h-4 text-accent" />
+                      <Label className="text-sm font-heading font-semibold">
+                        3-Layer Audio Stack
+                      </Label>
+                    </div>
+
+                    {[
+                      {
+                        index: 0,
+                        label: "Layer 1 — Normal",
+                        desc: "Base subliminal layer",
+                        color: "oklch(0.65 0.22 270)",
+                        colorClass: "text-primary",
+                        borderColor: "oklch(0.65 0.22 270)",
+                        minSpeed: 0.5,
+                        maxSpeed: 2.0,
+                      },
+                      {
+                        index: 1,
+                        label: "Layer 2 — Fast",
+                        desc: "Micro-repetition, faster cycling",
+                        color: "oklch(0.75 0.18 60)",
+                        colorClass: "text-amber-400",
+                        borderColor: "oklch(0.75 0.18 60)",
+                        minSpeed: 1.2,
+                        maxSpeed: 3.0,
+                      },
+                      {
+                        index: 2,
+                        label: "Layer 3 — Slow",
+                        desc: "Deep subconscious absorption",
+                        color: "oklch(0.65 0.2 185)",
+                        colorClass: "text-teal-400",
+                        borderColor: "oklch(0.65 0.2 185)",
+                        minSpeed: 0.3,
+                        maxSpeed: 0.9,
+                      },
+                    ].map((layerMeta) => {
+                      const layer = audioLayers[layerMeta.index];
+                      return (
+                        <div
+                          key={layerMeta.index}
+                          className="rounded-lg p-3 space-y-3 transition-all duration-200 border border-border/30 bg-background/40"
+                          style={{
+                            opacity: layer.enabled ? 1 : 0.4,
+                            borderLeftWidth: "3px",
+                            borderLeftColor: layer.enabled
+                              ? layerMeta.borderColor
+                              : "transparent",
+                          }}
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                                style={{
+                                  background: layer.enabled
+                                    ? layerMeta.color
+                                    : "oklch(0.4 0.01 270)",
+                                }}
+                              />
+                              <div>
+                                <p
+                                  className="text-xs font-heading font-semibold"
+                                  style={{
+                                    color: layer.enabled
+                                      ? layerMeta.color
+                                      : undefined,
+                                  }}
+                                >
+                                  {layerMeta.label}
+                                </p>
+                                <p className="text-[10px] text-muted-foreground leading-snug">
+                                  {layerMeta.desc}
+                                </p>
+                              </div>
+                            </div>
+                            <Switch
+                              checked={layer.enabled}
+                              onCheckedChange={(checked) =>
+                                setAudioLayers((prev) =>
+                                  prev.map((l, i) =>
+                                    i === layerMeta.index
+                                      ? { ...l, enabled: checked }
+                                      : l,
+                                  ),
+                                )
+                              }
+                            />
+                          </div>
+                          {layer.enabled && (
+                            <div className="space-y-2.5 pl-4">
+                              <div className="space-y-1">
+                                <div className="flex justify-between">
+                                  <Label className="text-[10px] text-muted-foreground">
+                                    Speed
+                                  </Label>
+                                  <span
+                                    className="text-[10px] font-mono"
+                                    style={{ color: layerMeta.color }}
+                                  >
+                                    {layer.speed.toFixed(2)}x
+                                  </span>
+                                </div>
+                                <Slider
+                                  min={layerMeta.minSpeed}
+                                  max={layerMeta.maxSpeed}
+                                  step={0.05}
+                                  value={[layer.speed]}
+                                  onValueChange={([v]) =>
+                                    setAudioLayers((prev) =>
+                                      prev.map((l, i) =>
+                                        i === layerMeta.index
+                                          ? { ...l, speed: v }
+                                          : l,
+                                      ),
+                                    )
+                                  }
+                                  className="w-full"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <div className="flex justify-between">
+                                  <Label className="text-[10px] text-muted-foreground">
+                                    Volume
+                                  </Label>
+                                  <span
+                                    className="text-[10px] font-mono"
+                                    style={{ color: layerMeta.color }}
+                                  >
+                                    {Math.round(layer.volume * 100)}%
+                                  </span>
+                                </div>
+                                <Slider
+                                  min={0}
+                                  max={1}
+                                  step={0.05}
+                                  value={[layer.volume]}
+                                  onValueChange={([v]) =>
+                                    setAudioLayers((prev) =>
+                                      prev.map((l, i) =>
+                                        i === layerMeta.index
+                                          ? { ...l, volume: v }
+                                          : l,
+                                      ),
+                                    )
+                                  }
+                                  className="w-full"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+
+                    <p className="text-[10px] text-muted-foreground leading-relaxed pt-1 border-t border-border/20">
+                      All layers are synchronized to the same total duration.
+                      Faster layers cycle more repetitions; slower layers cycle
+                      fewer but deeper.
+                    </p>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground">
@@ -616,6 +1892,45 @@ export default function GeneratorPage() {
                   checked={whisperOverlay}
                   onCheckedChange={setWhisperOverlay}
                 />
+              </div>
+
+              {/* TTS Preview */}
+              <div className="p-4 rounded-xl bg-background/40 border border-border/30 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Volume2 className="w-4 h-4 text-accent" />
+                  <Label className="text-sm font-heading font-semibold">
+                    TTS Preview
+                  </Label>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={!affirmations.length}
+                    onClick={handleTTSPlay}
+                    className={`gap-2 font-heading font-semibold transition-all ${
+                      isTTSPlaying
+                        ? "border-green-500/60 text-green-400 bg-green-500/10 hover:bg-green-500/20"
+                        : "border-accent/40 text-accent hover:bg-accent/10 hover:border-accent/70"
+                    }`}
+                  >
+                    {isTTSPlaying ? (
+                      <>
+                        <Square className="w-3.5 h-3.5" />
+                        Stop TTS
+                      </>
+                    ) : (
+                      <>
+                        <Volume2 className="w-3.5 h-3.5" />
+                        Preview Layered TTS
+                      </>
+                    )}
+                  </Button>
+                  <span className="text-xs text-muted-foreground">
+                    Speaks first 5 affirmations across all enabled layers
+                  </span>
+                </div>
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -728,6 +2043,227 @@ export default function GeneratorPage() {
                     onCheckedChange={setStereoMovement}
                   />
                 </div>
+              </div>
+
+              {/* ── Foreground Sound ── */}
+              <div className="space-y-4 p-4 rounded-xl bg-background/40 border border-border/30">
+                <div className="flex items-center gap-2">
+                  <Leaf className="w-4 h-4 text-accent" />
+                  <Label className="text-sm font-heading font-semibold">
+                    Foreground Sound
+                  </Label>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {NATURE_SOUNDS.map((sound) => {
+                    const Icon = sound.icon;
+                    const selected = natureSound === sound.label;
+                    return (
+                      <button
+                        type="button"
+                        key={sound.label}
+                        onClick={() => {
+                          setNatureSound(sound.label);
+                          if (isNaturePlaying) {
+                            natureSoundStopRef.current?.();
+                            natureSoundStopRef.current = null;
+                            setIsNaturePlaying(false);
+                          }
+                        }}
+                        className={`flex flex-col items-center gap-1.5 py-3 px-2 rounded-xl text-xs font-medium transition-all duration-200 border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+                          selected
+                            ? "mode-card-active"
+                            : "mode-card-inactive hover:border-border"
+                        }`}
+                        aria-pressed={selected}
+                      >
+                        <Icon
+                          className="w-5 h-5"
+                          style={{ color: selected ? sound.color : undefined }}
+                        />
+                        <span
+                          className="leading-tight text-center"
+                          style={selected ? { color: sound.color } : undefined}
+                        >
+                          {sound.label}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">
+                    Sound Volume: {Math.round(natureSoundVolume * 100)}%
+                  </Label>
+                  <Slider
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    value={[natureSoundVolume]}
+                    onValueChange={([v]) => setNatureSoundVolume(v)}
+                    className="w-full"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={natureSound === "None"}
+                  onClick={handleToggleNatureSound}
+                  className={`gap-2 font-heading font-semibold transition-all ${
+                    isNaturePlaying
+                      ? "border-green-500/60 text-green-400 bg-green-500/10 hover:bg-green-500/20"
+                      : "border-accent/40 text-accent hover:bg-accent/10 hover:border-accent/70"
+                  }`}
+                >
+                  {isNaturePlaying ? (
+                    <>
+                      <Square className="w-3.5 h-3.5" />
+                      Stop Sound
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-3.5 h-3.5" />
+                      Play Sound
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* ── Frequency Tone ── */}
+              <div className="space-y-4 p-4 rounded-xl bg-background/40 border border-border/30">
+                <div className="flex items-center gap-2">
+                  <Music className="w-4 h-4 text-accent" />
+                  <Label className="text-sm font-heading font-semibold">
+                    Frequency Tone
+                  </Label>
+                </div>
+
+                {/* Frequency presets */}
+                <div className="flex flex-wrap gap-2">
+                  {FREQUENCY_PRESETS.map((preset) => {
+                    const selected = frequencyHz === String(preset.hz);
+                    return (
+                      <button
+                        type="button"
+                        key={preset.hz}
+                        onClick={() => {
+                          setFrequencyHz(String(preset.hz));
+                          if (isFrequencyPlaying) {
+                            frequencyStopRef.current?.();
+                            const stop = startFrequencyTone(
+                              preset.hz,
+                              frequencyWaveform,
+                              frequencyToneVolume,
+                            );
+                            frequencyStopRef.current = stop;
+                          }
+                        }}
+                        className={`flex flex-col items-center px-3 py-2 rounded-full text-xs font-medium transition-all border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+                          selected
+                            ? "bg-primary/20 text-primary border-primary/50"
+                            : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-primary/40 hover:text-primary"
+                        }`}
+                        aria-pressed={selected}
+                      >
+                        <span className="font-semibold">{preset.label}</span>
+                        <span className="text-[10px] opacity-70 leading-tight">
+                          {preset.sublabel}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Custom hz input */}
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    min={1}
+                    max={20000}
+                    value={frequencyHz}
+                    onChange={(e) => setFrequencyHz(e.target.value)}
+                    className="w-28 h-8 text-sm text-center bg-input/50 border-border/50 focus:border-primary/50"
+                    placeholder="Hz"
+                  />
+                  <span className="text-xs text-muted-foreground">
+                    Custom frequency (Hz)
+                  </span>
+                </div>
+
+                {/* Waveform selector */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">
+                    Waveform
+                  </Label>
+                  <div className="flex gap-2 flex-wrap">
+                    {WAVEFORMS.map((wf) => (
+                      <button
+                        type="button"
+                        key={wf.type}
+                        onClick={() => {
+                          setFrequencyWaveform(wf.type);
+                          if (isFrequencyPlaying) {
+                            frequencyStopRef.current?.();
+                            const hz = Number.parseFloat(frequencyHz);
+                            const stop = startFrequencyTone(
+                              hz,
+                              wf.type,
+                              frequencyToneVolume,
+                            );
+                            frequencyStopRef.current = stop;
+                          }
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+                          frequencyWaveform === wf.type
+                            ? "bg-primary/20 text-primary border-primary/50"
+                            : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-primary/40 hover:text-primary"
+                        }`}
+                        aria-pressed={frequencyWaveform === wf.type}
+                      >
+                        {wf.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Volume */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">
+                    Tone Volume: {Math.round(frequencyToneVolume * 100)}%
+                  </Label>
+                  <Slider
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    value={[frequencyToneVolume]}
+                    onValueChange={([v]) => setFrequencyToneVolume(v)}
+                    className="w-full"
+                  />
+                </div>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleToggleFrequency}
+                  className={`gap-2 font-heading font-semibold transition-all ${
+                    isFrequencyPlaying
+                      ? "border-green-500/60 text-green-400 bg-green-500/10 hover:bg-green-500/20"
+                      : "border-accent/40 text-accent hover:bg-accent/10 hover:border-accent/70"
+                  }`}
+                >
+                  {isFrequencyPlaying ? (
+                    <>
+                      <Square className="w-3.5 h-3.5" />
+                      Stop Tone
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-3.5 h-3.5" />
+                      Play Tone
+                    </>
+                  )}
+                </Button>
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -870,9 +2406,41 @@ export default function GeneratorPage() {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+
+        {/* ── Preview Audio Mix ── */}
+        <div className="pt-2">
+          <Button
+            type="button"
+            onClick={handleToggleMix}
+            disabled={!affirmations.length}
+            variant="outline"
+            className={`w-full h-12 font-heading font-semibold gap-2 transition-all ${
+              isMixPlaying
+                ? "border-green-500/60 text-green-400 bg-green-500/10 hover:bg-green-500/20"
+                : "border-primary/40 text-primary hover:bg-primary/10 hover:border-primary/70"
+            }`}
+          >
+            {isMixPlaying ? (
+              <>
+                <Square className="w-4 h-4" />
+                Stop Mix
+              </>
+            ) : (
+              <>
+                <Play className="w-4 h-4" />
+                Preview Audio Mix
+              </>
+            )}
+          </Button>
+          {!affirmations.length && (
+            <p className="text-xs text-muted-foreground text-center mt-1.5">
+              Generate affirmations first to preview the audio mix
+            </p>
+          )}
+        </div>
       </motion.section>
 
-      {/* ── Step 4: Build JSON ────────────────────────────────── */}
+      {/* ── Step 4: Build JSON + Video Preview ───────────────── */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -891,11 +2459,11 @@ export default function GeneratorPage() {
 
         <Button
           onClick={handleBuild}
-          disabled={buildMutation.isPending || !affirmations.length}
+          disabled={isBuilding || !affirmations.length}
           variant="outline"
           className="w-full h-12 font-heading font-semibold border-accent/40 text-accent hover:bg-accent/10 hover:border-accent/70"
         >
-          {buildMutation.isPending ? (
+          {isBuilding ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               Building JSON...
@@ -909,13 +2477,14 @@ export default function GeneratorPage() {
         </Button>
 
         <AnimatePresence>
-          {projectJSON && !buildMutation.isPending && (
+          {projectJSON && !isBuilding && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               className="space-y-4"
             >
+              {/* JSON display */}
               <div className="relative">
                 <div className="terminal-block p-4 overflow-auto max-h-64 rounded-xl">
                   <pre className="text-xs whitespace-pre-wrap break-all">
@@ -941,6 +2510,40 @@ export default function GeneratorPage() {
                   Copy
                 </Button>
               </div>
+
+              {/* Preview & Export Video button */}
+              <Button
+                onClick={() => setShowVideoPreview((v) => !v)}
+                variant="outline"
+                className="w-full h-11 font-heading font-semibold border-primary/40 text-primary hover:bg-primary/10 hover:border-primary/70 gap-2"
+              >
+                <Video className="w-4 h-4" />
+                {showVideoPreview
+                  ? "Hide Video Preview"
+                  : "Preview & Export Video"}
+              </Button>
+
+              {/* Canvas video preview */}
+              <AnimatePresence>
+                {showVideoPreview && (
+                  <VideoPreview
+                    affirmations={affirmations}
+                    topic={topic}
+                    chakra={selectedChakra}
+                    palette={colorPalette}
+                    theme={themeStyle}
+                    duration={duration}
+                    natureSound={natureSound}
+                    natureSoundVolume={natureSoundVolume}
+                    frequencyHz={frequencyHz}
+                    frequencyWaveform={frequencyWaveform}
+                    frequencyToneVolume={frequencyToneVolume}
+                    audioLayers={audioLayers}
+                    voiceType={voiceType}
+                    voicePitch={voicePitch}
+                  />
+                )}
+              </AnimatePresence>
 
               {/* Save project */}
               <div className="flex gap-2">
