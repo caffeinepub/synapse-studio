@@ -1272,10 +1272,23 @@ function parseTaggedQuery(input: string): {
   tag: string | null;
   query: string;
 } {
-  // Match: "Tag Name": query  OR  "Tag Name":query
-  const match = input.match(/^"([^"]+)"\s*:\s*(.+)$/);
-  if (match) {
-    return { tag: match[1].trim(), query: match[2].trim() };
+  // Match quoted: "Tag Name": query  OR  "Tag Name":query
+  const quotedMatch = input.match(/^"([^"]+)"\s*:\s*(.+)$/);
+  if (quotedMatch) {
+    return { tag: quotedMatch[1].trim(), query: quotedMatch[2].trim() };
+  }
+  // Match unquoted: Tag Name: query — only if tag portion has 2+ words and colon is not in URL
+  // e.g. "Hazbin Hotel: Emily" → tag="Hazbin Hotel", query="Emily"
+  const unquotedMatch = input.match(
+    /^([A-Za-z][A-Za-z0-9 '._-]{2,}?):\s*(.+)$/,
+  );
+  if (unquotedMatch) {
+    const possibleTag = unquotedMatch[1].trim();
+    const possibleQuery = unquotedMatch[2].trim();
+    // Only treat as tag if the tag part is 2+ words or a known series name (not a generic word)
+    if (/\s/.test(possibleTag) || possibleTag.length > 6) {
+      return { tag: possibleTag, query: possibleQuery };
+    }
   }
   return { tag: null, query: input.trim() };
 }
@@ -1369,7 +1382,11 @@ async function searchWiki(
 }
 
 /** Score a result by how closely the title matches the query. Higher = better. */
-function scoreResult(result: WikiResult, query: string): number {
+function scoreResult(
+  result: WikiResult,
+  query: string,
+  scopedDomains?: Set<string>,
+): number {
   const queryLower = query.toLowerCase();
   const titleLower = result.title.toLowerCase();
   let score = 0;
@@ -1388,6 +1405,9 @@ function scoreResult(result: WikiResult, query: string): number {
   // Title contains query substring
   else if (titleLower.includes(queryLower)) score += 20;
 
+  // Boost results that come from a scoped wiki
+  if (scopedDomains?.has(result.wikiDomain)) score += 50;
+
   // Penalize disambiguation, list, and namespace pages
   if (/\(disambiguation\)/i.test(result.title)) score -= 30;
   if (/^list of/i.test(result.title)) score -= 20;
@@ -1400,6 +1420,7 @@ function scoreResult(result: WikiResult, query: string): number {
 async function searchMultipleWikis(
   wikis: WikiInfo[],
   query: string,
+  scopedDomains?: Set<string>,
 ): Promise<WikiResult[]> {
   const all = await Promise.allSettled(
     wikis.map((w) => searchWiki(w, query, 5)),
@@ -1429,9 +1450,22 @@ async function searchMultipleWikis(
       // Remove meta content pages (season, episode, volume, chapter entries)
       if (/\((season|episode|volume|chapter|arc|part)\s*\d*/i.test(t))
         return false;
+      // Remove comic issue/volume pages like "Ghosts Vol 1 8", "Lot 13 Vol 1 4"
+      if (/\bvol\.?\s*\d+\b/i.test(t)) return false;
+      if (/\bissue\s*#?\d+\b/i.test(t)) return false;
+      // Remove bare numbered entries like "Title 12" at the end
+      if (/\s+\d+$/.test(t) && !/^(season|episode)/i.test(t)) {
+        // Allow things like "Spider-Man 2" but block "Ghosts 8" (too generic a number suffix)
+        // Only block if the number is >3 digits or the title looks like a series entry
+        if (/\s+\d{2,}$/.test(t)) return false;
+      }
       return true;
     })
-    .sort((a, b) => scoreResult(b, query) - scoreResult(a, query))
+    .sort(
+      (a, b) =>
+        scoreResult(b, query, scopedDomains) -
+        scoreResult(a, query, scopedDomains),
+    )
     .slice(0, 50); // max 50 results
 }
 
@@ -1562,11 +1596,18 @@ export default function WikiSearchPage({
       POWER_WIKIS,
     );
     const searchPool = scope ? scope.wikis : POWER_WIKIS;
+    const scopedDomains = scope
+      ? new Set(scope.wikis.map((w) => w.domain))
+      : undefined;
     setUnifiedScope(scope);
     setUnifiedLoading(true);
     setUnifiedSearched(true);
     try {
-      const results = await searchMultipleWikis(searchPool, query);
+      const results = await searchMultipleWikis(
+        searchPool,
+        query,
+        scopedDomains,
+      );
       setUnifiedResults(results);
       if (results.length === 0)
         toast.info("No results found. Try a different term.");
@@ -1587,11 +1628,18 @@ export default function WikiSearchPage({
       CHARACTER_WIKIS,
     );
     const searchPool = scope ? scope.wikis : CHARACTER_WIKIS;
+    const scopedDomains = scope
+      ? new Set(scope.wikis.map((w) => w.domain))
+      : undefined;
     setCharacterScope(scope);
     setCharacterLoading(true);
     setCharacterSearched(true);
     try {
-      const results = await searchMultipleWikis(searchPool, query);
+      const results = await searchMultipleWikis(
+        searchPool,
+        query,
+        scopedDomains,
+      );
       setCharacterResults(results);
       if (results.length === 0)
         toast.info("No results found. Try a different name.");
@@ -1612,11 +1660,18 @@ export default function WikiSearchPage({
       POWERS_WIKIS,
     );
     const searchPool = scope ? scope.wikis : POWERS_WIKIS;
+    const scopedDomains = scope
+      ? new Set(scope.wikis.map((w) => w.domain))
+      : undefined;
     setPowersScope(scope);
     setPowersLoading(true);
     setPowersSearched(true);
     try {
-      const results = await searchMultipleWikis(searchPool, query);
+      const results = await searchMultipleWikis(
+        searchPool,
+        query,
+        scopedDomains,
+      );
       setPowersResults(results);
       if (results.length === 0)
         toast.info("No results found. Try a different term.");
@@ -1672,13 +1727,14 @@ export default function WikiSearchPage({
         <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/15">
           <Info className="w-3.5 h-3.5 text-primary/60 mt-0.5 shrink-0" />
           <p className="text-xs text-muted-foreground">
-            <span className="text-primary/80 font-medium">Tip:</span> Use{" "}
+            <span className="text-primary/80 font-medium">Tip:</span> Scope to a
+            wiki by typing{" "}
             <code className="px-1 py-0.5 rounded bg-primary/10 text-primary text-[11px]">
-              "Wiki Name": search term
+              Hazbin Hotel: Emily
             </code>{" "}
-            to scope results, e.g.{" "}
+            or{" "}
             <code className="px-1 py-0.5 rounded bg-primary/10 text-primary text-[11px]">
-              "Hazbin Hotel": Alastor
+              "Naruto": Sasuke
             </code>
           </p>
         </div>
@@ -1865,13 +1921,14 @@ export default function WikiSearchPage({
               <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/15">
                 <Info className="w-3.5 h-3.5 text-primary/60 mt-0.5 shrink-0" />
                 <p className="text-xs text-muted-foreground">
-                  <span className="text-primary/80 font-medium">Tip:</span> Use{" "}
+                  <span className="text-primary/80 font-medium">Tip:</span>{" "}
+                  Scope to a wiki:{" "}
                   <code className="px-1 py-0.5 rounded bg-primary/10 text-primary text-[11px]">
-                    "Wiki Name": search term
+                    Naruto: Sasuke
                   </code>{" "}
-                  to scope results, e.g.{" "}
+                  or{" "}
                   <code className="px-1 py-0.5 rounded bg-primary/10 text-primary text-[11px]">
-                    "Naruto": Sasuke
+                    Hazbin Hotel: Emily
                   </code>
                 </p>
               </div>
