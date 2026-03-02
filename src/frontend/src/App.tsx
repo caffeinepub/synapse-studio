@@ -9,6 +9,7 @@ import RitualsPage from "./pages/RitualsPage";
 import SettingsPage from "./pages/SettingsPage";
 import SpellsPage from "./pages/SpellsPage";
 import SpiritualEntitiesPage from "./pages/SpiritualEntitiesPage";
+import VideoEditorPage from "./pages/VideoEditorPage";
 import WikiSearchPage from "./pages/WikiSearchPage";
 import YouTubePage from "./pages/YouTubePage";
 
@@ -22,7 +23,8 @@ type Page =
   | "spells"
   | "rituals"
   | "settings"
-  | "youtube";
+  | "youtube"
+  | "videoeditor";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("generator");
@@ -106,6 +108,9 @@ export default function App() {
               onInjectedTopicConsumed={() => setWikiInjectedTopic("")}
               subliminalCtx={subliminalCtx}
             />
+          )}
+          {currentPage === "videoeditor" && (
+            <VideoEditorPage subliminalCtx={subliminalCtx} />
           )}
         </main>
 

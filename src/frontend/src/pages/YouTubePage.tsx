@@ -8,12 +8,15 @@ import {
   AlignLeft,
   Bold,
   Check,
+  CheckCircle,
+  Circle,
   Copy,
   Download,
   Eye,
   Image,
   ImagePlus,
   Lightbulb,
+  Package,
   Paintbrush,
   Play,
   RefreshCw,
@@ -402,6 +405,21 @@ export default function YouTubePage({
     [title, titleWasAutoSet],
   );
 
+  // Auto-sync and build description when subliminalCtx changes
+  // biome-ignore lint/correctness/useExhaustiveDependencies: syncFromCtx is stable memoized fn; including it causes infinite loops
+  useEffect(() => {
+    if (subliminalCtx?.topic) {
+      syncFromCtx(subliminalCtx);
+    }
+  }, [subliminalCtx]);
+
+  // Build description automatically after sync fields are set
+  useEffect(() => {
+    if (descIntro || descBenefits || descKeyPoints || descHashtagsRaw) {
+      buildDescription();
+    }
+  }, [descIntro, descBenefits, descKeyPoints, descHashtagsRaw]);
+
   // Inject topic from wiki
   useEffect(() => {
     if (injectedTopic) {
@@ -473,6 +491,65 @@ export default function YouTubePage({
       toast.success("Description copied!");
     });
   };
+
+  // --- Generate Description: sync + build in one action ---
+  const handleGenerateDescription = useCallback(() => {
+    if (subliminalCtx) {
+      syncFromCtx(subliminalCtx);
+      // buildDescription is triggered via the useEffect watching desc fields
+    } else {
+      buildDescription();
+    }
+    toast.success("Description generated!");
+  }, [subliminalCtx, syncFromCtx, buildDescription]);
+
+  // --- Download Package (.zip) ---
+  const handleDownloadPackage = useCallback(async () => {
+    if (!title && !assembledDesc && !thumbnailDataUrl) {
+      toast.error(
+        "Nothing to package yet — generate a title and description first.",
+      );
+      return;
+    }
+    if (!assembledDesc) {
+      toast.warning(
+        "Build the description first to include it in the package.",
+      );
+    }
+    if (!thumbnailDataUrl) {
+      toast.warning("Draw the thumbnail first to include it in the package.");
+    }
+
+    try {
+      // Download files individually (jszip not available; use direct downloads)
+      const downloadText = (content: string, filename: string) => {
+        const blob = new Blob([content], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 3000);
+      };
+
+      if (title) {
+        downloadText(title, "title.txt");
+      }
+      if (assembledDesc) {
+        downloadText(assembledDesc, "description.txt");
+      }
+      if (thumbnailDataUrl) {
+        const link = document.createElement("a");
+        link.href = thumbnailDataUrl;
+        link.download = "thumbnail.png";
+        link.click();
+      }
+      toast.success("Package files downloaded!");
+    } catch (err) {
+      console.error("Package download failed:", err);
+      toast.error("Failed to download package. Please try again.");
+    }
+  }, [title, assembledDesc, thumbnailDataUrl]);
 
   // --- Thumbnail logic ---
   const getConfig = useCallback(
@@ -570,6 +647,64 @@ export default function YouTubePage({
           Craft your perfect title, description, and thumbnail — all in one
           place.
         </p>
+      </motion.div>
+
+      {/* ─── PIPELINE STATUS ─── */}
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.05 }}
+        className="grid grid-cols-2 sm:grid-cols-4 gap-2"
+      >
+        {[
+          {
+            label: "Affirmations",
+            done: (subliminalCtx?.affirmations?.length ?? 0) > 0,
+            note: subliminalCtx?.affirmations?.length
+              ? `${subliminalCtx.affirmations.length} ready`
+              : "Generate in Studio",
+          },
+          {
+            label: "Audio Config",
+            done: true,
+            note: "Configure anytime",
+          },
+          {
+            label: "Video Export",
+            done: false,
+            note: "Export from Generator",
+          },
+          {
+            label: "YouTube Package",
+            done: Boolean(title && assembledDesc),
+            note: title && assembledDesc ? "Ready to download" : "Build below",
+          },
+        ].map((step, i) => (
+          <div
+            key={step.label}
+            className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border text-xs transition-all ${
+              step.done
+                ? "border-emerald-500/30 bg-emerald-500/5"
+                : "border-border/30 bg-secondary/10"
+            }`}
+          >
+            <span className="shrink-0">
+              {step.done ? (
+                <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+              ) : (
+                <Circle className="w-3.5 h-3.5 text-muted-foreground/40" />
+              )}
+            </span>
+            <div className="min-w-0">
+              <p
+                className={`font-semibold truncate ${step.done ? "text-emerald-400" : "text-muted-foreground"}`}
+              >
+                {i + 1}. {step.label}
+              </p>
+              <p className="text-muted-foreground/60 truncate">{step.note}</p>
+            </div>
+          </div>
+        ))}
       </motion.div>
 
       {/* ─── SYNC BANNER ─── */}
@@ -867,14 +1002,24 @@ export default function YouTubePage({
           </span>
         </div>
 
-        <Button
-          onClick={buildDescription}
-          className="gap-2 w-full sm:w-auto"
-          style={{ background: "oklch(0.46 0.22 264)", color: "#fff" }}
-        >
-          <RefreshCw className="w-4 h-4" />
-          Build Description
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            onClick={handleGenerateDescription}
+            className="gap-2"
+            style={{ background: "oklch(0.55 0.22 295)", color: "#fff" }}
+          >
+            <Sparkles className="w-4 h-4" />
+            Generate Description
+          </Button>
+          <Button
+            onClick={buildDescription}
+            variant="outline"
+            className="gap-2 border-border/40 hover:border-primary/40"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Rebuild Description
+          </Button>
+        </div>
 
         {/* Preview */}
         {assembledDesc && (
@@ -1358,6 +1503,16 @@ export default function YouTubePage({
               >
                 <Download className="w-3 h-3" />
                 Download Thumbnail
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDownloadPackage}
+                disabled={!title && !assembledDesc}
+                className="border-border/40 hover:border-emerald-500/40 hover:text-emerald-400 gap-1.5 text-xs disabled:opacity-40"
+              >
+                <Package className="w-3 h-3" />
+                Download Package (.zip)
               </Button>
             </div>
           </div>

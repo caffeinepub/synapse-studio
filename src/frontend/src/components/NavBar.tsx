@@ -2,6 +2,7 @@ import {
   Archive,
   BookOpen,
   Brain,
+  Film,
   Ghost,
   Globe,
   Menu,
@@ -26,7 +27,8 @@ type Page =
   | "spells"
   | "rituals"
   | "settings"
-  | "youtube";
+  | "youtube"
+  | "videoeditor";
 
 interface NavBarProps {
   currentPage: Page;
@@ -93,6 +95,12 @@ const navItems = [
     label: "YouTube",
     icon: Youtube,
     description: "Video Content Creator",
+  },
+  {
+    id: "videoeditor" as Page,
+    label: "Video Editor",
+    icon: Film,
+    description: "Frequency, TTS, Audio & Thumbnail",
   },
 ];
 

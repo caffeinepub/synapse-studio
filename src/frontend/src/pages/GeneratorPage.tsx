@@ -265,7 +265,8 @@ function VideoPreview({
   const ffmpegRef = useRef<any | null>(null);
   const ttsRecorderRef = useRef<MediaRecorder | null>(null);
   const ttsChunksRef = useRef<Blob[]>([]);
-  const ttsMicStreamRef = useRef<MediaStream | null>(null);
+  const ttsAudioCtxRef = useRef<AudioContext | null>(null);
+  const ttsAudioStopFnsRef = useRef<(() => void)[]>([]);
 
   const [isRecording, setIsRecording] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -276,8 +277,19 @@ function VideoPreview({
   const [isTTSRecording, setIsTTSRecording] = useState(false);
   const [ttsAudioUrl, setTtsAudioUrl] = useState<string | null>(null);
 
-  const previewDuration = Math.min(duration, 120);
+  // No cap — support full duration including 1hr+
+  const previewDuration = duration;
   const colors = PALETTE_COLORS[palette] ?? PALETTE_COLORS["Violet/Indigo"];
+
+  /** Format seconds as "Xh Ym" or "Ym Zs" or "Zs" */
+  const fmtDuration = (secs: number): string => {
+    const h = Math.floor(secs / 3600);
+    const m = Math.floor((secs % 3600) / 60);
+    const s = secs % 60;
+    if (h > 0) return `${h}h ${m > 0 ? `${m}m` : ""}`.trim();
+    if (m > 0) return `${m}m ${s > 0 ? `${s}s` : ""}`.trim();
+    return `${s}s`;
+  };
   const accent = PALETTE_ACCENT[palette] ?? "#a855f7";
 
   // Particle state for theme effects
@@ -742,9 +754,16 @@ function VideoPreview({
       setWebmFallbackUrl(null);
 
       try {
-        // Dynamically import ffmpeg to avoid bundling it up front
-        const { FFmpeg } = await import("@ffmpeg/ffmpeg");
-        const { fetchFile, toBlobURL } = await import("@ffmpeg/util");
+        // Dynamically import ffmpeg via Function constructor to prevent rollup
+        // from attempting to bundle these CDN-only packages at build time
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { FFmpeg } = (await new Function(
+          'return import("@ffmpeg/ffmpeg")',
+        )()) as any;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { fetchFile, toBlobURL } = (await new Function(
+          'return import("@ffmpeg/util")',
+        )()) as any;
 
         if (!ffmpegRef.current) {
           ffmpegRef.current = new FFmpeg();
@@ -863,8 +882,8 @@ function VideoPreview({
     };
   }, [ttsAudioUrl]);
 
-  // ── TTS Export: getUserMedia + speechSynthesis + MediaRecorder ──
-  const handleTTSExport = useCallback(async () => {
+  // ── TTS Export: AudioContext + MediaStreamDestination (no mic needed) ──
+  const handleTTSExport = useCallback(() => {
     if (isTTSRecording) {
       // Stop current TTS recording
       window.speechSynthesis?.cancel();
@@ -874,111 +893,170 @@ function VideoPreview({
       ) {
         ttsRecorderRef.current.stop();
       }
-      if (ttsMicStreamRef.current) {
-        for (const track of ttsMicStreamRef.current.getTracks()) track.stop();
-        ttsMicStreamRef.current = null;
+      // Stop audio nodes
+      for (const fn of ttsAudioStopFnsRef.current) {
+        try {
+          fn();
+        } catch (_) {}
+      }
+      ttsAudioStopFnsRef.current = [];
+      if (ttsAudioCtxRef.current) {
+        ttsAudioCtxRef.current.close().catch(() => {});
+        ttsAudioCtxRef.current = null;
       }
       setIsTTSRecording(false);
       return;
     }
 
-    try {
-      // Request microphone/system audio (works with loopback on Windows/Mac)
-      const micStream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: false,
-          noiseSuppression: false,
-          autoGainControl: false,
-        },
-      });
-      ttsMicStreamRef.current = micStream;
-      ttsChunksRef.current = [];
-      setTtsAudioUrl(null);
+    ttsChunksRef.current = [];
+    setTtsAudioUrl(null);
 
-      const mimeTypeAudio = MediaRecorder.isTypeSupported(
-        "audio/webm;codecs=opus",
-      )
-        ? "audio/webm;codecs=opus"
-        : "audio/webm";
+    // Create AudioContext + MediaStreamDestination for recording synthesized audio
+    const AudioCtxClass =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext;
+    const audioCtx = new AudioCtxClass();
+    ttsAudioCtxRef.current = audioCtx;
+    const dest = audioCtx.createMediaStreamDestination();
+    const stopFns: (() => void)[] = [];
 
-      const ttsRecorder = new MediaRecorder(micStream, {
-        mimeType: mimeTypeAudio,
-      });
-      ttsRecorderRef.current = ttsRecorder;
-
-      ttsRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) ttsChunksRef.current.push(e.data);
-      };
-
-      ttsRecorder.onstop = () => {
-        setIsTTSRecording(false);
-        if (ttsMicStreamRef.current) {
-          for (const track of ttsMicStreamRef.current.getTracks()) track.stop();
-          ttsMicStreamRef.current = null;
-        }
-        const audioBlob = new Blob(ttsChunksRef.current, {
-          type: mimeTypeAudio,
-        });
-        const url = URL.createObjectURL(audioBlob);
-        setTtsAudioUrl(url);
-        toast.success("TTS audio recorded! Click Download TTS to save.");
-      };
-
-      ttsRecorder.start(100);
-      setIsTTSRecording(true);
-
-      // Speak all affirmations sequentially
-      const voices = window.speechSynthesis.getVoices();
-      const femVoice = voices.find(
-        (v) =>
-          v.name.toLowerCase().includes("female") ||
-          v.name.includes("Samantha") ||
-          v.name.includes("Victoria"),
+    // Connect nature sound to BOTH speakers and recording destination
+    if (natureSound !== "None") {
+      const stopNature = connectNatureSoundToCtx(
+        natureSound,
+        natureSoundVolume,
+        audioCtx,
+        dest,
       );
-      const maleVoice = voices.find(
-        (v) =>
-          v.name.toLowerCase().includes("male") ||
-          v.name.includes("Daniel") ||
-          v.name.includes("Alex"),
+      // Also connect to speakers so user can hear it
+      const stopNatureAudible = connectNatureSoundToCtx(
+        natureSound,
+        natureSoundVolume,
+        audioCtx,
+        audioCtx.destination,
       );
-      const selectedVoice = voiceType.includes("Female")
-        ? femVoice
-        : voiceType.includes("Male")
-          ? maleVoice
-          : undefined;
+      stopFns.push(stopNature, stopNatureAudible);
+    }
 
-      const speakAll = () => {
-        const text = affirmations.join(". ");
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.rate = 0.9;
-        utter.volume = 1;
-        utter.pitch = 1 + voicePitch * 0.1;
-        if (selectedVoice) utter.voice = selectedVoice;
-        utter.onend = () => {
+    // Connect frequency tone to BOTH speakers and recording destination
+    const hz = Number.parseFloat(frequencyHz);
+    if (!Number.isNaN(hz) && hz > 0) {
+      const stopFreq = connectFrequencyToneToCtx(
+        hz,
+        frequencyWaveform,
+        frequencyToneVolume,
+        audioCtx,
+        dest,
+      );
+      const stopFreqAudible = connectFrequencyToneToCtx(
+        hz,
+        frequencyWaveform,
+        frequencyToneVolume,
+        audioCtx,
+        audioCtx.destination,
+      );
+      stopFns.push(stopFreq, stopFreqAudible);
+    }
+
+    ttsAudioStopFnsRef.current = stopFns;
+
+    const mimeTypeAudio = MediaRecorder.isTypeSupported(
+      "audio/webm;codecs=opus",
+    )
+      ? "audio/webm;codecs=opus"
+      : "audio/webm";
+
+    // Record from the MediaStreamDestination (captures nature + frequency audio)
+    const ttsRecorder = new MediaRecorder(dest.stream, {
+      mimeType: mimeTypeAudio,
+    });
+    ttsRecorderRef.current = ttsRecorder;
+
+    ttsRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) ttsChunksRef.current.push(e.data);
+    };
+
+    ttsRecorder.onstop = () => {
+      setIsTTSRecording(false);
+      // Cleanup audio
+      for (const fn of ttsAudioStopFnsRef.current) {
+        try {
+          fn();
+        } catch (_) {}
+      }
+      ttsAudioStopFnsRef.current = [];
+      if (ttsAudioCtxRef.current) {
+        ttsAudioCtxRef.current.close().catch(() => {});
+        ttsAudioCtxRef.current = null;
+      }
+      const audioBlob = new Blob(ttsChunksRef.current, { type: mimeTypeAudio });
+      const url = URL.createObjectURL(audioBlob);
+      setTtsAudioUrl(url);
+      toast.success("TTS audio captured! Click Download TTS to save.");
+    };
+
+    ttsRecorder.start(100);
+    setIsTTSRecording(true);
+
+    // Speak all affirmations via Web Speech API (plays through speakers)
+    const voices = window.speechSynthesis.getVoices();
+    const femVoice = voices.find(
+      (v) =>
+        v.name.toLowerCase().includes("female") ||
+        v.name.includes("Samantha") ||
+        v.name.includes("Victoria"),
+    );
+    const maleVoice = voices.find(
+      (v) =>
+        v.name.toLowerCase().includes("male") ||
+        v.name.includes("Daniel") ||
+        v.name.includes("Alex"),
+    );
+    const selectedVoice = voiceType.includes("Female")
+      ? femVoice
+      : voiceType.includes("Male")
+        ? maleVoice
+        : undefined;
+
+    const speakAll = () => {
+      const text = affirmations.join(". ");
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = 0.9;
+      utter.volume = 1;
+      utter.pitch = 1 + voicePitch * 0.1;
+      if (selectedVoice) utter.voice = selectedVoice;
+      utter.onend = () => {
+        // Give a short buffer after speech ends, then stop recording
+        setTimeout(() => {
           if (
             ttsRecorderRef.current &&
             ttsRecorderRef.current.state !== "inactive"
           ) {
             ttsRecorderRef.current.stop();
           }
-        };
-        window.speechSynthesis.speak(utter);
+        }, 500);
       };
+      window.speechSynthesis.speak(utter);
+    };
 
-      // Wait for voices to load if needed
-      if (window.speechSynthesis.getVoices().length === 0) {
-        window.speechSynthesis.onvoiceschanged = speakAll;
-      } else {
-        speakAll();
-      }
-    } catch (err) {
-      console.error("TTS export failed:", err);
-      toast.error(
-        "Microphone permission denied. Enable mic (or a loopback device like Stereo Mix) to capture TTS audio.",
-      );
-      setIsTTSRecording(false);
+    // Wait for voices to load if needed
+    if (window.speechSynthesis.getVoices().length === 0) {
+      window.speechSynthesis.onvoiceschanged = speakAll;
+    } else {
+      speakAll();
     }
-  }, [isTTSRecording, affirmations, voiceType, voicePitch]);
+  }, [
+    isTTSRecording,
+    affirmations,
+    voiceType,
+    voicePitch,
+    natureSound,
+    natureSoundVolume,
+    frequencyHz,
+    frequencyWaveform,
+    frequencyToneVolume,
+  ]);
 
   return (
     <motion.div
@@ -1025,7 +1103,8 @@ function VideoPreview({
           <div className="flex items-center gap-2 text-xs text-rose-400/90 bg-rose-400/10 border border-rose-400/20 rounded-lg px-3 py-2">
             <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse shrink-0" />
             <span>
-              Recording TTS via microphone — speak affirmations are playing…
+              Recording TTS + audio mix… affirmations are playing through
+              speakers
             </span>
           </div>
         )}
@@ -1050,7 +1129,7 @@ function VideoPreview({
             ) : (
               <>
                 <Video className="w-4 h-4" />
-                Record Preview ({previewDuration}s)
+                Record ({fmtDuration(previewDuration)})
               </>
             )}
           </Button>
@@ -1100,7 +1179,7 @@ function VideoPreview({
             ) : (
               <>
                 <Music className="w-4 h-4" />
-                Export TTS Audio
+                Capture TTS Audio
               </>
             )}
           </Button>
@@ -1121,14 +1200,19 @@ function VideoPreview({
 
         <p className="text-xs text-muted-foreground leading-relaxed space-y-1">
           <span className="block">
-            Video records up to {previewDuration}s with frequency tone and
-            nature sound baked in — downloads as <strong>.mp4</strong>.
+            Video records for {fmtDuration(previewDuration)} with frequency tone
+            and nature sound baked in — downloads as <strong>.mp4</strong>.{" "}
+            {previewDuration >= 3600 && (
+              <span className="text-amber-400/80">
+                Long recordings use more memory — keep the tab active until
+                recording stops.
+              </span>
+            )}
           </span>
           <span className="block">
-            <strong>Export TTS Audio</strong> captures your spoken affirmations
-            via microphone. For best results, enable a loopback device (Windows:
-            Stereo Mix · Mac: BlackHole/Soundflower) so TTS plays into the
-            recording without needing an external mic.
+            <strong>Capture TTS Audio</strong> records nature sound + frequency
+            tone into an audio file. TTS affirmations play through your speakers
+            simultaneously — no microphone required.
           </span>
         </p>
       </div>
@@ -2893,7 +2977,7 @@ export default function GeneratorPage({
               </div>
             </AccordionTrigger>
             <AccordionContent className="pb-4 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground">
                     Resolution
@@ -2931,24 +3015,69 @@ export default function GeneratorPage({
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-xs text-muted-foreground">
-                    Duration: {duration}s
-                  </Label>
+                <div className="space-y-2 col-span-1 sm:col-span-2">
+                  <div className="flex items-center justify-between flex-wrap gap-1">
+                    <Label className="text-xs text-muted-foreground">
+                      Duration
+                    </Label>
+                    <span className="text-xs font-mono text-primary">
+                      {Math.floor(duration / 3600) > 0
+                        ? `${Math.floor(duration / 3600)}h ${Math.floor((duration % 3600) / 60)}m ${duration % 60}s`
+                        : Math.floor(duration / 60) > 0
+                          ? `${Math.floor(duration / 60)}m ${duration % 60}s`
+                          : `${duration}s`}
+                    </span>
+                  </div>
                   <div className="flex gap-2">
                     <Input
                       type="number"
                       min={1}
-                      max={3600}
+                      max={14400}
                       value={duration}
                       onChange={(e) =>
                         setDuration(
-                          Math.max(1, Math.min(3600, Number(e.target.value))),
+                          Math.max(1, Math.min(14400, Number(e.target.value))),
                         )
                       }
-                      className="bg-input/50 border-border/50 text-sm"
+                      className="bg-input/50 border-border/50 text-sm w-28"
+                      placeholder="seconds"
                     />
+                    <span className="text-xs text-muted-foreground self-center">
+                      seconds
+                    </span>
                   </div>
+                  {/* Duration presets */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      { label: "1 min", value: 60 },
+                      { label: "5 min", value: 300 },
+                      { label: "10 min", value: 600 },
+                      { label: "15 min", value: 900 },
+                      { label: "30 min", value: 1800 },
+                      { label: "1 hr", value: 3600 },
+                      { label: "2 hr", value: 7200 },
+                      { label: "3 hr", value: 10800 },
+                      { label: "4 hr", value: 14400 },
+                    ].map((p) => (
+                      <button
+                        key={p.label}
+                        type="button"
+                        onClick={() => setDuration(p.value)}
+                        className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+                          duration === p.value
+                            ? "bg-primary/20 text-primary border-primary/50"
+                            : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-primary/40 hover:text-primary"
+                        }`}
+                      >
+                        {p.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground leading-snug">
+                    For 1hr+ recordings keep the browser tab active and do not
+                    lock your screen. The recording streams directly to memory —
+                    longer sessions require more RAM.
+                  </p>
                 </div>
               </div>
             </AccordionContent>
