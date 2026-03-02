@@ -1555,44 +1555,25 @@ export default function GeneratorPage({
         return;
       }
 
-      const backendResult = await generateMutation.mutateAsync({
-        topic,
-        boosterEnabled: modes.booster,
-        fantasyEnabled: modes.fantasy,
-        protectionEnabled: modes.protection,
-        chakraName: selectedChakras.join(", "),
-      });
-      // Append character/item manifestation lines from local engine when applicable
+      // Use the rich frontend affirmation engine as the primary rule-based generator
+      const { generateAffirmations: genLocal } = await import(
+        "../utils/affirmationUtils"
+      );
       const hasCharacter =
         modes.fantasy && characterEnabled && characterName.trim();
       const hasItem = modes.fantasy && itemEnabled && itemName.trim();
-      let result = [...backendResult];
-      if (hasCharacter || hasItem) {
-        const { generateAffirmations: genLocal } = await import(
-          "../utils/affirmationUtils"
-        );
-        const extra = genLocal(
-          topic,
-          false,
-          true,
-          false,
-          "",
-          hasCharacter ? characterName : undefined,
-          hasCharacter ? characterSource : undefined,
-          hasItem ? itemName : undefined,
-          hasItem ? itemSource : undefined,
-        );
-        // Only take lines that reference the character or item names
-        const filterTerms = [
-          ...(hasCharacter ? [characterName.trim().toLowerCase()] : []),
-          ...(hasItem ? [itemName.trim().toLowerCase()] : []),
-        ];
-        const manifestLines = extra.filter((line) =>
-          filterTerms.some((t) => line.toLowerCase().includes(t)),
-        );
-        result = [...result, ...manifestLines];
-      }
-      const expanded = expandToCount(result, affirmationCount);
+      const localResult = genLocal(
+        topic,
+        modes.booster,
+        modes.fantasy,
+        modes.protection,
+        selectedChakras,
+        hasCharacter ? characterName : undefined,
+        hasCharacter ? characterSource : undefined,
+        hasItem ? itemName : undefined,
+        hasItem ? itemSource : undefined,
+      );
+      const expanded = expandToCount(localResult, affirmationCount);
       setAffirmations(expanded);
       setGenerationSource("rule-based");
       toast.success(`Generated ${expanded.length} affirmations`);

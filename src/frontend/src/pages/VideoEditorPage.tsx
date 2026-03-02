@@ -1399,10 +1399,37 @@ export default function VideoEditorPage({
       setWebmFallbackUrl(null);
 
       try {
+        // Load ffmpeg from CDN via script tag (avoids build-time resolution)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { FFmpeg } = (await import("@ffmpeg/ffmpeg")) as any;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { fetchFile, toBlobURL } = (await import("@ffmpeg/util")) as any;
+        const win = window as any;
+        if (!win.__ffmpegLoaded) {
+          await new Promise<void>((resolve, reject) => {
+            const s = document.createElement("script");
+            s.src =
+              "https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js";
+            s.onload = () => {
+              win.__ffmpegLoaded = true;
+              resolve();
+            };
+            s.onerror = reject;
+            document.head.appendChild(s);
+          });
+        }
+        if (!win.__ffmpegUtilLoaded) {
+          await new Promise<void>((resolve, reject) => {
+            const s = document.createElement("script");
+            s.src = "https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/index.js";
+            s.onload = () => {
+              win.__ffmpegUtilLoaded = true;
+              resolve();
+            };
+            s.onerror = reject;
+            document.head.appendChild(s);
+          });
+        }
+        const { FFmpeg } = win.FFmpegWASM ?? win["@ffmpeg/ffmpeg"] ?? {};
+        const { fetchFile, toBlobURL } =
+          win.FFmpegUtil ?? win["@ffmpeg/util"] ?? {};
         if (!ffmpegRef.current) ffmpegRef.current = new FFmpeg();
         const ffmpeg = ffmpegRef.current;
         if (!ffmpeg.loaded) {

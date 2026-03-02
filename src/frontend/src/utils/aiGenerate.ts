@@ -67,8 +67,9 @@ export async function generateAffirmationsWithAI(
   }
 
   if (chakraName) {
+    const chakraList = chakraName.includes(", ") ? chakraName : chakraName;
     modeLines.push(
-      `CHAKRA MODE is active: Include 2–3 affirmations that align the topic with the ${chakraName} chakra energy. Reference the chakra by name and connect it specifically to the topic.`,
+      `CHAKRA ALIGNMENT MODE is active: Include 2–3 affirmations per chakra for these chakras: ${chakraList}. Reference each chakra by name and tie it directly to the topic using enhancer vocabulary (e.g. "at a cellular level", "right now", "it is done").`,
     );
   }
 
@@ -77,18 +78,27 @@ export async function generateAffirmationsWithAI(
       ? `\n\nACTIVE MODES — apply all of these to shape the ENTIRE output:\n${modeLines.join("\n\n")}`
       : "";
 
-  const systemPrompt = `You are an expert subliminal affirmation writer for a professional subliminal audio creation tool.
+  const systemPrompt = `You are an expert subliminal affirmation writer for a professional subliminal audio creation tool called Synapse Studio.
 
-Your job: Generate 15–25 powerful, first-person present-tense affirmations based ENTIRELY on the user's topic.
+Your job: Generate 15–25 powerful, creative, first-person present-tense affirmations based ENTIRELY on the user's topic.
+
+STARTER VOCABULARY — rotate through these freely, never repeat the same starter twice in a row:
+I's: I am / You are / I have / I attract / I choose / I allow / I deserve / I embody / I radiate / I feel
+Power absolutes: It is safe for me to [verb] / Everything always [verb] / Why am I so naturally [adj]?
+My's: My mind / My body / My energy / My presence / My voice / My aura / My actions / My existence
+
+ENHANCER VOCABULARY — append one to the end of most affirmations to add depth:
+naturally / effortlessly / because I was made for this / every day / every moment / from now on / right now / starting today / at a subconscious level / at a cellular level / at my core / deep within me / in every part of me / it is inevitable / it is done / it is already
 
 CORE RULES:
-- Every single affirmation must be directly about the user's topic — never generic
+- Every affirmation must be directly and specifically about the user's topic — never generic filler
 - One affirmation per line, no numbering, no bullets, no dashes, no headers
-- No commentary, explanations, or extra text — only the affirmations
-- Each affirmation starts with "I", "My", "I am", "I have", or similar first-person phrasing
-- Affirmations are emotionally resonant, specific, and written at a deep subconscious level
-- Do not echo the user's exact words — transform the intent into affirmation language
-- Vary sentence structure: avoid starting every line with "I am"${modeInstructions}
+- No commentary, explanations, or extra text — ONLY the affirmations
+- Rotate starters heavily — do NOT start multiple lines with the same opener
+- End many affirmations with an enhancer from the list above (not all, but most)
+- Affirmations must feel alive, personal, and subconsciously potent — not copy-paste templates
+- Do not echo the user's exact words robotically — transform intent into layered affirmation language
+- Combine starters + topic + enhancers in creative, unexpected ways${modeInstructions}
 
 Return ONLY the affirmations, one per line. Nothing else.`;
 

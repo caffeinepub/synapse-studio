@@ -504,4 +504,580 @@ export const KINESIS_DATA: KinesisEntry[] = [
     psychologicalMetaphor:
       "Shadow integration, psychological wholeness, and the immense personal power that comes from accepting rather than fighting the darker or hidden aspects of oneself.",
   },
+  {
+    name: "Gravitokinesis",
+    suffix: "kinesis",
+    element: "Gravity",
+    fictionalOrigins:
+      "Gravity manipulation emerges from physics speculation and science fiction — the dream of defying the fundamental force that binds us to the earth. It appears in superhero lore, anime, and theoretical physics narratives.",
+    mediaReferences: [
+      "Gravity Falls — Disney",
+      "Gravity Man — Mega Man",
+      "Graviton — Marvel",
+      "Ganishka — Berserk",
+      "Nagato (Deva Path) — Naruto",
+    ],
+    symbolicMeaning:
+      "Gravity represents the forces that pull us down, bind us, and keep us grounded. Gravitokinesis symbolizes the mastery over weight — both literal and metaphorical burdens.",
+    psychologicalMetaphor:
+      "Freedom from limiting beliefs, the ability to rise above heavy emotions, and the power to attract or repel circumstances. Mastery over what holds you down.",
+  },
+  {
+    name: "Vitakinesis",
+    suffix: "kinesis",
+    element: "Vitality",
+    fictionalOrigins:
+      "The concept of manipulating life force energy appears in healing traditions worldwide — from chi in Chinese medicine to prana in Ayurveda, and manifests in fiction as the power to heal or drain life energy.",
+    mediaReferences: [
+      "Tsunade — Naruto (advanced healing)",
+      "Recovery Girl — My Hero Academia",
+      "Jean Grey (healing) — X-Men",
+      "Various healers in Final Fantasy",
+      "Life-force manipulation in Dragon Ball",
+    ],
+    symbolicMeaning:
+      "Vitakinesis represents the raw power of living energy — the force that animates and sustains all life. It symbolizes the capacity to restore, replenish, and revitalize.",
+    psychologicalMetaphor:
+      "Emotional and physical restoration, the power of nurturing and healing others, and the internal capacity to regenerate after setbacks.",
+  },
+  {
+    name: "Sonokinesis",
+    suffix: "kinesis",
+    element: "Sound",
+    fictionalOrigins:
+      "Sound as a supernatural weapon or tool appears in myths of sacred vibration (Nada Brahma), the biblical walls of Jericho, and modern fiction featuring sonic heroes and villains.",
+    mediaReferences: [
+      "Black Canary — DC",
+      "Banshee — X-Men",
+      "Dosu Kinuta — Naruto",
+      "Ravel — Fairy Tail",
+      "Soundwave — Transformers",
+    ],
+    symbolicMeaning:
+      "Sound represents vibration, resonance, and the invisible waves that carry meaning. Sonokinesis symbolizes the power of voice, frequency, and the ability to shake the world with words.",
+    psychologicalMetaphor:
+      "The power of voice, authentic self-expression, the ability to resonate with others, and the courage to make yourself heard in a world full of noise.",
+  },
+  {
+    name: "Magnetokinesis",
+    suffix: "kinesis",
+    element: "Magnetism",
+    fictionalOrigins:
+      "Magnetic manipulation appears prominently in comic book fiction as one of the most visually spectacular and physically versatile powers, drawing from electromagnetism in physics.",
+    mediaReferences: [
+      "Magneto — X-Men",
+      "Polaris — X-Men",
+      "Envy (indirectly) — Fullmetal Alchemist",
+      "Magnetic Man — Marvel",
+      "Tetsuo — Akira",
+    ],
+    symbolicMeaning:
+      "Magnetism represents attraction and repulsion — the invisible forces of alignment and opposition. Magnetokinesis symbolizes the power to draw what you need and deflect what you don't.",
+    psychologicalMetaphor:
+      "Personal magnetism, the law of attraction in action, charisma that naturally pulls people and opportunities, and the strength to repel toxic influences.",
+  },
+  {
+    name: "Thermokinesis",
+    suffix: "kinesis",
+    element: "Heat",
+    fictionalOrigins:
+      "Thermal manipulation — control over temperature itself (separate from fire or ice) — appears in physics-based superhero narratives and science fiction stories about human body temperature control.",
+    mediaReferences: [
+      "Endeavor — My Hero Academia",
+      "Portgas D. Ace — One Piece (Mera Mera)",
+      "Tempest — various",
+      "Various fire/ice hybrid characters",
+      "Thermal-based superhumans in Marvel/DC",
+    ],
+    symbolicMeaning:
+      "Temperature represents the spectrum between extremes — hot and cold, passion and calm, action and stillness. Thermokinesis symbolizes mastery of the full spectrum of intensity.",
+    psychologicalMetaphor:
+      "Emotional range and regulation — the ability to bring full heat to passion and full cool to conflict, choosing your emotional temperature in every situation.",
+  },
+  {
+    name: "Plasmakinesis",
+    suffix: "kinesis",
+    element: "Plasma",
+    fictionalOrigins:
+      "Plasma — the fourth state of matter, superheated ionized gas — appears in science fiction and superhero narratives as one of the most powerful and rare elemental abilities, often associated with cosmic-level beings.",
+    mediaReferences: [
+      "Nova — Marvel",
+      "Various cosmic entities — Marvel/DC",
+      "Plasma-based abilities in Destiny",
+      "Energy benders in science fiction",
+      "Star-level beings across space opera fiction",
+    ],
+    symbolicMeaning:
+      "Plasma represents the raw, uncontained energy of stars — primal creation force at its most intense. It symbolizes the transformative power that exists beyond ordinary boundaries.",
+    psychologicalMetaphor:
+      "Access to your deepest creative force, the energy that exists when all limitations burn away. The state of peak flow — pure, radiant expression of your highest potential.",
+  },
+  {
+    name: "Lunakinesis",
+    suffix: "kinesis",
+    element: "Moon",
+    fictionalOrigins:
+      "Lunar energy manipulation is rooted in moon goddess traditions worldwide — Selene, Artemis, Luna, Chang'e — and appears in Sailor Moon, lunar magic systems in fantasy, and esoteric traditions linking the moon to cycles and intuition.",
+    mediaReferences: [
+      "Sailor Moon",
+      "Tsukuyomi — Naruto",
+      "Moon Knight — Marvel",
+      "Luna Lovegood — Harry Potter (symbolically)",
+      "Lunar-themed heroes in JRPG tradition",
+    ],
+    symbolicMeaning:
+      "The moon represents cycles, intuition, the subconscious, and the pull of tides. Lunakinesis symbolizes mastery over cycles — knowing when to act and when to rest.",
+    psychologicalMetaphor:
+      "Deep intuition, cyclical awareness, emotional depth, and the ability to navigate the rhythms of life — understanding that all things wax and wane.",
+  },
+  {
+    name: "Heliokinesis",
+    suffix: "kinesis",
+    element: "Sun",
+    fictionalOrigins:
+      "Solar energy manipulation draws from sun god traditions across every culture — Ra, Apollo, Amaterasu, Sol Invictus — and appears in superhero fiction as the source of the most primal life-giving power.",
+    mediaReferences: [
+      "Superman (solar power) — DC",
+      "Amaterasu — various mythology",
+      "Sol — Guilty Gear",
+      "Soleil — various",
+      "Solar-powered heroes across Marvel and DC",
+    ],
+    symbolicMeaning:
+      "The sun represents the source of all life, radiant authority, and the center around which everything orbits. Heliokinesis symbolizes the power of being a source — a light that others gather around.",
+    psychologicalMetaphor:
+      "Radiant leadership, the capacity to be someone's source of warmth and energy, and the solar confidence of someone who shines without needing permission.",
+  },
+  {
+    name: "Dendrokinesis",
+    suffix: "kinesis",
+    element: "Nature",
+    fictionalOrigins:
+      "Plant and nature manipulation appears in druidic traditions, nature spirits in folklore worldwide, and fiction featuring characters who can command roots, vines, flowers, and forests.",
+    mediaReferences: [
+      "Poison Ivy — DC",
+      "Yamato — Naruto (Wood Style)",
+      "Swamp Thing — DC",
+      "Hashirama Senju — Naruto",
+      "Various druids and nature spirits in fantasy",
+    ],
+    symbolicMeaning:
+      "Plants and nature represent patient growth, deep roots, and the unstoppable persistence of life. Dendrokinesis symbolizes the quiet power of growth — slow, inevitable, and enduring.",
+    psychologicalMetaphor:
+      "Patient cultivation of goals, deep-rootedness in values, the ability to grow toward the light no matter the obstacle, and the perseverance of all living things.",
+  },
+  {
+    name: "Atmokinesis",
+    suffix: "kinesis",
+    element: "Weather",
+    fictionalOrigins:
+      "Weather control is one of the most powerful elemental abilities in mythology — Thor, Zeus, Raijin, and weather-working shamans represent humanity's ancient relationship with atmospheric forces.",
+    mediaReferences: [
+      "Storm — X-Men",
+      "Thor — Marvel",
+      "Fujin — various mythology",
+      "Weather Report — JoJo's Bizarre Adventure",
+      "Zeus — Greek mythology",
+    ],
+    symbolicMeaning:
+      "Weather represents the vast, shifting forces of the world — unpredictable, powerful, and beyond individual control. Atmokinesis symbolizes becoming a force of nature rather than a victim of it.",
+    psychologicalMetaphor:
+      "The ability to command the atmosphere of any environment — emotional intelligence so developed that you change the mood of every room you enter.",
+  },
+  {
+    name: "Necrokinesis",
+    suffix: "kinesis",
+    element: "Death",
+    fictionalOrigins:
+      "Necromancy and death manipulation appear in every ancient tradition — from Egyptian death rites to Greek underworld mythology — as the most taboo and powerful form of supernatural ability.",
+    mediaReferences: [
+      "Nagato (Outer Path) — Naruto",
+      "Death Eaters — Harry Potter",
+      "Necromancers — Diablo series",
+      "Thanos (indirectly) — Marvel",
+      "Various undead-commanding characters in fantasy",
+    ],
+    symbolicMeaning:
+      "Death represents transition, ending, and the threshold between states. Necrokinesis symbolizes the power to transmute — to work with endings and transform them into new beginnings.",
+    psychologicalMetaphor:
+      "The psychological capacity for radical transformation — letting old versions of yourself die so new ones can emerge. Comfort with endings as the gateway to rebirth.",
+  },
+  {
+    name: "Ergokinesis",
+    suffix: "kinesis",
+    element: "Energy",
+    fictionalOrigins:
+      "Raw energy manipulation — pure force beyond elemental classification — appears in anime and comic fiction as the most versatile and potent of all supernatural abilities.",
+    mediaReferences: [
+      "Dragon Ball Z — Ki manipulation",
+      "Naruto — Chakra energy",
+      "Bleach — Reiatsu/spiritual pressure",
+      "One Punch Man — Saitama's raw energy",
+      "Green Lantern — Willpower energy",
+    ],
+    symbolicMeaning:
+      "Raw energy represents the undifferentiated power of the universe before it takes form. Ergokinesis symbolizes access to the primal creative force — will made manifest.",
+    psychologicalMetaphor:
+      "Peak personal energy — the cultivation of life force through discipline, focus, and alignment of body, mind, and spirit. Unlimited potential expressed through concentrated effort.",
+  },
+  {
+    name: "Dimensiokinesis",
+    suffix: "kinesis",
+    element: "Space",
+    fictionalOrigins:
+      "Spatial and dimensional manipulation appears in physics-inspired science fiction, multiverse theory narratives, and fantasy featuring portals, pocket dimensions, and reality-warping abilities.",
+    mediaReferences: [
+      "Doctor Strange — Marvel",
+      "Obito Uchiha (Kamui) — Naruto",
+      "Kuzan — One Piece",
+      "Beerus — Dragon Ball Super",
+      "Portal — video game series",
+    ],
+    symbolicMeaning:
+      "Dimensional manipulation represents the power to transcend the ordinary limitations of space. It symbolizes the ability to operate outside conventional boundaries and access possibilities others cannot perceive.",
+    psychologicalMetaphor:
+      "Expansive thinking, the ability to perceive multiple dimensions of reality simultaneously, and the skill of stepping outside conventional thinking into creative breakthrough.",
+  },
+  {
+    name: "Pathokinesis",
+    suffix: "kinesis",
+    element: "Emotion",
+    fictionalOrigins:
+      "Emotional manipulation — the ability to feel, sense, or alter the emotions of others — appears in empathic traditions, shamanic healing practices, and fiction featuring empaths and emotional manipulators.",
+    mediaReferences: [
+      "Jasper Hale — Twilight",
+      "Raven — DC/Teen Titans (emotion absorption)",
+      "Mantis — Marvel",
+      "Troi — Star Trek (empath)",
+      "Various empaths in fantasy fiction",
+    ],
+    symbolicMeaning:
+      "Emotion represents the invisible current that moves through all human interaction. Pathokinesis symbolizes profound empathic capacity — the ability to read, understand, and harmonize emotional fields.",
+    psychologicalMetaphor:
+      "Deep emotional intelligence, the capacity to understand and influence emotional environments, and the rare skill of truly reading others and creating resonance.",
+  },
+  {
+    name: "Mnemokinesis",
+    suffix: "kinesis",
+    element: "Memory",
+    fictionalOrigins:
+      "Memory manipulation draws from psychological horror, neuroscience fiction, and myths of gods who could erase or alter the minds of mortals — appearing in films like Eternal Sunshine and series like Dark.",
+    mediaReferences: [
+      "Professor X — X-Men",
+      "Ino Yamanaka — Naruto",
+      "Dark — Netflix series",
+      "Eternal Sunshine of the Spotless Mind",
+      "Memory-altering entities in SCP Foundation",
+    ],
+    symbolicMeaning:
+      "Memory represents the architecture of identity — who we believe we are and where we came from. Mnemokinesis symbolizes the power to reshape identity by rewriting what we carry from the past.",
+    psychologicalMetaphor:
+      "Cognitive reframing, the ability to revisit and reinterpret memories to create a new personal narrative, and the therapeutic power of choosing what we hold onto.",
+  },
+  {
+    name: "Onirokinesis",
+    suffix: "kinesis",
+    element: "Dreams",
+    fictionalOrigins:
+      "Dream manipulation appears in myths of Morpheus and Hypnos, Sandman mythology, Jungian dreamwork traditions, and modern fiction like Inception and A Nightmare on Elm Street.",
+    mediaReferences: [
+      "Freddy Krueger — A Nightmare on Elm Street",
+      "Morpheus — The Sandman",
+      "Inception — Christopher Nolan",
+      "Cobb — Naruto (Tsukuyomi, dream-adjacent)",
+      "Dream manipulation in various JRPG narratives",
+    ],
+    symbolicMeaning:
+      "Dreams represent the unguarded territory of the subconscious — where true desires, fears, and archetypes emerge. Onirokinesis symbolizes the ability to consciously navigate and shape the inner world.",
+    psychologicalMetaphor:
+      "Lucid awareness of your own subconscious, the ability to work intentionally with dreams and imagination, and mastery of the inner landscape of the mind.",
+  },
+  {
+    name: "Chlorokinesis",
+    suffix: "kinesis",
+    element: "Plants",
+    fictionalOrigins:
+      "Plant control is rooted in fertility goddesses, agricultural deities, and the magical traditions of herbalism and druidry. In fiction it appears as one of the most versatile and underestimated elemental powers.",
+    mediaReferences: [
+      "Poison Ivy — DC",
+      "Flora — Winx Club",
+      "Kurama (Wood Release) — Naruto",
+      "Groot — Marvel",
+      "Nature-based witches in fantasy fiction",
+    ],
+    symbolicMeaning:
+      "Plants represent the quiet persistence of life — the ability to crack concrete, reach light from the deepest darkness, and adapt to any soil. Chlorokinesis symbolizes the unstoppable nature of growth.",
+    psychologicalMetaphor:
+      "Tenacity, the capacity to grow in any conditions, patience with the natural rhythm of progress, and the understanding that roots must go deep before branches can spread wide.",
+  },
+  {
+    name: "Ferrokinesis",
+    suffix: "kinesis",
+    element: "Metal",
+    fictionalOrigins:
+      "Metal manipulation draws from blacksmithing deities (Hephaestus, Vulcan), alchemical traditions of metal transmutation, and comic fiction featuring iron and steel as symbols of industrial human power.",
+    mediaReferences: [
+      "Magneto (metal focus) — X-Men",
+      "Alex Armstrong — Fullmetal Alchemist",
+      "Colossus — X-Men",
+      "Metal Lee — Naruto",
+      "Iron Man (technology as metal mastery)",
+    ],
+    symbolicMeaning:
+      "Metal represents the refined — raw material shaped by fire and force into something stronger. Ferrokinesis symbolizes the transformation of raw potential into tempered, purposeful strength.",
+    psychologicalMetaphor:
+      "The refinement of character through hardship — like metal forged in heat, the most resilient version of yourself emerges through pressure and persistence.",
+  },
+  {
+    name: "Haemokinesis",
+    suffix: "kinesis",
+    element: "Blood",
+    fictionalOrigins:
+      "Blood manipulation appears in vampire mythology, shamanic bloodwork traditions, and horror fiction — the most visceral and intimate of all elemental manipulations, representing life force at its most primal.",
+    mediaReferences: [
+      "Karin — Naruto",
+      "Alucard — Hellsing",
+      "Medusa — Soul Eater",
+      "Bloody Mary — folklore",
+      "Blood benders — Avatar: The Legend of Korra",
+    ],
+    symbolicMeaning:
+      "Blood represents the sacred life force — lineage, vitality, sacrifice, and the irreducible essence of being alive. Haemokinesis symbolizes intimate relationship with one's own vital energy.",
+    psychologicalMetaphor:
+      "Connection to your deepest vitality, ancestral strength, and the primal life force that carries your lineage and history. Ownership of your own life energy.",
+  },
+  {
+    name: "Psionics",
+    suffix: "kinesis",
+    element: "Psi",
+    fictionalOrigins:
+      "Psionic abilities — the umbrella of all mental supernatural powers including telepathy, psychokinesis, and precognition — appear in science fiction as the evolutionary next step of human consciousness.",
+    mediaReferences: [
+      "Professor X — X-Men",
+      "Psylocke — X-Men",
+      "Mob — Mob Psycho 100",
+      "Espers in A Certain Scientific Railgun",
+      "Psionics — Warhammer 40k",
+    ],
+    symbolicMeaning:
+      "Psionics represents the total awakening of mental potential — the fullest expression of what the human mind can become. It symbolizes transcendence of physical limitation through pure consciousness.",
+    psychologicalMetaphor:
+      "The integration of all cognitive abilities — perception, intuition, memory, focus, and social intelligence — into a unified field of extraordinary mental mastery.",
+  },
+  {
+    name: "Geomagnetokinesis",
+    suffix: "kinesis",
+    element: "Geomagnetism",
+    fictionalOrigins:
+      "The manipulation of the Earth's magnetic field draws from geomancy, compass-lore, and science fiction featuring characters who can sense and bend the planet's invisible lines of force.",
+    mediaReferences: [
+      "Magneto (planetary scale) — X-Men",
+      "Various earth-shapers in dark fantasy",
+      "Lodestone — Marvel",
+      "Magnetic field manipulators in SF novels",
+      "Geomancers in fantasy RPG settings",
+    ],
+    symbolicMeaning:
+      "The Earth's magnetic field represents invisible guidance — the force that orients compasses and navigators. Geomagnetokinesis symbolizes the ability to sense true north even in complete darkness.",
+    psychologicalMetaphor:
+      "Unwavering internal compass, the rare ability to always know your direction and purpose even when the environment is disorienting or chaotic.",
+  },
+  {
+    name: "Quantumkinesis",
+    suffix: "kinesis",
+    element: "Quantum",
+    fictionalOrigins:
+      "Quantum manipulation draws from theoretical physics — superposition, entanglement, probability collapse — and appears in hard science fiction as the ultimate form of reality manipulation at the subatomic level.",
+    mediaReferences: [
+      "Scarlet Witch — Marvel (probability manipulation)",
+      "Ant-Man (Quantum Realm) — Marvel",
+      "Trafalgar Law (surgical precision) — One Piece",
+      "Quantum entities in hard SF",
+      "Q — Star Trek (implied quantum mastery)",
+    ],
+    symbolicMeaning:
+      "Quantum mechanics reveals that reality is fundamentally probabilistic — outcomes are not fixed until observed. Quantumkinesis symbolizes the ability to collapse probability in your favor.",
+    psychologicalMetaphor:
+      "Radical openness to multiple possibilities, the practice of holding uncertainty without anxiety, and the ability to choose the most favorable outcome from the infinite field of potential.",
+  },
+  {
+    name: "Cosmokinesis",
+    suffix: "kinesis",
+    element: "Cosmos",
+    fictionalOrigins:
+      "Cosmic power manipulation appears as the highest tier of supernatural ability in comic fiction — the Silver Surfer, Galactus, the Phoenix Force — representing power on a universal rather than personal scale.",
+    mediaReferences: [
+      "Silver Surfer — Marvel",
+      "Phoenix Force — X-Men",
+      "Galactus — Marvel",
+      "Zen-Oh — Dragon Ball Super",
+      "Celestials — Marvel cosmology",
+    ],
+    symbolicMeaning:
+      "Cosmic energy represents the incomprehensible vastness of the universe itself — power that operates at the scale of galaxies and eternities. Cosmokinesis symbolizes alignment with the largest possible forces.",
+    psychologicalMetaphor:
+      "The sense of being held by something larger than yourself — cosmic perspective that dissolves petty concerns and aligns your actions with what truly matters at the deepest level.",
+  },
+  {
+    name: "Nosokinesis",
+    suffix: "kinesis",
+    element: "Illness",
+    fictionalOrigins:
+      "Disease and illness manipulation appears in dark fantasy, viral horror, and mythology of plague deities (Pestilence, Nurgle, Ereshkigal) as the feared power to harm or, inversely, to cure all afflictions.",
+    mediaReferences: [
+      "Pestilence — Good Omens / biblical",
+      "Nurgle — Warhammer 40k",
+      "Plague doctors in dark fantasy",
+      "Viral manipulators in Marvel",
+      "Disease-themed abilities in horror RPGs",
+    ],
+    symbolicMeaning:
+      "Illness represents imbalance, hidden weakness, and the body's communication of deeper truths. Nosokinesis symbolizes understanding the language of the body and the ability to restore systemic balance.",
+    psychologicalMetaphor:
+      "Deep somatic intelligence — the capacity to recognize where imbalance lives before it manifests fully, and the power to restore equilibrium in body, mind, and environment.",
+  },
+  {
+    name: "Teleportation",
+    suffix: "kinesis",
+    element: "Space-Fold",
+    fictionalOrigins:
+      "Teleportation — instantaneous movement through space — appears across mythology as divine traversal (Hermes, angels), in physics thought experiments, and countless science fiction and fantasy narratives.",
+    mediaReferences: [
+      "Nightcrawler — X-Men",
+      "Minato Namikaze (Flying Thunder God) — Naruto",
+      "Goku (Instant Transmission) — Dragon Ball",
+      "Blink — X-Men",
+      "Kuzan — One Piece",
+    ],
+    symbolicMeaning:
+      "Teleportation represents freedom from the tyranny of physical distance — the ability to be exactly where you are needed, exactly when you are needed. It symbolizes perfect presence.",
+    psychologicalMetaphor:
+      "The ability to be fully present — mentally, emotionally, and energetically — without the drag of distraction or the distance of dissociation.",
+  },
+  {
+    name: "Intangibility",
+    suffix: "kinesis",
+    element: "Phase",
+    fictionalOrigins:
+      "The ability to pass through solid matter appears in ghost mythology worldwide, phasing mutants in comic fiction, and quantum tunneling in physics — the dream of moving unimpeded through the physical world.",
+    mediaReferences: [
+      "Kitty Pryde — X-Men",
+      "Martian Manhunter — DC",
+      "Ghost — various fictional ghosts",
+      "Vision — Marvel",
+      "Ghosts and spirits across all mythologies",
+    ],
+    symbolicMeaning:
+      "Intangibility represents the ability to be undisturbed by what would stop others — to pass through obstacles without resistance or impact. It symbolizes invulnerability through non-attachment.",
+    psychologicalMetaphor:
+      "The Taoist principle of Wu Wei — flowing through resistance rather than colliding with it. Emotional resilience that allows criticism and conflict to pass through without taking root.",
+  },
+  {
+    name: "Invisibility",
+    suffix: "kinesis",
+    element: "Concealment",
+    fictionalOrigins:
+      "Invisibility appears in mythology as the gift of gods (Ring of Gyges, Hades' helm), in folk tales of cloaks and rings, and across science fiction and fantasy as one of the most universally desired abilities.",
+    mediaReferences: [
+      "Susan Storm — Fantastic Four",
+      "Harry Potter (Invisibility Cloak)",
+      "Predator — film series",
+      "Claude — Fire Emblem",
+      "Invisible Woman — Marvel",
+    ],
+    symbolicMeaning:
+      "Invisibility represents the power of the unnoticed — the ability to observe without being seen, to move without drawing attention. It symbolizes strategic presence and selective visibility.",
+    psychologicalMetaphor:
+      "The discipline of observation without ego — the rare ability to listen, watch, and understand deeply without the need to be seen or validated.",
+  },
+  {
+    name: "Psammokinesis",
+    suffix: "kinesis",
+    element: "Sand",
+    fictionalOrigins:
+      "Sand manipulation draws from desert mythology (Egyptian sand gods, desert spirits), and is most famously represented in anime and manga as a nuanced and devastating elemental ability.",
+    mediaReferences: [
+      "Gaara — Naruto",
+      "Crocodile — One Piece",
+      "Sandman — Marvel",
+      "Sandy Marko — Spider-Man",
+      "Desert entities in Arabian mythology",
+    ],
+    symbolicMeaning:
+      "Sand represents both fragility and inevitability — individual grains are nothing, but together they form deserts that reshape civilizations. Psammokinesis symbolizes collective, patient overwhelming force.",
+    psychologicalMetaphor:
+      "The power of accumulation — small daily actions compounding over time into an unstoppable force. Patience as the most devastating power of all.",
+  },
+  {
+    name: "Terrakinesis",
+    suffix: "kinesis",
+    element: "Terrain",
+    fictionalOrigins:
+      "Broad terrain manipulation — shifting landscapes, raising mountains, opening chasms — appears in creation myths worldwide and in the abilities of legendary titans and world-shapers in fiction.",
+    mediaReferences: [
+      "Toph Beifong (seismic sense) — Avatar",
+      "Terra — Teen Titans",
+      "Hashirama Senju — Naruto",
+      "Atlas — Greek mythology",
+      "World-shapers in epic fantasy",
+    ],
+    symbolicMeaning:
+      "Terrain manipulation represents the power to literally reshape the landscape of reality — to alter the ground others stand on and create entirely new topographies of possibility.",
+    psychologicalMetaphor:
+      "The transformational leader who changes the entire playing field — someone whose presence shifts the fundamental conditions of any situation they enter.",
+  },
+  {
+    name: "Nucleokinesis",
+    suffix: "kinesis",
+    element: "Nuclear",
+    fictionalOrigins:
+      "Nuclear and atomic manipulation draws from the atomic age, Cold War-era science fiction, and superhero narratives built around radiation and fission as both catastrophic threat and superhuman source.",
+    mediaReferences: [
+      "Captain Atom — DC",
+      "Doctor Manhattan — Watchmen",
+      "Firestorm — DC",
+      "Radioactive Man — Marvel",
+      "Nuclear-powered beings in hard SF",
+    ],
+    symbolicMeaning:
+      "Nuclear power represents energy so concentrated it can either destroy or power civilization. Nucleokinesis symbolizes the responsibility of holding enormous power — and the wisdom required to wield it.",
+    psychologicalMetaphor:
+      "The awareness that you hold tremendous potential — and the maturity to direct it constructively rather than destructively. Power paired with profound responsibility.",
+  },
+  {
+    name: "Typhokinesis",
+    suffix: "kinesis",
+    element: "Smoke",
+    fictionalOrigins:
+      "Smoke manipulation appears in stealth traditions, ninja mythology, and various fictional characters who use concealment and obscuration as their primary tool.",
+    mediaReferences: [
+      "Smoke — Mortal Kombat",
+      "Various ninjas in fiction",
+      "Zabuza Momochi — Naruto",
+      "Smoke-based illusionists in fantasy",
+      "Ghost Rider (smoke/exhaust imagery)",
+    ],
+    symbolicMeaning:
+      "Smoke represents mystery, concealment, and the space between the seen and unseen. Typhokinesis symbolizes the power of ambiguity — the ability to remain unreadable and undefined.",
+    psychologicalMetaphor:
+      "Strategic mystery — the power of not revealing all your cards, maintaining intrigue, and operating effectively in the space between clarity and concealment.",
+  },
+  {
+    name: "Aciukinesis",
+    suffix: "kinesis",
+    element: "Sharpness",
+    fictionalOrigins:
+      "The supernatural sharpening of edges, blades, and cutting force appears in samurai mythology, divine weapons of the gods (Durandal, Excalibur's edge), and anime featuring characters who refine cutting to an impossible art.",
+    mediaReferences: [
+      "Zoro — One Piece",
+      "Sword-saints across samurai fiction",
+      "Excalibur mythology",
+      "Various blade-users in fantasy",
+      "Blade sharpening rituals in Japanese swordsmanship",
+    ],
+    symbolicMeaning:
+      "Sharpness represents precision, refinement, and the power to cut through what is unnecessary. Aciukinesis symbolizes the mastery of discernment — cutting to the truth.",
+    psychologicalMetaphor:
+      "Razor-sharp discernment, the ability to cut through confusion and noise to the essential truth, and the discipline of refining your mind until it is an instrument of absolute clarity.",
+  },
 ];

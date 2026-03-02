@@ -59,76 +59,178 @@ function cap(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+// ─── Template vocabulary ──────────────────────────────────────────────────────
+
+const I_STARTERS = [
+  "I am",
+  "You are",
+  "I have",
+  "I attract",
+  "I choose",
+  "I allow",
+  "I deserve",
+  "I embody",
+  "I radiate",
+  "I feel",
+];
+
+const POWER_ABSOLUTES = [
+  "It is safe for me to",
+  "Everything always aligns with",
+  "Why am I so naturally",
+];
+
+const MY_STARTERS = [
+  "My mind",
+  "My body",
+  "My energy",
+  "My presence",
+  "My voice",
+  "My aura",
+  "My actions",
+  "My existence",
+];
+
+const ENHANCERS = [
+  "naturally",
+  "effortlessly",
+  "because I was made for this",
+  "every day",
+  "every moment",
+  "from now on",
+  "right now",
+  "starting today",
+  "at a subconscious level",
+  "at a cellular level",
+  "at my core",
+  "deep within me",
+  "in every part of me",
+  "it is inevitable",
+  "it is done",
+  "it is already",
+];
+
+/** Pick a pseudo-random item from an array using a seed offset */
+function pick<T>(arr: T[], seed: number): T {
+  return arr[seed % arr.length];
+}
+
+/** Shuffle array using a deterministic seed (Fisher-Yates) */
+function seededShuffle<T>(arr: T[], seed: number): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = (seed * (i + 7) * 31 + i * 13) % (i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/**
+ * Build a unique affirmation from the template vocabulary.
+ * Uses slot index to vary starter + enhancer combination.
+ */
+function buildAffirmation(T: string, slot: number, strong: boolean): string {
+  const section = slot % 4;
+
+  if (section === 0) {
+    // I's starters
+    const starter = pick(I_STARTERS, slot + 3);
+    const enhancer = pick(ENHANCERS, slot + 5);
+    if (strong) {
+      return `${starter} deeply and completely ${T} — ${enhancer}.`;
+    }
+    return `${starter} ${T} — ${enhancer}.`;
+  }
+
+  if (section === 1) {
+    // My's starters
+    const starter = pick(MY_STARTERS, slot + 2);
+    const enhancer = pick(ENHANCERS, slot + 7);
+    if (strong) {
+      return `${starter} fully embodies ${T} — ${enhancer}.`;
+    }
+    return `${starter} reflects ${T} — ${enhancer}.`;
+  }
+
+  if (section === 2) {
+    // Power absolutes
+    const abs = pick(POWER_ABSOLUTES, slot);
+    const enhancer = pick(ENHANCERS, slot + 9);
+    if (abs.startsWith("Why am I")) {
+      return `${abs} filled with ${T} — ${enhancer}?`;
+    }
+    return `${abs} fully experience ${T} — ${enhancer}.`;
+  }
+
+  // section === 3: Compound form
+  const starter = pick(I_STARTERS, slot + 11);
+  const myStarter = pick(MY_STARTERS, slot + 6);
+  const enhancer = pick(ENHANCERS, slot + 13);
+  if (strong) {
+    return `${starter} unstoppably ${T} and ${myStarter} confirms this — ${enhancer}.`;
+  }
+  return `${starter} ${T} and ${myStarter} knows it — ${enhancer}.`;
+}
+
 export function generateAffirmations(
   topic: string,
   boosterEnabled: boolean,
   fantasyEnabled: boolean,
   protectionEnabled: boolean,
-  chakraName: string,
+  chakraNames: string | string[],
   characterName?: string,
   characterSource?: string,
   itemName?: string,
   itemSource?: string,
 ): string[] {
   const intent = extractIntent(topic);
-  const T = intent; // short alias
+  const T = intent;
 
-  // ── Base affirmations (always generated, topic-specific) ─────────────
-  const base: string[] = boosterEnabled
-    ? [
-        // Boosted identity-level versions
-        `I am powerfully and completely ${T} in every dimension of my being.`,
-        `${cap(T)} is my natural, permanent state — I embody it without effort.`,
-        `Every single cell of my being radiates ${T} at maximum intensity.`,
-        `I am the living, breathing definition of ${T} — it flows from me effortlessly.`,
-        `My ${T} grows stronger, deeper, and more unshakeable with every breath.`,
-        `I am an unstoppable, magnetic force of ${T} — nothing can diminish it.`,
-        `The universe recognizes me as a master of ${T} and aligns everything in my favor.`,
-        `My identity is permanently fused with ${T} — it is who I am at my core.`,
-        `I attract infinite ${T} because I am a perfect vibrational match for it.`,
-        `My subconscious mind is completely saturated with ${T} — it runs through everything I do.`,
-        `${cap(T)} multiplies and compounds within me every moment of every day.`,
-        `I radiate ${T} so powerfully that it transforms every environment I enter.`,
-        `My capacity for ${T} is limitless and constantly expanding beyond what I thought possible.`,
-        `I am already living the reality of ${T} — my mind, body, and spirit confirm this now.`,
-        `The intensity of my ${T} is legendary — it defines my entire existence.`,
-      ]
-    : [
-        // Standard depth
-        `I am ${T}.`,
-        `I have ${T} in abundance.`,
-        `My ${T} grows stronger every single day.`,
-        `I radiate ${T} naturally and effortlessly.`,
-        `I deserve ${T} and I receive it fully.`,
-        `The universe aligns to bring me ${T} in perfect timing.`,
-        `I am grateful for the ${T} that is already mine.`,
-        `Every day I step deeper into my ${T}.`,
-        `I am worthy of ${T} beyond what I can imagine.`,
-        `My subconscious mind is fully programmed with ${T}.`,
-        `${cap(T)} is a natural part of who I am.`,
-        `I attract ${T} because I embody it completely.`,
-        `My relationship with ${T} deepens with every passing moment.`,
-        `I choose ${T} and ${T} chooses me.`,
-        `Everything I do reflects my ${T}.`,
-      ];
+  const result: string[] = [];
 
-  const result: string[] = [...base];
+  // ── Base affirmations (template-vocabulary driven, not copy-paste templates) ─
+  // We generate 15 affirmations cycling through all starter/enhancer combos
+  const baseSlots = seededShuffle(
+    Array.from({ length: 15 }, (_, i) => i),
+    T.length + 3,
+  );
 
-  // ── Fantasy-to-Reality mode ──────────────────────────────────────────
-  // Generates affirmations about physically bringing fictional elements into reality
+  for (let idx = 0; idx < 15; idx++) {
+    result.push(buildAffirmation(T, baseSlots[idx], boosterEnabled));
+  }
+
+  // ── Booster extras ────────────────────────────────────────────────────────
+  if (boosterEnabled) {
+    // Extra intensity lines using power-absolute + enhancer combos
+    const boosterLines: string[] = [
+      `I am powerfully and completely ${T} in every dimension of my being — it is done.`,
+      `My identity is permanently fused with ${T} — at a cellular level — right now.`,
+      `Every single cell of my being radiates ${T} — it is inevitable.`,
+      `I embody ${T} at my core — effortlessly and deeply within me.`,
+      `My aura vibrates at the frequency of ${T} — from now on.`,
+      `I attract ${T} at an unstoppable rate — at a subconscious level.`,
+      `My existence is proof of ${T} — in every part of me — every moment.`,
+      `I choose ${T} and it is already mine — at a cellular level.`,
+      `${cap(T)} multiplies and expands within me every single day — it is done.`,
+      `My presence radiates ${T} so powerfully it transforms every space I enter — naturally.`,
+    ];
+    result.push(...boosterLines);
+  }
+
+  // ── Fantasy-to-Reality mode ───────────────────────────────────────────────
   if (fantasyEnabled) {
     result.push(
       `I possess ${T} — it is physically real, active, and fully present in my life right now.`,
       `The fabric of reality has opened and ${T} is now a tangible, physical part of my world.`,
-      `${cap(T)} exists in my physical reality — I can see it, feel it, and access it at will.`,
-      `I have broken the boundary between fiction and reality — ${T} is mine in the physical world.`,
+      `${cap(T)} exists in my physical reality — I feel it, I access it, and it responds to me.`,
+      `I have broken the boundary between imagination and reality — ${T} is mine physically.`,
       `Reality itself has shifted to accommodate my ${T} — it is no longer a concept, it is fact.`,
-      `I live in a reality where ${T} is physically possible and completely real for me.`,
-      `The laws of my reality have expanded — ${T} is now a natural part of my physical existence.`,
-      `What was once fictional has become physical — ${T} has crossed into my reality completely.`,
+      `I live in a reality where ${T} is fully real and completely mine — it is done.`,
+      `What was once beyond reach has now materialized — ${T} is a physical part of my world.`,
+      `My energy opened the door and ${T} walked through — it is here with me now.`,
     );
 
-    // ── Character Manifestation ────────────────────────────────────────
+    // ── Character Manifestation ─────────────────────────────────────────────
     if (characterName?.trim()) {
       const C = characterName.trim();
       const src = characterSource?.trim()
@@ -145,7 +247,7 @@ export function generateAffirmations(
       );
     }
 
-    // ── Item Manifestation ────────────────────────────────────────────
+    // ── Item Manifestation ──────────────────────────────────────────────────
     if (itemName?.trim()) {
       const I2 = itemName.trim();
       const isrc = itemSource?.trim() ? ` from ${itemSource.trim()}` : "";
@@ -154,32 +256,41 @@ export function generateAffirmations(
         `I have opened the fabric of reality and pulled ${I2}${isrc} through into my physical world.`,
         `${I2} exists as a physical object in my life — it has manifested and I possess it completely.`,
         `The reality-barrier for ${I2} no longer exists — it is here with me in my physical world.`,
-        `I physically possess ${I2}${isrc} — it crossed from fiction into my reality and it is mine.`,
+        `I physically possess ${I2}${isrc} — it crossed into my reality and it is mine.`,
         `${I2} is no longer beyond reach — it has materialized in my world and responds to me fully.`,
         `My reality now includes ${I2}${isrc} as a physical presence — I have made this real.`,
       );
     }
   }
 
-  // ── Protection mode ──────────────────────────────────────────────────
-  // Grounding affirmations themed to the user's specific topic
+  // ── Protection mode ───────────────────────────────────────────────────────
   if (protectionEnabled) {
-    result.push(
-      `My ${T} is protected, stable, and cannot be taken from me.`,
-      `I am grounded in my ${T} — no outside force can shake what I have built.`,
-      `My inner clarity keeps my ${T} safe and continuously growing.`,
+    const protectionLines: string[] = [
+      `My ${T} is protected, stable, and cannot be taken from me — deep within me.`,
+      `I am grounded in my ${T} — my energy remains steady and untouchable — at my core.`,
+      `My inner clarity keeps my ${T} safe and continuously growing — every moment.`,
       `It is safe for me to fully own my ${T} — I am ready and I am protected.`,
-      `My energy around ${T} remains steady and unaffected by doubt or external noise.`,
-      `I trust myself completely to sustain and protect my ${T} at all times.`,
-    );
+      `My aura around ${T} remains unshakeable — no outside force can diminish what I have built.`,
+      `I trust myself completely to sustain and protect my ${T} — naturally and effortlessly.`,
+      `My presence is grounded in ${T} — it is safe for me to exist fully in this power.`,
+      `My energy holds ${T} with calm authority — it is inevitable and it is done.`,
+    ];
+    result.push(...protectionLines);
   }
 
-  // ── Chakra alignment ────────────────────────────────────────────────
-  if (chakraName && chakraName !== "") {
+  // ── Chakra alignment ──────────────────────────────────────────────────────
+  const chakras = Array.isArray(chakraNames)
+    ? chakraNames
+    : chakraNames
+      ? [chakraNames]
+      : [];
+
+  for (const chakraName of chakras) {
+    if (!chakraName || chakraName === "") continue;
     result.push(
-      `My ${chakraName} chakra is balanced, open, and radiating — it amplifies my ${T}.`,
-      `I align my energy with the pure frequency of the ${chakraName} chakra, deepening my ${T}.`,
-      `The ${chakraName} center within me is fully awakened and perfectly tuned to my ${T}.`,
+      `My ${chakraName} chakra is open, radiant, and perfectly aligned with ${T} — right now.`,
+      `I align my energy with the pure frequency of the ${chakraName} chakra — it deepens my ${T} at a cellular level.`,
+      `The ${chakraName} center within me is fully awakened and tuned to ${T} — it is done.`,
     );
   }
 
