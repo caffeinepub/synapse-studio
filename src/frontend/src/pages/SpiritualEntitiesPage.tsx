@@ -22,7 +22,147 @@ interface SpiritualEntity {
   context: string;
   psychologicalMeaning: string;
   archetypalNote?: string;
+  relatedSpells?: string[];
+  relatedSigils?: string[];
 }
+
+const ENTITY_CONNECTIONS: Record<
+  string,
+  { relatedSpells: string[]; relatedSigils: string[] }
+> = {
+  Michael: {
+    relatedSpells: ["Protection Circle", "LBRP", "Energy Shield"],
+    relatedSigils: ["Seal of Solomon", "Pentagram (Pentacle)", "Algiz (Rune)"],
+  },
+  Gabriel: {
+    relatedSpells: ["Moon Spell", "Air Invocation", "Invocation"],
+    relatedSigils: ["Seal of Solomon", "Eye of Providence"],
+  },
+  Raphael: {
+    relatedSpells: ["Healing Transmission", "Chakra Clearing", "Water Ritual"],
+    relatedSigils: ["Caduceus", "Seal of Solomon"],
+  },
+  Uriel: {
+    relatedSpells: ["Fire Spell", "Talisman Creation", "Planetary Seal"],
+    relatedSigils: ["Eye of Providence", "Metatron's Cube"],
+  },
+  Metatron: {
+    relatedSpells: ["Sigil Charging", "Planetary Seal", "Talisman Creation"],
+    relatedSigils: [
+      "Metatron's Cube",
+      "Flower of Life",
+      "Tree of Life (Kabbalah)",
+    ],
+  },
+  Lucifer: {
+    relatedSpells: ["Sigil Charging", "Desire Sigil", "Chaos Magick Sigil"],
+    relatedSigils: ["Sigil of Lucifer", "Leviathan Cross", "Chaos Star"],
+  },
+  Lilith: {
+    relatedSpells: ["Binding Spell", "Cord Cutting", "Mirror Magic"],
+    relatedSigils: ["Sigil of Baphomet", "Triquetra"],
+  },
+  Azazel: {
+    relatedSpells: [
+      "Sigil Charging",
+      "Talisman Creation",
+      "Chaos Magick Sigil",
+    ],
+    relatedSigils: ["Sigil of Azazel", "Pentagram (Pentacle)"],
+  },
+  Baphomet: {
+    relatedSpells: ["LBRP", "Invocation", "Chaos Magick Sigil"],
+    relatedSigils: [
+      "Sigil of Baphomet",
+      "Hexagram (Star of David)",
+      "Chaos Star",
+    ],
+  },
+  Asmodeus: {
+    relatedSpells: ["Glamour Spell", "Desire Sigil", "Jar Spell"],
+    relatedSigils: ["Sigil of Asmodeus"],
+  },
+  Odin: {
+    relatedSpells: ["Runic Bind Rune", "Talisman Creation", "Invocation"],
+    relatedSigils: ["Valknut", "Vegvisir", "Algiz (Rune)", "Othala (Rune)"],
+  },
+  Thor: {
+    relatedSpells: ["Protection Circle", "Fire Spell", "Knot Magic"],
+    relatedSigils: ["Mjolnir (Thor's Hammer)", "Algiz (Rune)"],
+  },
+  Freya: {
+    relatedSpells: ["Glamour Spell", "Moon Spell", "Abundance Ritual"],
+    relatedSigils: ["Triquetra", "Vegvisir"],
+  },
+  Ra: {
+    relatedSpells: ["Fire Spell", "Candle Magic", "Planetary Seal"],
+    relatedSigils: ["Ankh", "Solar Cross", "Eye of Horus"],
+  },
+  Anubis: {
+    relatedSpells: ["Cord Cutting", "Sigil Charging", "Herb Pouch"],
+    relatedSigils: ["Ankh", "Eye of Horus"],
+  },
+  Isis: {
+    relatedSpells: ["Healing Transmission", "Moon Spell", "Invocation"],
+    relatedSigils: ["Ankh", "Eye of Horus", "Sigil of Maat"],
+  },
+  Hecate: {
+    relatedSpells: ["Moon Spell", "Protection Circle", "Mirror Magic"],
+    relatedSigils: ["Hecate's Wheel", "Triquetra", "Pentagram (Pentacle)"],
+  },
+  Hermes: {
+    relatedSpells: ["Planetary Seal", "Talisman Creation", "Air Invocation"],
+    relatedSigils: ["Caduceus", "Seal of Solomon"],
+  },
+  Kali: {
+    relatedSpells: ["Fire Spell", "Binding Spell", "Cord Cutting"],
+    relatedSigils: ["Sri Yantra", "Chaos Star"],
+  },
+  Ganesha: {
+    relatedSpells: ["Abundance Ritual", "Earth Grounding", "Talisman Creation"],
+    relatedSigils: ["Sri Yantra", "Flower of Life"],
+  },
+  Loki: {
+    relatedSpells: ["Chaos Magick Sigil", "Desire Sigil", "Glamour Spell"],
+    relatedSigils: ["Vegvisir", "Chaos Star"],
+  },
+  "The Morrigan": {
+    relatedSpells: ["Protection Circle", "Binding Spell", "Fire Spell"],
+    relatedSigils: ["Triquetra", "Celtic Cross", "Triskelion"],
+  },
+  Oshun: {
+    relatedSpells: ["Abundance Ritual", "Glamour Spell", "Water Ritual"],
+    relatedSigils: ["Hamsa", "Solar Cross"],
+  },
+  Shango: {
+    relatedSpells: ["Fire Spell", "Candle Magic", "Invocation"],
+    relatedSigils: ["Valknut", "Solar Cross"],
+  },
+  "The Shadow": {
+    relatedSpells: ["Mirror Magic", "Cord Cutting", "Chaos Magick Sigil"],
+    relatedSigils: ["Leviathan Cross", "Sigil of Lucifer"],
+  },
+  "The Trickster": {
+    relatedSpells: ["Chaos Magick Sigil", "Desire Sigil", "Glamour Spell"],
+    relatedSigils: ["Chaos Star", "Ouroboros"],
+  },
+  "The Phoenix": {
+    relatedSpells: ["Fire Spell", "Cord Cutting", "Candle Magic"],
+    relatedSigils: ["Ankh", "Solar Cross", "Ouroboros"],
+  },
+  "The Dragon": {
+    relatedSpells: ["Invocation", "Fire Spell", "Talisman Creation"],
+    relatedSigils: ["Pentagram (Pentacle)", "Ouroboros"],
+  },
+  "The Serpent": {
+    relatedSpells: [
+      "Healing Transmission",
+      "Earth Grounding",
+      "Sigil Charging",
+    ],
+    relatedSigils: ["Caduceus", "Ouroboros", "Yin-Yang"],
+  },
+};
 
 const ENTITIES: SpiritualEntity[] = [
   // ── Angels ─────────────────────────────────────────────────────────────────
@@ -1103,10 +1243,12 @@ const ENTITY_TYPES: Array<"All" | EntityType> = [
 
 interface SpiritualEntitiesPageProps {
   onUseForSubliminal: (topic: string) => void;
+  onNavigate: (page: string) => void;
 }
 
 export default function SpiritualEntitiesPage({
   onUseForSubliminal,
+  onNavigate,
 }: SpiritualEntitiesPageProps) {
   const [search, setSearch] = useState("");
   const [activeType, setActiveType] = useState<"All" | EntityType>("All");
@@ -1395,6 +1537,78 @@ export default function SpiritualEntitiesPage({
                             {entity.psychologicalMeaning}
                           </p>
                         </div>
+
+                        {/* Connections */}
+                        {(() => {
+                          const conn = ENTITY_CONNECTIONS[entity.name] ?? {
+                            relatedSpells: ["Invocation", "Sigil Charging"],
+                            relatedSigils: ["Seal of Solomon"],
+                          };
+                          return (
+                            <div className="space-y-2 pt-1 border-t border-border/20">
+                              <h4 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                                ◈ Connections
+                              </h4>
+                              {/* Spells */}
+                              <div className="space-y-1">
+                                <p
+                                  className="text-xs font-semibold uppercase tracking-widest"
+                                  style={{
+                                    color: "oklch(0.62 0.22 295 / 0.8)",
+                                  }}
+                                >
+                                  ⚔ Spells
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {conn.relatedSpells.map((spell) => (
+                                    <button
+                                      key={spell}
+                                      type="button"
+                                      onClick={() => onNavigate("spells")}
+                                      className="text-xs px-2 py-0.5 rounded-full cursor-pointer transition-all duration-150 hover:scale-105"
+                                      style={{
+                                        background:
+                                          "oklch(0.62 0.22 295 / 0.12)",
+                                        color: "oklch(0.62 0.22 295)",
+                                        border:
+                                          "1px solid oklch(0.62 0.22 295 / 0.3)",
+                                      }}
+                                    >
+                                      {spell}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              {/* Sigils */}
+                              <div className="space-y-1">
+                                <p
+                                  className="text-xs font-semibold uppercase tracking-widest"
+                                  style={{ color: "oklch(0.72 0.2 70 / 0.8)" }}
+                                >
+                                  ◈ Sigils
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {conn.relatedSigils.map((sigil) => (
+                                    <button
+                                      key={sigil}
+                                      type="button"
+                                      onClick={() => onNavigate("sigils")}
+                                      className="text-xs px-2 py-0.5 rounded-full cursor-pointer transition-all duration-150 hover:scale-105"
+                                      style={{
+                                        background: "oklch(0.72 0.2 70 / 0.12)",
+                                        color: "oklch(0.72 0.2 70)",
+                                        border:
+                                          "1px solid oklch(0.72 0.2 70 / 0.3)",
+                                      }}
+                                    >
+                                      {sigil}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
 
                         <Button
                           size="sm"

@@ -22,6 +22,132 @@ interface Spell {
   affirmationConversion: string;
 }
 
+const SPELL_CONNECTIONS: Record<
+  string,
+  { relatedEntities: string[]; relatedSigils: string[] }
+> = {
+  "Candle Magic": {
+    relatedEntities: ["Ra", "Brigid", "Oshun"],
+    relatedSigils: ["Solar Cross", "Ankh"],
+  },
+  "Moon Spell": {
+    relatedEntities: ["Hecate", "Isis", "The Moon"],
+    relatedSigils: ["Eye of Providence", "Triquetra"],
+  },
+  "Protection Circle": {
+    relatedEntities: ["Michael", "Thor", "The Morrigan"],
+    relatedSigils: ["Pentagram (Pentacle)", "Algiz (Rune)", "Seal of Solomon"],
+  },
+  "Abundance Ritual": {
+    relatedEntities: ["Lakshmi", "Oshun", "Ganesha"],
+    relatedSigils: ["Hamsa", "Flower of Life", "Hexagram (Star of David)"],
+  },
+  "Binding Spell": {
+    relatedEntities: ["Lilith", "Kali", "The Morrigan"],
+    relatedSigils: ["Leviathan Cross", "Algiz (Rune)"],
+  },
+  "Glamour Spell": {
+    relatedEntities: ["Freya", "Oshun", "Asmodeus"],
+    relatedSigils: ["Hamsa", "Hecate's Wheel"],
+  },
+  "Lesser Banishing Ritual of the Pentagram (LBRP)": {
+    relatedEntities: ["Michael", "Raphael", "Gabriel", "Uriel"],
+    relatedSigils: [
+      "Seal of Solomon",
+      "Pentagram (Pentacle)",
+      "Tree of Life (Kabbalah)",
+    ],
+  },
+  Invocation: {
+    relatedEntities: ["Hermes", "Isis", "Odin"],
+    relatedSigils: [
+      "Seal of Solomon",
+      "Eye of Providence",
+      "Hexagram (Star of David)",
+    ],
+  },
+  "Sigil Charging": {
+    relatedEntities: ["Metatron", "Azazel", "Lucifer"],
+    relatedSigils: ["Metatron's Cube", "Chaos Star", "Flower of Life"],
+  },
+  "Talisman Creation": {
+    relatedEntities: ["Hermes", "Metatron", "Odin"],
+    relatedSigils: ["Seal of Solomon", "Valknut"],
+  },
+  "Jar Spell": {
+    relatedEntities: ["Oshun", "Asmodeus", "Eshu / Elegba"],
+    relatedSigils: ["Hamsa", "Hexagram (Star of David)"],
+  },
+  "Knot Magic": {
+    relatedEntities: ["The Morrigan", "Thor", "Freya"],
+    relatedSigils: ["Triquetra", "Celtic Cross"],
+  },
+  "Herb Pouch (Mojo Bag)": {
+    relatedEntities: ["Hecate", "Anubis", "Cernunnos"],
+    relatedSigils: ["Triskelion", "Celtic Cross"],
+  },
+  "Mirror Magic": {
+    relatedEntities: ["Lilith", "Hecate", "The Shadow"],
+    relatedSigils: ["Eye of Providence", "Hecate's Wheel"],
+  },
+  "Cord Cutting": {
+    relatedEntities: ["Anubis", "Kali", "Lilith"],
+    relatedSigils: ["Leviathan Cross", "Ouroboros"],
+  },
+  "Desire Sigil": {
+    relatedEntities: ["Lucifer", "Loki", "Asmodeus"],
+    relatedSigils: ["Chaos Star", "Sigil of Lucifer"],
+  },
+  "Chaos Magick Sigil": {
+    relatedEntities: ["Loki", "The Trickster", "Baphomet"],
+    relatedSigils: ["Chaos Star", "Leviathan Cross"],
+  },
+  "Planetary Seal": {
+    relatedEntities: ["Hermes", "Ra", "Uriel"],
+    relatedSigils: [
+      "Hexagram (Star of David)",
+      "Seal of Solomon",
+      "Eye of Providence",
+    ],
+  },
+  "Runic Bind Rune": {
+    relatedEntities: ["Odin", "Thor", "Freya"],
+    relatedSigils: ["Valknut", "Algiz (Rune)", "Othala (Rune)", "Vegvisir"],
+  },
+  "Fire Spell": {
+    relatedEntities: ["Ra", "Shango", "Kali", "Brigid"],
+    relatedSigils: ["Solar Cross", "Mjolnir (Thor's Hammer)"],
+  },
+  "Water Ritual": {
+    relatedEntities: ["Isis", "Oshun", "Poseidon / Neptune"],
+    relatedSigils: ["Triquetra", "Eye of Horus"],
+  },
+  "Earth Grounding": {
+    relatedEntities: ["Cernunnos", "Ganesha", "The Serpent"],
+    relatedSigils: ["Celtic Cross", "Tree of Life (Kabbalah)"],
+  },
+  "Air Invocation": {
+    relatedEntities: ["Hermes", "Gabriel", "Susanoo"],
+    relatedSigils: ["Eye of Providence", "Caduceus"],
+  },
+  "Chakra Clearing": {
+    relatedEntities: ["Shiva", "Ganesha", "Metatron"],
+    relatedSigils: ["Sri Yantra", "Flower of Life", "Seed of Life"],
+  },
+  "Aura Cleansing": {
+    relatedEntities: ["Raphael", "Michael", "Isis"],
+    relatedSigils: ["Seal of Solomon", "Pentagram (Pentacle)"],
+  },
+  "Energy Shield": {
+    relatedEntities: ["Michael", "Thor", "Uriel"],
+    relatedSigils: ["Algiz (Rune)", "Hamsa", "Pentagram (Pentacle)"],
+  },
+  "Healing Transmission": {
+    relatedEntities: ["Raphael", "Isis", "The Serpent"],
+    relatedSigils: ["Caduceus", "Ankh", "Seed of Life"],
+  },
+};
+
 const SPELLS: Spell[] = [
   // Wicca
   {
@@ -510,9 +636,13 @@ const TRADITIONS: Array<"All" | SpellTradition> = [
 
 interface SpellsPageProps {
   onUseForSubliminal: (topic: string) => void;
+  onNavigate: (page: string) => void;
 }
 
-export default function SpellsPage({ onUseForSubliminal }: SpellsPageProps) {
+export default function SpellsPage({
+  onUseForSubliminal,
+  onNavigate,
+}: SpellsPageProps) {
   const [search, setSearch] = useState("");
   const [activeTradition, setActiveTradition] = useState<
     "All" | SpellTradition
@@ -765,6 +895,78 @@ export default function SpellsPage({ onUseForSubliminal }: SpellsPageProps) {
                             {spell.affirmationConversion}
                           </p>
                         </div>
+
+                        {/* Connections */}
+                        {(() => {
+                          const conn = SPELL_CONNECTIONS[spell.name] ?? {
+                            relatedEntities: ["Metatron", "The Shadow"],
+                            relatedSigils: ["Seal of Solomon"],
+                          };
+                          return (
+                            <div className="space-y-2 pt-1 border-t border-border/20">
+                              <h4 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                                ◈ Connections
+                              </h4>
+                              {/* Entities */}
+                              <div className="space-y-1">
+                                <p
+                                  className="text-xs font-semibold uppercase tracking-widest"
+                                  style={{
+                                    color: "oklch(0.68 0.18 195 / 0.8)",
+                                  }}
+                                >
+                                  👁 Entities
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {conn.relatedEntities.map((ent) => (
+                                    <button
+                                      key={ent}
+                                      type="button"
+                                      onClick={() => onNavigate("entities")}
+                                      className="text-xs px-2 py-0.5 rounded-full cursor-pointer transition-all duration-150 hover:scale-105"
+                                      style={{
+                                        background:
+                                          "oklch(0.68 0.18 195 / 0.12)",
+                                        color: "oklch(0.68 0.18 195)",
+                                        border:
+                                          "1px solid oklch(0.68 0.18 195 / 0.3)",
+                                      }}
+                                    >
+                                      {ent}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              {/* Sigils */}
+                              <div className="space-y-1">
+                                <p
+                                  className="text-xs font-semibold uppercase tracking-widest"
+                                  style={{ color: "oklch(0.72 0.2 70 / 0.8)" }}
+                                >
+                                  ◈ Sigils
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {conn.relatedSigils.map((sigil) => (
+                                    <button
+                                      key={sigil}
+                                      type="button"
+                                      onClick={() => onNavigate("sigils")}
+                                      className="text-xs px-2 py-0.5 rounded-full cursor-pointer transition-all duration-150 hover:scale-105"
+                                      style={{
+                                        background: "oklch(0.72 0.2 70 / 0.12)",
+                                        color: "oklch(0.72 0.2 70)",
+                                        border:
+                                          "1px solid oklch(0.72 0.2 70 / 0.3)",
+                                      }}
+                                    >
+                                      {sigil}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
 
                         <Button
                           size="sm"

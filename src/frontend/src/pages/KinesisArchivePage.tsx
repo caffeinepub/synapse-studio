@@ -123,11 +123,102 @@ function KinesisCard({
   );
 }
 
+const KINESIS_CONNECTIONS: Record<
+  string,
+  { entities: string[]; spells: string[] }
+> = {
+  Telekinesis: {
+    entities: ["Metatron", "The Shadow", "Odin"],
+    spells: ["Planetary Seal", "Sigil Charging", "Invocation"],
+  },
+  Pyrokinesis: {
+    entities: ["Ra", "Shango", "Brigid"],
+    spells: ["Fire Spell", "Candle Magic", "Invocation"],
+  },
+  Electrokinesis: {
+    entities: ["Thor", "Shango"],
+    spells: ["Fire Spell", "Runic Bind Rune", "Planetary Seal"],
+  },
+  Hydrokinesis: {
+    entities: ["Isis", "Oshun", "Poseidon / Neptune"],
+    spells: ["Water Ritual", "Moon Spell", "Healing Transmission"],
+  },
+  Aerokinesis: {
+    entities: ["Gabriel", "Hermes", "Susanoo"],
+    spells: ["Air Invocation", "Planetary Seal", "Invocation"],
+  },
+  Geokinesis: {
+    entities: ["Cernunnos", "Ganesha", "Veles"],
+    spells: ["Earth Grounding", "Herb Pouch (Mojo Bag)", "Talisman Creation"],
+  },
+  Biokinesis: {
+    entities: ["Raphael", "Isis", "Kali"],
+    spells: ["Healing Transmission", "Chakra Clearing", "Aura Cleansing"],
+  },
+  Cryokinesis: {
+    entities: ["Odin", "Freya"],
+    spells: ["Moon Spell", "Runic Bind Rune"],
+  },
+  Chronokinesis: {
+    entities: ["Odin", "Metatron"],
+    spells: ["Planetary Seal", "Sigil Charging", "Talisman Creation"],
+  },
+  Photokinesis: {
+    entities: ["Ra", "Apollo", "Uriel"],
+    spells: ["Candle Magic", "Fire Spell", "Planetary Seal"],
+  },
+  Umbrakinesis: {
+    entities: ["Lilith", "The Shadow", "Tezcatlipoca"],
+    spells: ["Mirror Magic", "Desire Sigil", "Chaos Magick Sigil"],
+  },
+  Gravitokinesis: {
+    entities: ["Metatron", "Odin"],
+    spells: ["Planetary Seal", "Sigil Charging"],
+  },
+  Atmokinesis: {
+    entities: ["Thor", "Shango", "Perun"],
+    spells: ["Fire Spell", "Water Ritual", "Air Invocation"],
+  },
+  Ergokinesis: {
+    entities: ["Metatron", "Ra"],
+    spells: ["Sigil Charging", "Planetary Seal", "Energy Shield"],
+  },
+  Cosmokinesis: {
+    entities: ["Metatron", "Ra"],
+    spells: ["Planetary Seal", "Invocation", "Talisman Creation"],
+  },
+  Onirokinesis: {
+    entities: ["Hecate", "Odin"],
+    spells: ["Moon Spell", "Mirror Magic", "Sigil Charging"],
+  },
+};
+
+function getKinesisConnections(name: string) {
+  // Try exact match first
+  if (KINESIS_CONNECTIONS[name]) return KINESIS_CONNECTIONS[name];
+  // Try partial match
+  const key = Object.keys(KINESIS_CONNECTIONS).find((k) =>
+    name.toLowerCase().includes(k.toLowerCase()),
+  );
+  if (key) return KINESIS_CONNECTIONS[key];
+  // Default
+  return {
+    entities: ["Metatron", "The Shadow"],
+    spells: ["Sigil Charging", "Invocation"],
+  };
+}
+
 function KinesisModal({
   entry,
   open,
   onClose,
-}: { entry: KinesisEntry | null; open: boolean; onClose: () => void }) {
+  onNavigate,
+}: {
+  entry: KinesisEntry | null;
+  open: boolean;
+  onClose: () => void;
+  onNavigate: (page: string) => void;
+}) {
   if (!entry) return null;
   const color = getElementColor(entry.element);
 
@@ -255,13 +346,92 @@ function KinesisModal({
               "{entry.psychologicalMetaphor}"
             </p>
           </div>
+
+          {/* Connections */}
+          {(() => {
+            const conn = getKinesisConnections(entry.name);
+            return (
+              <div className="space-y-3 pt-1 border-t border-border/20">
+                <h4
+                  className="text-xs font-heading font-semibold uppercase tracking-widest"
+                  style={{ color: `${color}cc` }}
+                >
+                  ◈ Connected Systems
+                </h4>
+                {/* Entities */}
+                <div className="space-y-1">
+                  <p
+                    className="text-xs font-semibold uppercase tracking-widest"
+                    style={{ color: "oklch(0.68 0.18 195 / 0.8)" }}
+                  >
+                    👁 Entities
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {conn.entities.map((ent) => (
+                      <button
+                        key={ent}
+                        type="button"
+                        onClick={() => {
+                          onClose();
+                          onNavigate("entities");
+                        }}
+                        className="text-xs px-2 py-0.5 rounded-full cursor-pointer transition-all duration-150 hover:scale-105"
+                        style={{
+                          background: "oklch(0.68 0.18 195 / 0.12)",
+                          color: "oklch(0.68 0.18 195)",
+                          border: "1px solid oklch(0.68 0.18 195 / 0.3)",
+                        }}
+                      >
+                        {ent}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {/* Spells */}
+                <div className="space-y-1">
+                  <p
+                    className="text-xs font-semibold uppercase tracking-widest"
+                    style={{ color: "oklch(0.62 0.22 295 / 0.8)" }}
+                  >
+                    ⚔ Spells
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {conn.spells.map((spell) => (
+                      <button
+                        key={spell}
+                        type="button"
+                        onClick={() => {
+                          onClose();
+                          onNavigate("spells");
+                        }}
+                        className="text-xs px-2 py-0.5 rounded-full cursor-pointer transition-all duration-150 hover:scale-105"
+                        style={{
+                          background: "oklch(0.62 0.22 295 / 0.12)",
+                          color: "oklch(0.62 0.22 295)",
+                          border: "1px solid oklch(0.62 0.22 295 / 0.3)",
+                        }}
+                      >
+                        {spell}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </DialogContent>
     </Dialog>
   );
 }
 
-export default function KinesisArchivePage() {
+interface KinesisArchivePageProps {
+  onNavigate?: (page: string) => void;
+}
+
+export default function KinesisArchivePage({
+  onNavigate,
+}: KinesisArchivePageProps) {
   const { data: entries, isLoading, error } = useGetAllKinesisEntries();
   const [search, setSearch] = useState("");
   const [selectedEntry, setSelectedEntry] = useState<KinesisEntry | null>(null);
@@ -441,6 +611,7 @@ export default function KinesisArchivePage() {
           setModalOpen(false);
           setTimeout(() => setSelectedEntry(null), 300);
         }}
+        onNavigate={onNavigate ?? (() => {})}
       />
     </div>
   );

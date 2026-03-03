@@ -10,6 +10,7 @@ import {
   Moon,
   Search,
   Settings,
+  Star,
   Wand2,
   X,
   Youtube,
@@ -26,6 +27,7 @@ type Page =
   | "religions"
   | "entities"
   | "spells"
+  | "sigils"
   | "rituals"
   | "healing"
   | "settings"
@@ -79,6 +81,12 @@ const navItems = [
     label: "Spells",
     icon: Wand2,
     description: "Spells & Magical Traditions",
+  },
+  {
+    id: "sigils" as Page,
+    label: "Sigils",
+    icon: Star,
+    description: "Sigil Codex & Sacred Symbols",
   },
   {
     id: "rituals" as Page,

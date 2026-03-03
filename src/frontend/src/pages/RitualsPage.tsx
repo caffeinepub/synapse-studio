@@ -6,7 +6,94 @@ import { motion } from "motion/react";
 
 interface RitualsPageProps {
   onUseForSubliminal: (topic: string) => void;
+  onNavigate?: (page: string) => void;
 }
+
+const RITUAL_CONNECTIONS: Record<
+  string,
+  { entities: string[]; spells: string[] }
+> = {
+  "New Moon": {
+    entities: ["Hecate", "Isis", "Inanna / Ishtar"],
+    spells: ["Moon Spell", "Desire Sigil", "Candle Magic"],
+  },
+  "Full Moon": {
+    entities: ["Isis", "Freya", "Hecate"],
+    spells: ["Moon Spell", "Abundance Ritual", "Sigil Charging"],
+  },
+  "Waxing Crescent": {
+    entities: ["Freya", "Inanna / Ishtar"],
+    spells: ["Moon Spell", "Candle Magic"],
+  },
+  "First Quarter": {
+    entities: ["Michael", "Thor"],
+    spells: ["Protection Circle", "Fire Spell"],
+  },
+  "Waxing Gibbous": {
+    entities: ["Isis", "Lakshmi"],
+    spells: ["Abundance Ritual", "Sigil Charging"],
+  },
+  "Disseminating Moon": {
+    entities: ["Hermes", "Gabriel"],
+    spells: ["Invocation", "Air Invocation"],
+  },
+  "Third Quarter": {
+    entities: ["Kali", "Anubis"],
+    spells: ["Cord Cutting", "Binding Spell"],
+  },
+  "Waning Crescent": {
+    entities: ["Hecate", "Lilith"],
+    spells: ["Mirror Magic", "Cord Cutting"],
+  },
+  Samhain: {
+    entities: ["The Morrigan", "Anubis", "Hecate"],
+    spells: ["Cord Cutting", "Mirror Magic", "Protection Circle"],
+  },
+  Imbolc: {
+    entities: ["Brigid", "Freya"],
+    spells: ["Candle Magic", "Abundance Ritual"],
+  },
+  Beltane: {
+    entities: ["Freya", "Cernunnos", "Oshun"],
+    spells: ["Glamour Spell", "Abundance Ritual", "Fire Spell"],
+  },
+  "Litha / Midsummer": {
+    entities: ["Ra", "Apollo", "Shango"],
+    spells: ["Fire Spell", "Candle Magic", "Planetary Seal"],
+  },
+  Ostara: {
+    entities: ["Freya", "Brigid", "Inanna / Ishtar"],
+    spells: ["Abundance Ritual", "Earth Grounding", "Moon Spell"],
+  },
+  Lammas: {
+    entities: ["Cernunnos", "Lakshmi"],
+    spells: ["Abundance Ritual", "Earth Grounding"],
+  },
+  Mabon: {
+    entities: ["Anubis", "The Morrigan"],
+    spells: ["Cord Cutting", "Earth Grounding"],
+  },
+  Yule: {
+    entities: ["Odin", "Brigid"],
+    spells: ["Candle Magic", "Protection Circle", "Runic Bind Rune"],
+  },
+  "Daily Morning": {
+    entities: ["Ra", "Apollo", "Michael"],
+    spells: ["Air Invocation", "Candle Magic", "Protection Circle"],
+  },
+  "Evening Wind Down": {
+    entities: ["Hecate", "Isis"],
+    spells: ["Moon Spell", "Aura Cleansing"],
+  },
+  "Weekly Reset": {
+    entities: ["Hermes", "Metatron"],
+    spells: ["Sigil Charging", "Talisman Creation"],
+  },
+  "Monthly Inventory": {
+    entities: ["Anubis", "Odin"],
+    spells: ["Mirror Magic", "Cord Cutting"],
+  },
+};
 
 // ── Moon Phases ──────────────────────────────────────────────────────────────
 interface MoonPhase {
@@ -959,7 +1046,78 @@ function UseButton({
   );
 }
 
-export default function RitualsPage({ onUseForSubliminal }: RitualsPageProps) {
+function RitualConnectionChips({
+  name,
+  onNavigate,
+}: {
+  name: string;
+  onNavigate?: (page: string) => void;
+}) {
+  const conn = RITUAL_CONNECTIONS[name];
+  if (!conn || !onNavigate) return null;
+  return (
+    <div className="space-y-2 pt-2 border-t border-border/20">
+      <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+        ◈ Connections
+      </p>
+      <div className="space-y-1.5">
+        <p
+          className="text-xs font-semibold uppercase tracking-widest"
+          style={{ color: "oklch(0.68 0.18 195 / 0.8)" }}
+        >
+          👁 Entities
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {conn.entities.map((ent) => (
+            <button
+              key={ent}
+              type="button"
+              onClick={() => onNavigate("entities")}
+              className="text-xs px-2 py-0.5 rounded-full cursor-pointer transition-all hover:scale-105"
+              style={{
+                background: "oklch(0.68 0.18 195 / 0.12)",
+                color: "oklch(0.68 0.18 195)",
+                border: "1px solid oklch(0.68 0.18 195 / 0.3)",
+              }}
+            >
+              {ent}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="space-y-1.5">
+        <p
+          className="text-xs font-semibold uppercase tracking-widest"
+          style={{ color: "oklch(0.62 0.22 295 / 0.8)" }}
+        >
+          ⚔ Spells
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {conn.spells.map((spell) => (
+            <button
+              key={spell}
+              type="button"
+              onClick={() => onNavigate("spells")}
+              className="text-xs px-2 py-0.5 rounded-full cursor-pointer transition-all hover:scale-105"
+              style={{
+                background: "oklch(0.62 0.22 295 / 0.12)",
+                color: "oklch(0.62 0.22 295)",
+                border: "1px solid oklch(0.62 0.22 295 / 0.3)",
+              }}
+            >
+              {spell}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function RitualsPage({
+  onUseForSubliminal,
+  onNavigate,
+}: RitualsPageProps) {
   return (
     <div className="container max-w-6xl mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-10 space-y-6 sm:space-y-8">
       {/* Hero */}
@@ -1068,6 +1226,10 @@ export default function RitualsPage({ onUseForSubliminal }: RitualsPageProps) {
                     </span>
                   ))}
                 </div>
+                <RitualConnectionChips
+                  name={phase.name}
+                  onNavigate={onNavigate}
+                />
                 <UseButton
                   topic={`${phase.name} energy and intention setting`}
                   onUse={onUseForSubliminal}

@@ -447,12 +447,68 @@ const CATEGORIES = [
 ] as const;
 type CategoryFilter = (typeof CATEGORIES)[number];
 
+const HEALING_CONNECTIONS: Record<
+  string,
+  { entities: string[]; spells: string[] }
+> = {
+  "Inner Child Healing": {
+    entities: ["Chamuel", "Isis", "The Anima / Animus"],
+    spells: ["Healing Transmission", "Cord Cutting", "Mirror Magic"],
+  },
+  "Shadow Work": {
+    entities: ["The Shadow", "Lilith", "Hecate"],
+    spells: ["Mirror Magic", "Cord Cutting", "Desire Sigil"],
+  },
+  "Somatic Healing": {
+    entities: ["Raphael", "The Serpent", "Pele"],
+    spells: ["Earth Grounding", "Healing Transmission", "Water Ritual"],
+  },
+  "Divine Feminine": {
+    entities: ["Isis", "Freya", "Oshun", "Kali"],
+    spells: ["Moon Spell", "Glamour Spell", "Water Ritual"],
+  },
+  "Divine Masculine": {
+    entities: ["Odin", "Thor", "Shiva"],
+    spells: ["Fire Spell", "Runic Bind Rune", "Protection Circle"],
+  },
+  "Chakra Healing": {
+    entities: ["Shiva", "Ganesha", "Metatron"],
+    spells: ["Chakra Clearing", "Energy Shield", "Healing Transmission"],
+  },
+  Reiki: {
+    entities: ["Raphael", "Metatron", "Michael"],
+    spells: ["Healing Transmission", "Aura Cleansing", "Energy Shield"],
+  },
+  "Crystal Healing": {
+    entities: ["Uriel", "Metatron", "Ganesha"],
+    spells: ["Talisman Creation", "Chakra Clearing", "Earth Grounding"],
+  },
+  "Sound Healing": {
+    entities: ["Apollo", "Gabriel", "Odin"],
+    spells: ["Air Invocation", "Healing Transmission", "Chakra Clearing"],
+  },
+  Breathwork: {
+    entities: ["Gabriel", "Raphael"],
+    spells: ["Air Invocation", "Chakra Clearing", "Aura Cleansing"],
+  },
+  "Ancestral Healing": {
+    entities: ["Anubis", "The Morrigan", "Odin"],
+    spells: ["Cord Cutting", "Earth Grounding", "Herb Pouch (Mojo Bag)"],
+  },
+  "Akashic Records": {
+    entities: ["Metatron", "Isis", "The Self"],
+    spells: ["Sigil Charging", "Invocation", "Talisman Creation"],
+  },
+};
+
 interface HealingMethodsPageProps {
   onUseForSubliminal: (topic: string) => void;
+  onNavigate?: (page: string) => void;
 }
 
 export default function HealingMethodsPage({
   onUseForSubliminal,
+  onNavigate,
 }: HealingMethodsPageProps) {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("All");
@@ -732,6 +788,80 @@ export default function HealingMethodsPage({
                             ))}
                           </div>
                         </div>
+
+                        {/* Connections */}
+                        {(() => {
+                          const conn = HEALING_CONNECTIONS[method.name] ?? {
+                            entities: ["Raphael", "Metatron"],
+                            spells: ["Healing Transmission", "Sigil Charging"],
+                          };
+                          if (!onNavigate) return null;
+                          return (
+                            <div className="space-y-2 pt-2 border-t border-border/20">
+                              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                                ◈ Connections
+                              </p>
+                              <div className="space-y-1.5">
+                                <p
+                                  className="text-xs font-semibold uppercase tracking-widest"
+                                  style={{
+                                    color: "oklch(0.68 0.18 195 / 0.8)",
+                                  }}
+                                >
+                                  👁 Entities
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {conn.entities.map((ent) => (
+                                    <button
+                                      key={ent}
+                                      type="button"
+                                      onClick={() => onNavigate("entities")}
+                                      className="text-xs px-2 py-0.5 rounded-full cursor-pointer transition-all hover:scale-105"
+                                      style={{
+                                        background:
+                                          "oklch(0.68 0.18 195 / 0.12)",
+                                        color: "oklch(0.68 0.18 195)",
+                                        border:
+                                          "1px solid oklch(0.68 0.18 195 / 0.3)",
+                                      }}
+                                    >
+                                      {ent}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="space-y-1.5">
+                                <p
+                                  className="text-xs font-semibold uppercase tracking-widest"
+                                  style={{
+                                    color: "oklch(0.62 0.22 295 / 0.8)",
+                                  }}
+                                >
+                                  ⚔ Spells
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {conn.spells.map((spell) => (
+                                    <button
+                                      key={spell}
+                                      type="button"
+                                      onClick={() => onNavigate("spells")}
+                                      className="text-xs px-2 py-0.5 rounded-full cursor-pointer transition-all hover:scale-105"
+                                      style={{
+                                        background:
+                                          "oklch(0.62 0.22 295 / 0.12)",
+                                        color: "oklch(0.62 0.22 295)",
+                                        border:
+                                          "1px solid oklch(0.62 0.22 295 / 0.3)",
+                                      }}
+                                    >
+                                      {spell}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
 
                         {/* Actions */}
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 pt-1">

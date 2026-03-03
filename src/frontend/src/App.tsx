@@ -8,6 +8,7 @@ import KinesisArchivePage from "./pages/KinesisArchivePage";
 import ReligionsPage from "./pages/ReligionsPage";
 import RitualsPage from "./pages/RitualsPage";
 import SettingsPage from "./pages/SettingsPage";
+import SigilsPage from "./pages/SigilsPage";
 import SpellsPage from "./pages/SpellsPage";
 import SpiritualEntitiesPage from "./pages/SpiritualEntitiesPage";
 import VideoEditorPage from "./pages/VideoEditorPage";
@@ -26,7 +27,8 @@ type Page =
   | "healing"
   | "settings"
   | "youtube"
-  | "videoeditor";
+  | "videoeditor"
+  | "sigils";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("generator");
@@ -48,6 +50,10 @@ export default function App() {
   const handleUseForSubliminal = (topic: string) => {
     setWikiInjectedTopic(topic);
     setCurrentPage("generator");
+  };
+
+  const handleNavigate = (page: string) => {
+    setCurrentPage(page as Page);
   };
 
   return (
@@ -85,26 +91,47 @@ export default function App() {
             />
           )}
           {currentPage === "energy" && <EnergyLibraryPage />}
-          {currentPage === "kinesis" && <KinesisArchivePage />}
+          {currentPage === "kinesis" && (
+            <KinesisArchivePage onNavigate={handleNavigate} />
+          )}
           {currentPage === "wiki" && (
             <WikiSearchPage onUseForSubliminal={handleUseForSubliminal} />
           )}
           {currentPage === "religions" && (
-            <ReligionsPage onUseForSubliminal={handleUseForSubliminal} />
+            <ReligionsPage
+              onUseForSubliminal={handleUseForSubliminal}
+              onNavigate={handleNavigate}
+            />
           )}
           {currentPage === "entities" && (
             <SpiritualEntitiesPage
               onUseForSubliminal={handleUseForSubliminal}
+              onNavigate={handleNavigate}
             />
           )}
           {currentPage === "spells" && (
-            <SpellsPage onUseForSubliminal={handleUseForSubliminal} />
+            <SpellsPage
+              onUseForSubliminal={handleUseForSubliminal}
+              onNavigate={handleNavigate}
+            />
           )}
           {currentPage === "rituals" && (
-            <RitualsPage onUseForSubliminal={handleUseForSubliminal} />
+            <RitualsPage
+              onUseForSubliminal={handleUseForSubliminal}
+              onNavigate={handleNavigate}
+            />
           )}
           {currentPage === "healing" && (
-            <HealingMethodsPage onUseForSubliminal={handleUseForSubliminal} />
+            <HealingMethodsPage
+              onUseForSubliminal={handleUseForSubliminal}
+              onNavigate={handleNavigate}
+            />
+          )}
+          {currentPage === "sigils" && (
+            <SigilsPage
+              onUseForSubliminal={handleUseForSubliminal}
+              onNavigate={handleNavigate}
+            />
           )}
           {currentPage === "settings" && <SettingsPage />}
           {currentPage === "youtube" && (

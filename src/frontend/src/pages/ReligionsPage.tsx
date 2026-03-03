@@ -478,12 +478,81 @@ const CATEGORIES = [
 ] as const;
 type CategoryFilter = (typeof CATEGORIES)[number];
 
+const RELIGION_CONNECTIONS: Record<
+  string,
+  { entities: string[]; spells: string[] }
+> = {
+  Christianity: {
+    entities: ["Michael", "Gabriel", "Raphael", "Jophiel"],
+    spells: ["Protection Circle", "Healing Transmission", "Invocation"],
+  },
+  Judaism: {
+    entities: ["Michael", "Metatron", "Uriel"],
+    spells: ["LBRP", "Sigil Charging", "Talisman Creation"],
+  },
+  Islam: {
+    entities: ["Gabriel", "Michael", "Azrael"],
+    spells: ["Protection Circle", "Invocation", "Air Invocation"],
+  },
+  Hinduism: {
+    entities: ["Kali", "Shiva", "Ganesha", "Lakshmi"],
+    spells: ["Chakra Clearing", "Abundance Ritual", "Earth Grounding"],
+  },
+  Buddhism: {
+    entities: ["The Self", "The Sage", "Metatron"],
+    spells: ["Healing Transmission", "Chakra Clearing", "Earth Grounding"],
+  },
+  "Norse / Ásatrú": {
+    entities: ["Odin", "Thor", "Freya", "Loki"],
+    spells: ["Runic Bind Rune", "Protection Circle", "Invocation"],
+  },
+  "Celtic / Druidism": {
+    entities: ["The Morrigan", "Cernunnos", "Brigid"],
+    spells: ["Protection Circle", "Earth Grounding", "Fire Spell"],
+  },
+  "Ancient Egyptian": {
+    entities: ["Ra", "Isis", "Anubis"],
+    spells: ["Sigil Charging", "Invocation", "Talisman Creation"],
+  },
+  Wicca: {
+    entities: ["Hecate", "Freya", "Cernunnos"],
+    spells: [
+      "Moon Spell",
+      "Protection Circle",
+      "Abundance Ritual",
+      "Glamour Spell",
+    ],
+  },
+  Kabbalah: {
+    entities: ["Metatron", "Michael", "Gabriel"],
+    spells: ["LBRP", "Talisman Creation", "Sigil Charging"],
+  },
+  Taoism: {
+    entities: ["The Sage", "The Trickster"],
+    spells: ["Earth Grounding", "Water Ritual", "Sigil Charging"],
+  },
+  Gnosticism: {
+    entities: ["Lucifer", "Metatron", "The Shadow"],
+    spells: ["Invocation", "Sigil Charging", "Mirror Magic"],
+  },
+  Shamanism: {
+    entities: ["The Raven", "The Wolf", "The Dragon"],
+    spells: ["Invocation", "Herb Pouch (Mojo Bag)", "Earth Grounding"],
+  },
+  Hermeticism: {
+    entities: ["Hermes", "Metatron", "Thoth"],
+    spells: ["Planetary Seal", "Talisman Creation", "Invocation"],
+  },
+};
+
 interface ReligionsPageProps {
   onUseForSubliminal: (topic: string) => void;
+  onNavigate?: (page: string) => void;
 }
 
 export default function ReligionsPage({
   onUseForSubliminal,
+  onNavigate,
 }: ReligionsPageProps) {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("All");
@@ -781,6 +850,87 @@ export default function ReligionsPage({
                             Use for Subliminal
                           </Button>
                         </div>
+
+                        {/* Connections */}
+                        {(() => {
+                          const conn = RELIGION_CONNECTIONS[religion.name] ??
+                            RELIGION_CONNECTIONS[
+                              Object.keys(RELIGION_CONNECTIONS).find((k) =>
+                                religion.name
+                                  .toLowerCase()
+                                  .includes(k.toLowerCase()),
+                              ) ?? ""
+                            ] ?? {
+                              entities: ["The Sage", "The Self"],
+                              spells: ["Invocation", "Sigil Charging"],
+                            };
+                          if (!onNavigate) return null;
+                          return (
+                            <div className="space-y-2 pt-3 border-t border-border/20">
+                              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                                ◈ Connections
+                              </p>
+                              <div className="space-y-1.5">
+                                <p
+                                  className="text-xs font-semibold uppercase tracking-widest"
+                                  style={{
+                                    color: "oklch(0.68 0.18 195 / 0.8)",
+                                  }}
+                                >
+                                  👁 Entities
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {conn.entities.map((ent) => (
+                                    <button
+                                      key={ent}
+                                      type="button"
+                                      onClick={() => onNavigate("entities")}
+                                      className="text-xs px-2 py-0.5 rounded-full cursor-pointer transition-all hover:scale-105"
+                                      style={{
+                                        background:
+                                          "oklch(0.68 0.18 195 / 0.12)",
+                                        color: "oklch(0.68 0.18 195)",
+                                        border:
+                                          "1px solid oklch(0.68 0.18 195 / 0.3)",
+                                      }}
+                                    >
+                                      {ent}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="space-y-1.5">
+                                <p
+                                  className="text-xs font-semibold uppercase tracking-widest"
+                                  style={{
+                                    color: "oklch(0.62 0.22 295 / 0.8)",
+                                  }}
+                                >
+                                  ⚔ Spells
+                                </p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {conn.spells.map((spell) => (
+                                    <button
+                                      key={spell}
+                                      type="button"
+                                      onClick={() => onNavigate("spells")}
+                                      className="text-xs px-2 py-0.5 rounded-full cursor-pointer transition-all hover:scale-105"
+                                      style={{
+                                        background:
+                                          "oklch(0.62 0.22 295 / 0.12)",
+                                        color: "oklch(0.62 0.22 295)",
+                                        border:
+                                          "1px solid oklch(0.62 0.22 295 / 0.3)",
+                                      }}
+                                    >
+                                      {spell}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </motion.div>
                   )}

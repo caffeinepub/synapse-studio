@@ -26,10 +26,12 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Atom,
   Check,
   ChevronDown,
   ChevronUp,
   CircleDot,
+  Coins,
   Copy,
   Download,
   Droplets,
@@ -39,6 +41,7 @@ import {
   FolderOpen,
   Leaf,
   Loader2,
+  MapPin,
   Music,
   Package,
   Play,
@@ -46,7 +49,9 @@ import {
   Shield,
   Square,
   Star,
+  Timer,
   Trash2,
+  TrendingUp,
   User,
   Video,
   Volume2,
@@ -65,6 +70,7 @@ import {
   useListProjects,
   useSaveProject,
 } from "../hooks/useQueries";
+import type { BoosterLevel } from "../utils/affirmationUtils";
 import { generateAffirmationsWithAI } from "../utils/aiGenerate";
 import {
   connectFrequencyToneToCtx,
@@ -1240,9 +1246,26 @@ export default function GeneratorPage({
   const [characterEnabled, setCharacterEnabled] = useState(false);
   const [characterName, setCharacterName] = useState("");
   const [characterSource, setCharacterSource] = useState("");
+  const [characterLocation, setCharacterLocation] = useState("");
+  const [characterTimeFrame, setCharacterTimeFrame] = useState("");
   const [itemEnabled, setItemEnabled] = useState(false);
   const [itemName, setItemName] = useState("");
   const [itemSource, setItemSource] = useState("");
+  const [itemLocation, setItemLocation] = useState("");
+  const [itemTimeFrame, setItemTimeFrame] = useState("");
+  const [symbioticEnabled, setSymbioticEnabled] = useState(false);
+  const [symbioticName, setSymbioticName] = useState("");
+  const [symbioticSource, setSymbioticSource] = useState("");
+  const [symbioticBondType, setSymbioticBondType] = useState("");
+  const [symbioticLocation, setSymbioticLocation] = useState("");
+  const [symbioticTimeFrame, setSymbioticTimeFrame] = useState("");
+
+  // Booster level
+  const [boosterLevel, setBoosterLevel] = useState<BoosterLevel>("standard");
+  const [boosterCustomPhrase, setBoosterCustomPhrase] = useState("");
+
+  // Wealth presets panel
+  const [wealthPresetsOpen, setWealthPresetsOpen] = useState(false);
 
   // Step 2 state
   const [affirmationCount, setAffirmationCount] = useState(50);
@@ -1537,6 +1560,17 @@ export default function GeneratorPage({
         modes.fantasy && characterEnabled ? characterSource : undefined,
         modes.fantasy && itemEnabled ? itemName : undefined,
         modes.fantasy && itemEnabled ? itemSource : undefined,
+        modes.fantasy && symbioticEnabled ? symbioticName : undefined,
+        modes.fantasy && symbioticEnabled ? symbioticSource : undefined,
+        modes.fantasy && symbioticEnabled ? symbioticBondType : undefined,
+        boosterLevel,
+        boosterCustomPhrase,
+        modes.fantasy && characterEnabled ? characterLocation : undefined,
+        modes.fantasy && characterEnabled ? characterTimeFrame : undefined,
+        modes.fantasy && itemEnabled ? itemLocation : undefined,
+        modes.fantasy && itemEnabled ? itemTimeFrame : undefined,
+        modes.fantasy && symbioticEnabled ? symbioticLocation : undefined,
+        modes.fantasy && symbioticEnabled ? symbioticTimeFrame : undefined,
       );
 
       if (aiResult && aiResult.length > 0) {
@@ -1562,6 +1596,8 @@ export default function GeneratorPage({
       const hasCharacter =
         modes.fantasy && characterEnabled && characterName.trim();
       const hasItem = modes.fantasy && itemEnabled && itemName.trim();
+      const hasSymbiotic =
+        modes.fantasy && symbioticEnabled && symbioticName.trim();
       const localResult = genLocal(
         topic,
         modes.booster,
@@ -1572,6 +1608,17 @@ export default function GeneratorPage({
         hasCharacter ? characterSource : undefined,
         hasItem ? itemName : undefined,
         hasItem ? itemSource : undefined,
+        hasSymbiotic ? symbioticName : undefined,
+        hasSymbiotic ? symbioticSource : undefined,
+        hasSymbiotic ? symbioticBondType : undefined,
+        boosterLevel,
+        boosterCustomPhrase,
+        hasCharacter ? characterLocation : undefined,
+        hasCharacter ? characterTimeFrame : undefined,
+        hasItem ? itemLocation : undefined,
+        hasItem ? itemTimeFrame : undefined,
+        hasSymbiotic ? symbioticLocation : undefined,
+        hasSymbiotic ? symbioticTimeFrame : undefined,
       );
       const expanded = expandToCount(localResult, affirmationCount);
       setAffirmations(expanded);
@@ -1622,6 +1669,11 @@ export default function GeneratorPage({
         affirmations,
         modes: {
           booster: modes.booster,
+          booster_level: modes.booster ? boosterLevel : null,
+          booster_custom_phrase:
+            modes.booster && boosterLevel === "custom"
+              ? boosterCustomPhrase
+              : null,
           fantasy_to_reality: modes.fantasy,
           protection: modes.protection,
           character_manifestation:
@@ -1630,11 +1682,30 @@ export default function GeneratorPage({
                   enabled: true,
                   character: characterName,
                   source: characterSource || null,
+                  location: characterLocation || null,
+                  time_frame: characterTimeFrame || null,
                 }
               : { enabled: false },
           item_manifestation:
             modes.fantasy && itemEnabled
-              ? { enabled: true, item: itemName, source: itemSource || null }
+              ? {
+                  enabled: true,
+                  item: itemName,
+                  source: itemSource || null,
+                  location: itemLocation || null,
+                  time_frame: itemTimeFrame || null,
+                }
+              : { enabled: false },
+          symbiotic_manifestation:
+            modes.fantasy && symbioticEnabled
+              ? {
+                  enabled: true,
+                  entity: symbioticName,
+                  source: symbioticSource || null,
+                  bond_type: symbioticBondType || "symbiotic bond",
+                  location: symbioticLocation || null,
+                  time_frame: symbioticTimeFrame || null,
+                }
               : { enabled: false },
         },
         chakra: selectedChakras,
@@ -1805,7 +1876,77 @@ export default function GeneratorPage({
             onChange={(e) => setTopic(e.target.value)}
             placeholder="e.g. Unshakeable confidence and magnetic presence in social situations..."
             className="bg-input/50 border-border/50 focus:border-primary/50 resize-none h-24 text-sm font-sans"
+            data-ocid="generator.topic.textarea"
           />
+
+          {/* Wealth Presets */}
+          <div className="pt-1">
+            <button
+              type="button"
+              onClick={() => setWealthPresetsOpen((v) => !v)}
+              className="flex items-center gap-1.5 text-xs font-medium text-amber-400/80 hover:text-amber-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40 rounded"
+              data-ocid="generator.wealth_presets.toggle"
+            >
+              <Coins className="w-3.5 h-3.5" />
+              Wealth Presets
+              <TrendingUp className="w-3 h-3 opacity-60" />
+              <ChevronDown
+                className={`w-3 h-3 transition-transform duration-200 ${wealthPresetsOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+
+            <AnimatePresence>
+              {wealthPresetsOpen && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="overflow-hidden"
+                >
+                  <div className="pt-2 pb-1">
+                    <p className="text-[10px] text-amber-400/60 mb-2 leading-snug">
+                      Tap any preset to auto-fill your topic with a wealth
+                      subliminal focus
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {[
+                        "Financial abundance",
+                        "Passive income streams",
+                        "Business success and growth",
+                        "Debt-free living",
+                        "Millionaire mindset",
+                        "Luxury lifestyle manifestation",
+                        "Career promotion and salary increase",
+                        "Investment and wealth multiplication",
+                        "Generational wealth",
+                        "Unexpected money flowing to me",
+                        "Abundance in all areas of life",
+                        "Money comes to me easily and frequently",
+                      ].map((preset) => (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() => {
+                            setTopic(preset);
+                            setWealthPresetsOpen(false);
+                          }}
+                          className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/40 ${
+                            topic === preset
+                              ? "bg-amber-400/20 text-amber-300 border-amber-400/50"
+                              : "bg-amber-400/8 text-amber-400/70 border-amber-400/25 hover:bg-amber-400/15 hover:text-amber-300 hover:border-amber-400/50"
+                          }`}
+                          data-ocid="generator.wealth_preset.button"
+                        >
+                          {preset}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Mode toggles */}
@@ -1870,6 +2011,116 @@ export default function GeneratorPage({
             })}
           </div>
         </div>
+
+        {/* Booster Level sub-panel */}
+        <AnimatePresence>
+          {modes.booster && (
+            <motion.div
+              key="booster-subpanel"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden"
+            >
+              <div className="space-y-3 p-4 rounded-xl border border-[oklch(0.78_0.18_90)/40] bg-[oklch(0.78_0.18_90)/5]">
+                <div className="flex items-center gap-2 mb-1">
+                  <Zap
+                    className="w-4 h-4"
+                    style={{ color: "oklch(0.78 0.18 90)" }}
+                  />
+                  <span
+                    className="text-sm font-heading font-semibold"
+                    style={{ color: "oklch(0.78 0.18 90)" }}
+                  >
+                    Booster Intensity Level
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {(
+                    [
+                      {
+                        level: "minimal" as BoosterLevel,
+                        label: "Minimal",
+                        subtext: "Gentle, opening language",
+                        bg: "bg-slate-500/15 border-slate-500/40 text-slate-300",
+                        activeBg:
+                          "bg-slate-500/30 border-slate-400/70 text-slate-200",
+                      },
+                      {
+                        level: "standard" as BoosterLevel,
+                        label: "Standard",
+                        subtext: "Balanced intensity (default)",
+                        bg: "bg-violet-500/15 border-violet-500/40 text-violet-300",
+                        activeBg:
+                          "bg-violet-500/30 border-violet-400/70 text-violet-200",
+                      },
+                      {
+                        level: "custom" as BoosterLevel,
+                        label: "Custom",
+                        subtext: "Your own intensity phrase",
+                        bg: "bg-amber-500/15 border-amber-500/40 text-amber-300",
+                        activeBg:
+                          "bg-amber-500/30 border-amber-400/70 text-amber-200",
+                      },
+                      {
+                        level: "extremely_powerful" as BoosterLevel,
+                        label: "Extremely Powerful",
+                        subtext: "Maximum absolute certainty",
+                        bg: "bg-rose-500/15 border-rose-500/40 text-rose-300",
+                        activeBg:
+                          "bg-rose-500/30 border-rose-400/70 text-rose-200",
+                      },
+                      {
+                        level: "evolving" as BoosterLevel,
+                        label: "Evolving",
+                        subtext: "Starts soft, escalates to max",
+                        bg: "bg-emerald-500/15 border-emerald-500/40 text-emerald-300",
+                        activeBg:
+                          "bg-emerald-500/30 border-emerald-400/70 text-emerald-200",
+                      },
+                    ] as const
+                  ).map((opt) => {
+                    const isActive = boosterLevel === opt.level;
+                    return (
+                      <button
+                        key={opt.level}
+                        type="button"
+                        onClick={() => setBoosterLevel(opt.level)}
+                        className={`flex flex-col items-start px-3 py-2 rounded-xl text-xs font-medium transition-all border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 ${isActive ? opt.activeBg : opt.bg}`}
+                        aria-pressed={isActive}
+                        data-ocid="generator.booster_level.button"
+                      >
+                        <span className="font-semibold">{opt.label}</span>
+                        <span className="text-[10px] opacity-70 leading-snug mt-0.5">
+                          {opt.subtext}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <AnimatePresence>
+                  {boosterLevel === "custom" && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <Input
+                        value={boosterCustomPhrase}
+                        onChange={(e) => setBoosterCustomPhrase(e.target.value)}
+                        placeholder='Your intensity prefix phrase (e.g. "Powerfully and completely…")'
+                        className="bg-input/50 border-amber-500/40 focus:border-amber-500/70 text-sm mt-2"
+                        data-ocid="generator.booster_custom_phrase.input"
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Fantasy-to-Reality sub-functions */}
         <AnimatePresence>
@@ -1938,6 +2189,81 @@ export default function GeneratorPage({
                           placeholder="Source / series (optional — e.g. Naruto, Hazbin Hotel)..."
                           className="bg-input/50 border-border/50 focus:border-violet-500/50 text-sm"
                         />
+                        {/* Location + Time Frame */}
+                        <div className="pt-1 space-y-2 border-t border-violet-500/20">
+                          <div className="flex items-center gap-1.5">
+                            <MapPin className="w-3 h-3 text-violet-400/70" />
+                            <span className="text-[10px] text-violet-400/70 font-medium">
+                              Manifestation Location & Time Frame (optional)
+                            </span>
+                          </div>
+                          <Input
+                            value={characterLocation}
+                            onChange={(e) =>
+                              setCharacterLocation(e.target.value)
+                            }
+                            placeholder='Where will this manifest? (e.g. "my bedroom", "at my front door")...'
+                            className="bg-input/40 border-violet-500/30 focus:border-violet-500/60 text-xs h-8"
+                          />
+                          <div className="space-y-1.5">
+                            <div className="flex items-center gap-1.5">
+                              <Timer className="w-3 h-3 text-violet-400/70" />
+                              <span className="text-[10px] text-violet-400/60">
+                                Time frame
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {[
+                                "Now",
+                                "Today",
+                                "Within 3 Days",
+                                "This Week",
+                                "This Month",
+                              ].map((tf) => (
+                                <button
+                                  key={tf}
+                                  type="button"
+                                  onClick={() =>
+                                    setCharacterTimeFrame(
+                                      characterTimeFrame === tf ? "" : tf,
+                                    )
+                                  }
+                                  className={`px-2 py-0.5 rounded-full text-[10px] font-medium border transition-all ${characterTimeFrame === tf ? "bg-violet-500/30 text-violet-200 border-violet-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-violet-400/40 hover:text-violet-300"}`}
+                                >
+                                  {tf}
+                                </button>
+                              ))}
+                            </div>
+                            {(![
+                              "Now",
+                              "Today",
+                              "Within 3 Days",
+                              "This Week",
+                              "This Month",
+                            ].includes(characterTimeFrame) &&
+                              characterTimeFrame !== "") ||
+                            characterTimeFrame === "" ? (
+                              <Input
+                                value={
+                                  [
+                                    "Now",
+                                    "Today",
+                                    "Within 3 Days",
+                                    "This Week",
+                                    "This Month",
+                                  ].includes(characterTimeFrame)
+                                    ? ""
+                                    : characterTimeFrame
+                                }
+                                onChange={(e) =>
+                                  setCharacterTimeFrame(e.target.value)
+                                }
+                                placeholder='Custom time frame (e.g. "By midnight", "In 2 hours")...'
+                                className="bg-input/40 border-violet-500/30 focus:border-violet-500/60 text-[10px] h-7"
+                              />
+                            ) : null}
+                          </div>
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -1985,6 +2311,215 @@ export default function GeneratorPage({
                           placeholder="Source / origin (optional — e.g. Naruto, Arthurian legend)..."
                           className="bg-input/50 border-border/50 focus:border-amber-500/50 text-sm"
                         />
+                        {/* Location + Time Frame */}
+                        <div className="pt-1 space-y-2 border-t border-amber-500/20">
+                          <div className="flex items-center gap-1.5">
+                            <MapPin className="w-3 h-3 text-amber-400/70" />
+                            <span className="text-[10px] text-amber-400/70 font-medium">
+                              Manifestation Location & Time Frame (optional)
+                            </span>
+                          </div>
+                          <Input
+                            value={itemLocation}
+                            onChange={(e) => setItemLocation(e.target.value)}
+                            placeholder='Where will this appear? (e.g. "in my home", "on my desk")...'
+                            className="bg-input/40 border-amber-500/30 focus:border-amber-500/60 text-xs h-8"
+                          />
+                          <div className="space-y-1.5">
+                            <div className="flex items-center gap-1.5">
+                              <Timer className="w-3 h-3 text-amber-400/70" />
+                              <span className="text-[10px] text-amber-400/60">
+                                Time frame
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {[
+                                "Now",
+                                "Today",
+                                "Within 3 Days",
+                                "This Week",
+                                "This Month",
+                              ].map((tf) => (
+                                <button
+                                  key={tf}
+                                  type="button"
+                                  onClick={() =>
+                                    setItemTimeFrame(
+                                      itemTimeFrame === tf ? "" : tf,
+                                    )
+                                  }
+                                  className={`px-2 py-0.5 rounded-full text-[10px] font-medium border transition-all ${itemTimeFrame === tf ? "bg-amber-500/30 text-amber-200 border-amber-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-amber-400/40 hover:text-amber-300"}`}
+                                >
+                                  {tf}
+                                </button>
+                              ))}
+                            </div>
+                            {(![
+                              "Now",
+                              "Today",
+                              "Within 3 Days",
+                              "This Week",
+                              "This Month",
+                            ].includes(itemTimeFrame) &&
+                              itemTimeFrame !== "") ||
+                            itemTimeFrame === "" ? (
+                              <Input
+                                value={
+                                  [
+                                    "Now",
+                                    "Today",
+                                    "Within 3 Days",
+                                    "This Week",
+                                    "This Month",
+                                  ].includes(itemTimeFrame)
+                                    ? ""
+                                    : itemTimeFrame
+                                }
+                                onChange={(e) =>
+                                  setItemTimeFrame(e.target.value)
+                                }
+                                placeholder='Custom time frame (e.g. "By tomorrow", "Tonight")...'
+                                className="bg-input/40 border-amber-500/30 focus:border-amber-500/60 text-[10px] h-7"
+                              />
+                            ) : null}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Symbiotic / Bio-Engineered Manifestation */}
+                <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-border/30">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Atom className="w-3.5 h-3.5 text-teal-400" />
+                      <Label
+                        className="text-sm font-semibold text-teal-300 cursor-pointer"
+                        htmlFor="symbiotic-toggle"
+                      >
+                        Symbiotic / Bio-Engineered Bond
+                      </Label>
+                    </div>
+                    <Switch
+                      id="symbiotic-toggle"
+                      checked={symbioticEnabled}
+                      onCheckedChange={setSymbioticEnabled}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-snug">
+                    For entities that are <em>both</em> a living being and a
+                    physical extension — bio-engineered, sentient, or symbiotic
+                    (e.g. Klyntar/Venom, TARDIS). They bond with you and become
+                    part of your reality simultaneously as a character{" "}
+                    <em>and</em> an object.
+                  </p>
+                  <AnimatePresence>
+                    {symbioticEnabled && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="space-y-2 overflow-hidden"
+                      >
+                        <Input
+                          value={symbioticName}
+                          onChange={(e) => setSymbioticName(e.target.value)}
+                          placeholder="Entity name (e.g. Klyntar, TARDIS, Evangelion Unit-01)..."
+                          className="bg-input/50 border-border/50 focus:border-teal-500/50 text-sm"
+                        />
+                        <Input
+                          value={symbioticSource}
+                          onChange={(e) => setSymbioticSource(e.target.value)}
+                          placeholder="Source / series (optional — e.g. Marvel, Doctor Who)..."
+                          className="bg-input/50 border-border/50 focus:border-teal-500/50 text-sm"
+                        />
+                        <Input
+                          value={symbioticBondType}
+                          onChange={(e) => setSymbioticBondType(e.target.value)}
+                          placeholder="Bond type (optional — e.g. symbiotic bond, neural merge, telepathic link)..."
+                          className="bg-input/50 border-border/50 focus:border-teal-500/50 text-sm"
+                        />
+                        <p className="text-[10px] text-teal-400/70 leading-snug pt-0.5">
+                          Affirmations will reflect the entity arriving in your
+                          reality, the bond forming, and the merged state — you
+                          and the entity as one unified presence.
+                        </p>
+                        {/* Location + Time Frame */}
+                        <div className="pt-1 space-y-2 border-t border-teal-500/20">
+                          <div className="flex items-center gap-1.5">
+                            <MapPin className="w-3 h-3 text-teal-400/70" />
+                            <span className="text-[10px] text-teal-400/70 font-medium">
+                              Bond Location & Time Frame (optional)
+                            </span>
+                          </div>
+                          <Input
+                            value={symbioticLocation}
+                            onChange={(e) =>
+                              setSymbioticLocation(e.target.value)
+                            }
+                            placeholder='Where does the bond form? (e.g. "in my home", "here with me")...'
+                            className="bg-input/40 border-teal-500/30 focus:border-teal-500/60 text-xs h-8"
+                          />
+                          <div className="space-y-1.5">
+                            <div className="flex items-center gap-1.5">
+                              <Timer className="w-3 h-3 text-teal-400/70" />
+                              <span className="text-[10px] text-teal-400/60">
+                                Time frame
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {[
+                                "Now",
+                                "Today",
+                                "Within 3 Days",
+                                "This Week",
+                                "This Month",
+                              ].map((tf) => (
+                                <button
+                                  key={tf}
+                                  type="button"
+                                  onClick={() =>
+                                    setSymbioticTimeFrame(
+                                      symbioticTimeFrame === tf ? "" : tf,
+                                    )
+                                  }
+                                  className={`px-2 py-0.5 rounded-full text-[10px] font-medium border transition-all ${symbioticTimeFrame === tf ? "bg-teal-500/30 text-teal-200 border-teal-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-teal-400/40 hover:text-teal-300"}`}
+                                >
+                                  {tf}
+                                </button>
+                              ))}
+                            </div>
+                            {(![
+                              "Now",
+                              "Today",
+                              "Within 3 Days",
+                              "This Week",
+                              "This Month",
+                            ].includes(symbioticTimeFrame) &&
+                              symbioticTimeFrame !== "") ||
+                            symbioticTimeFrame === "" ? (
+                              <Input
+                                value={
+                                  [
+                                    "Now",
+                                    "Today",
+                                    "Within 3 Days",
+                                    "This Week",
+                                    "This Month",
+                                  ].includes(symbioticTimeFrame)
+                                    ? ""
+                                    : symbioticTimeFrame
+                                }
+                                onChange={(e) =>
+                                  setSymbioticTimeFrame(e.target.value)
+                                }
+                                placeholder='Custom time frame (e.g. "During this session", "At dawn")...'
+                                className="bg-input/40 border-teal-500/30 focus:border-teal-500/60 text-[10px] h-7"
+                              />
+                            ) : null}
+                          </div>
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
