@@ -3,6 +3,7 @@ import { useState } from "react";
 import NavBar from "./components/NavBar";
 import EnergyLibraryPage from "./pages/EnergyLibraryPage";
 import GeneratorPage, { type SubliminalContext } from "./pages/GeneratorPage";
+import HealingMethodsPage from "./pages/HealingMethodsPage";
 import KinesisArchivePage from "./pages/KinesisArchivePage";
 import ReligionsPage from "./pages/ReligionsPage";
 import RitualsPage from "./pages/RitualsPage";
@@ -22,6 +23,7 @@ type Page =
   | "entities"
   | "spells"
   | "rituals"
+  | "healing"
   | "settings"
   | "youtube"
   | "videoeditor";
@@ -100,6 +102,9 @@ export default function App() {
           )}
           {currentPage === "rituals" && (
             <RitualsPage onUseForSubliminal={handleUseForSubliminal} />
+          )}
+          {currentPage === "healing" && (
+            <HealingMethodsPage onUseForSubliminal={handleUseForSubliminal} />
           )}
           {currentPage === "settings" && <SettingsPage />}
           {currentPage === "youtube" && (

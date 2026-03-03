@@ -5,6 +5,7 @@ import {
   Film,
   Ghost,
   Globe,
+  Heart,
   Menu,
   Moon,
   Search,
@@ -26,6 +27,7 @@ type Page =
   | "entities"
   | "spells"
   | "rituals"
+  | "healing"
   | "settings"
   | "youtube"
   | "videoeditor";
@@ -83,6 +85,12 @@ const navItems = [
     label: "Rituals",
     icon: Moon,
     description: "Rituals & Sacred Systems",
+  },
+  {
+    id: "healing" as Page,
+    label: "Healing",
+    icon: Heart,
+    description: "Healing Methods & Modalities",
   },
   {
     id: "settings" as Page,

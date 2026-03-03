@@ -74,53 +74,67 @@ function formatHashtags(raw: string): string {
     .join(" ");
 }
 
-// --- Derive benefits from affirmation lines ---
-function deriveBenefits(affirmations: string[], topic: string): string {
-  if (affirmations.length === 0) {
-    const cap = topic.charAt(0).toUpperCase() + topic.slice(1).toLowerCase();
-    return [
-      `• Rapid transformation of ${cap.toLowerCase()}`,
-      `• Deep subconscious reprogramming for ${cap.toLowerCase()}`,
-      `• Effortless embodiment of ${cap.toLowerCase()}`,
-      `• Permanent identity-level shifts around ${cap.toLowerCase()}`,
-      `• Daily reinforcement of your ${cap.toLowerCase()} mindset`,
-    ].join("\n");
-  }
+// --- Generate benefits list from topic and modes ---
+// Returns benefit statements (what the listener will experience), NOT affirmations.
+function deriveBenefits(
+  topic: string,
+  modes?: {
+    booster?: boolean;
+    protection?: boolean;
+    fantasy?: boolean;
+    chakraAlignment?: boolean;
+    chakras?: string[];
+  },
+): string {
+  const t = topic.trim().toLowerCase() || "this subliminal";
+  const cap = t.charAt(0).toUpperCase() + t.slice(1);
 
-  const strippers = [
-    /^i am\s+/i,
-    /^i have\s+/i,
-    /^my\s+/i,
-    /^i feel\s+/i,
-    /^i possess\s+/i,
-    /^i embody\s+/i,
-    /^i attract\s+/i,
-    /^i manifest\s+/i,
-    /^i radiate\s+/i,
-    /^i experience\s+/i,
-    /^i embrace\s+/i,
-    /^i choose\s+/i,
-    /^i create\s+/i,
-    /^i live\s+/i,
-    /^i exist\s+/i,
-    /^i breathe\s+/i,
-    /^i trust\s+/i,
-    /^i release\s+/i,
-    /^i welcome\s+/i,
-    /^i allow\s+/i,
+  const coreBenefits = [
+    `• Deep subconscious reprogramming accelerates your results with ${t}`,
+    `• Unshakeable belief and confidence in your ability to achieve ${t}`,
+    `• Release of mental blocks and limiting beliefs surrounding ${t}`,
+    `• Heightened focus, clarity, and daily alignment toward ${t}`,
+    `• Lasting identity-level shift — ${cap} becomes your natural, effortless state`,
+    `• Stronger self-image and internal certainty around ${t}`,
+    `• Reduced resistance and increased openness to receiving ${t}`,
   ];
 
-  const lines = affirmations.slice(0, 5).map((aff) => {
-    let text = aff.trim();
-    for (const re of strippers) {
-      text = text.replace(re, "");
-    }
-    // Capitalize first char
-    text = text.charAt(0).toUpperCase() + text.slice(1);
-    // Strip trailing period
-    text = text.replace(/\.$/, "");
-    return `• ${text}`;
-  });
+  const boosterBenefits = [
+    `• Amplified reprogramming intensity for faster, more powerful ${t} results`,
+    "• Layered subconscious saturation ensures maximum absorption at every session",
+    "• Accelerated timeline — booster mode compounds each listening cycle",
+  ];
+
+  const protectionBenefits = [
+    `• Emotional grounding and energetic stability throughout your ${t} journey`,
+    "• Protected mindset — doubt, fear, and external negativity cannot derail your progress",
+    "• Calm, steady inner environment that supports continuous growth",
+  ];
+
+  const fantasyBenefits = [
+    `• Reality-bridging programming anchors ${t} as physically present in your experience`,
+    "• Manifestation pathways open — your inner world and outer reality begin to align",
+    `• Quantum-level shifts support the physical arrival of ${t} into your life`,
+  ];
+
+  const chakraBenefits =
+    modes?.chakras && modes.chakras.length > 0
+      ? [
+          `• Chakra-aligned energy flow supporting ${t} at a vibrational level (${modes.chakras.join(", ")})`,
+          `• Energetic blocks in the ${modes.chakras.join(", ")} system cleared to allow ${t} to flow freely`,
+        ]
+      : modes?.chakraAlignment
+        ? [
+            `• Full 7-chakra alignment creates a balanced energetic foundation for ${t}`,
+            "• Harmonized energy centers amplify the subconscious impact of each session",
+          ]
+        : [];
+
+  const lines = [...coreBenefits];
+  if (modes?.booster) lines.push(...boosterBenefits);
+  if (modes?.protection) lines.push(...protectionBenefits);
+  if (modes?.fantasy) lines.push(...fantasyBenefits);
+  lines.push(...chakraBenefits);
 
   return lines.join("\n");
 }
@@ -349,7 +363,15 @@ export default function YouTubePage({
         `This powerful subliminal is designed to help you ${ctx.topic.toLowerCase()}. Listen daily for best results. Created with Synapse Studio's advanced subliminal engine.`,
       );
 
-      setDescBenefits(deriveBenefits(ctx.affirmations, ctx.topic));
+      setDescBenefits(
+        deriveBenefits(ctx.topic, {
+          booster: ctx.modes.booster,
+          protection: ctx.modes.protection,
+          fantasy: ctx.modes.fantasy,
+          chakraAlignment: ctx.modes.chakraAlignment,
+          chakras: ctx.selectedChakras,
+        }),
+      );
 
       setDescKeyPoints(
         [
