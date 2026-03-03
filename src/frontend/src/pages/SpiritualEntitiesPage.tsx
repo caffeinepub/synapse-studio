@@ -5,11 +5,18 @@ import { Ghost, Search, Sparkles, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
 
-type EntityType = "Angel" | "Demon" | "Deity" | "Spirit" | "Archetype";
+type EntityType =
+  | "Angel"
+  | "Demon"
+  | "Deity"
+  | "Spirit"
+  | "Archetype"
+  | "Egregore";
 
 interface SpiritualEntity {
   name: string;
   type: EntityType;
+  subCategory?: string;
   origin: string;
   domain: string;
   context: string;
@@ -18,7 +25,7 @@ interface SpiritualEntity {
 }
 
 const ENTITIES: SpiritualEntity[] = [
-  // Angels
+  // ── Angels ─────────────────────────────────────────────────────────────────
   {
     name: "Michael",
     type: "Angel",
@@ -100,7 +107,7 @@ const ENTITIES: SpiritualEntity[] = [
     psychologicalMeaning:
       "Chamuel represents the heart's capacity for unconditional acceptance — both of others and of oneself — and the power of love as a navigational force in life.",
   },
-  // Demons (archetypal/mythological)
+  // ── Demons (archetypal / mythological) ─────────────────────────────────────
   {
     name: "Lucifer",
     type: "Demon",
@@ -188,7 +195,7 @@ const ENTITIES: SpiritualEntity[] = [
     archetypalNote:
       "Archetypal/esoteric interpretation — Asmodeus is a mythological symbolic construct representing aspects of desire and passion in the human psyche.",
   },
-  // Deities
+  // ── Deities ─────────────────────────────────────────────────────────────────
   {
     name: "Odin",
     type: "Deity",
@@ -335,7 +342,219 @@ const ENTITIES: SpiritualEntity[] = [
     psychologicalMeaning:
       "Loki embodies the archetype of the divine Trickster — the part of the psyche that disrupts comfortable illusions, forces creative thinking through constraint, and uses humor and chaos as catalysts for genuine transformation.",
   },
-  // Spirits
+  // Mesopotamian deities
+  {
+    name: "Enlil",
+    type: "Deity",
+    origin: "Sumerian mythology",
+    domain: "Cosmic authority, wind, air, storms, breath of life, civilization",
+    context:
+      "Enlil is one of the most important Sumerian deities, lord of the air and cosmic authority who decreed fate. He breathed the breath of life into creation and stood second only to An in the Sumerian pantheon. Enlil shaped the destiny of humanity and the cosmos through his word and his wind.",
+    psychologicalMeaning:
+      "Enlil embodies the archetype of commanding presence — the power of the voice that shapes the world, the authority whose words carry the weight of cosmic law.",
+  },
+  {
+    name: "Inanna / Ishtar",
+    type: "Deity",
+    origin: "Sumerian/Babylonian mythology",
+    domain:
+      "Love, desire, war, fertility, the morning star, descent and return",
+    context:
+      "Inanna descended into the underworld to face death and returned transformed — the central myth of death and rebirth in Mesopotamian religion. As Ishtar in Babylonian tradition, she is the queen of heaven and goddess of both love and war, the embodiment of the paradox of desire.",
+    psychologicalMeaning:
+      "Inanna represents the archetype of radical descent and return — the willingness to face the underworld of one's own psyche and emerge transformed, having surrendered all defenses to meet one's deepest truth.",
+  },
+  {
+    name: "Marduk",
+    type: "Deity",
+    origin: "Babylonian mythology",
+    domain: "Creation, order, magic, judgment, water, storm",
+    context:
+      "Marduk slew the chaos dragon Tiamat and formed the world from her body — the archetypal creation myth of overcoming chaos to establish order. He became the supreme deity of the Babylonian pantheon, associated with magic, judgment, and the ordering of civilized life.",
+    psychologicalMeaning:
+      "Marduk embodies creative authority — the power to face the dragon of chaos and transform raw, undifferentiated potential into structured reality.",
+  },
+  // Celtic deities
+  {
+    name: "The Morrigan",
+    type: "Deity",
+    origin: "Irish/Celtic mythology",
+    domain: "Fate, death, war, prophecy, shape-shifting, ravens, sovereignty",
+    context:
+      "The Morrigan is the triple goddess of Irish mythology — Badb (crow), Macha (sovereignty), and Nemain (frenzy). She appears on battlefields as an omen and tests warriors. She is the embodiment of sovereign fate and the fierce feminine force of transformation.",
+    psychologicalMeaning:
+      "The Morrigan embodies the archetype of sovereign fate — the fierce feminine force that demands authenticity and rewards only those who stand fully in their power.",
+  },
+  {
+    name: "Cernunnos",
+    type: "Deity",
+    origin: "Celtic mythology",
+    domain:
+      "Wild nature, animals, fertility, wealth, the underworld, primal forces",
+    context:
+      "Cernunnos is the antlered lord depicted in the Gundestrup Cauldron, surrounded by wild animals. He represents the primal masculine force of nature — untamed, generative, cyclical. He rules the liminal space between the wild and the human, the seasonal turning of the year.",
+    psychologicalMeaning:
+      "Cernunnos represents the archetype of wild embodiment — the primal masculine energy that is rooted in nature, cycles with the seasons, and needs no civilization to validate it.",
+  },
+  {
+    name: "Brigid",
+    type: "Deity",
+    origin: "Celtic mythology",
+    domain: "Healing, poetry, smithcraft, fire, inspiration, dawn",
+    context:
+      "Brigid is the beloved goddess of the Celts, associated with the sacred flame at Kildare, healing wells, creative inspiration, and the crafts of transformation. Her triple nature encompasses the healer, the poet, and the smith — all workers with fire.",
+    psychologicalMeaning:
+      "Brigid embodies the archetype of inspired creation — the sacred fire that simultaneously heals, creates, and illuminates, the transformative force of craft wielded with heart.",
+  },
+  // Japanese deities
+  {
+    name: "Amaterasu",
+    type: "Deity",
+    origin: "Japanese Shinto mythology",
+    domain: "The sun, light, creation, weaving, divine rulership",
+    context:
+      "Amaterasu is the supreme deity of the Shinto pantheon, from whom the imperial family descends. When she hid in a cave from her brother's violence, the world went dark until divine trickery lured her back. She is the source of all light and the guarantor of life.",
+    psychologicalMeaning:
+      "Amaterasu represents the archetype of radiant presence — the light that the world depends on, and the courage to return to shining after darkness and withdrawal.",
+  },
+  {
+    name: "Susanoo",
+    type: "Deity",
+    origin: "Japanese Shinto mythology",
+    domain: "Storms, seas, heroism, poetry, honor, serpents",
+    context:
+      "Susanoo is the storm god who was banished from heaven, killed the eight-headed serpent Yamata no Orochi, and found the sacred sword Kusanagi. Complex, mercurial, but ultimately heroic — he demonstrates honor through deed rather than birth.",
+    psychologicalMeaning:
+      "Susanoo embodies the archetype of the exiled hero — the one who must face their own destructive power, be banished, and prove themselves through honorable deeds.",
+  },
+  {
+    name: "Inari",
+    type: "Deity",
+    origin: "Japanese Shinto mythology",
+    domain:
+      "Foxes (kitsune), rice, fertility, industry, worldly success, swordsmanship",
+    context:
+      "Inari is one of the most widely worshipped Shinto kami, appearing as male, female, or androgynous, served by fox messengers. Inari's shrines outnumber all other Shinto shrines in Japan. This deity embodies the fluid adaptability of abundance itself.",
+    psychologicalMeaning:
+      "Inari represents the archetype of adaptive abundance — the capacity to shift form as needed while remaining fundamentally aligned with prosperity and flourishing.",
+  },
+  // African/Diaspora deities
+  {
+    name: "Oshun",
+    type: "Deity",
+    origin: "Yoruba / Afro-Caribbean (Candomblé, Santería)",
+    domain: "Fresh water, love, fertility, beauty, sensuality, art, diplomacy",
+    context:
+      "Oshun is one of the most beloved orishas in Yoruba and Afro-Caribbean traditions, associated with honey, gold, and the sweetness of life. She is the goddess of the river — ever-flowing, nourishing, beautiful, and powerful. Her colors are gold and amber.",
+    psychologicalMeaning:
+      "Oshun embodies the archetype of sacred pleasure — the understanding that beauty, sensuality, and delight are divine, and that joy is a spiritual power that opens the soul.",
+  },
+  {
+    name: "Shango",
+    type: "Deity",
+    origin: "Yoruba / Afro-Caribbean (Candomblé, Santería)",
+    domain: "Thunder, lightning, fire, justice, war, masculine vitality",
+    context:
+      "Shango is the powerful orisha of thunder and lightning, associated with royal power and masculine strength. He is fierce, just, and vital — his colors are red and white, and his symbol is the double-headed axe of justice.",
+    psychologicalMeaning:
+      "Shango represents the archetype of divine authority — the just use of power, the force that strikes down injustice with thunder, the king who rules through vitality and righteousness.",
+  },
+  {
+    name: "Eshu / Elegba",
+    type: "Deity",
+    origin: "Yoruba / Afro-Caribbean (Candomblé, Santería)",
+    domain:
+      "Crossroads, beginnings, communication, trickery, fate, the divine messenger",
+    context:
+      "Eshu (Elegba, Exu) is the first orisha consulted in any ceremony — without his blessing, communication between humans and the divine is impossible. He stands at every crossroads, controls all beginnings, and must be honored before any spiritual work can proceed.",
+    psychologicalMeaning:
+      "Eshu embodies the archetype of the divine gatekeeper — the one who controls access between worlds and must be honored before any spiritual work can begin.",
+  },
+  // Slavic deities
+  {
+    name: "Perun",
+    type: "Deity",
+    origin: "Slavic mythology",
+    domain: "Thunder, lightning, storms, law, justice, war, sky",
+    context:
+      "Perun is the supreme Slavic deity, god of sky, thunder, and war — cognate with Thor and Zeus. He battles the underworld serpent Veles in the eternal Slavic thunderstorm myth, maintaining cosmic balance between the heavens and the depths.",
+    psychologicalMeaning:
+      "Perun embodies the archetype of celestial law — the divine force that establishes order, battles chaos, and ensures the cycles of nature are maintained.",
+  },
+  {
+    name: "Veles",
+    type: "Deity",
+    origin: "Slavic mythology",
+    domain: "The underworld, cattle, magic, arts, wealth, the dead",
+    context:
+      "Veles is the Slavic chthonic deity of the underworld, associated with magic, trickery, and earthly wealth. He is Perun's eternal opponent — their battle generates the storms. Veles rules the deep places of earth and the mysteries of death and fortune.",
+    psychologicalMeaning:
+      "Veles represents the archetype of chthonic wisdom — the knowledge that comes from the depths, the underworld intelligence that accumulates wealth and mystery in the dark places of the world.",
+  },
+  // Aztec / Mesoamerican deities
+  {
+    name: "Tezcatlipoca",
+    type: "Deity",
+    origin: "Aztec mythology",
+    domain:
+      "Darkness, night sky, sorcery, conflict, change, shadow work, the smoking mirror",
+    context:
+      "Tezcatlipoca means 'Smoking Mirror' — he holds a black obsidian mirror in which he sees all truths, all shadows, all hidden things. He is the adversary and shadow complement of Quetzalcoatl, representing the dark half of creation's duality.",
+    psychologicalMeaning:
+      "Tezcatlipoca embodies the archetype of the shadow mirror — the relentless truth-teller who confronts you with exactly what you are hiding, forcing integration through conflict.",
+  },
+  {
+    name: "Tlaloc",
+    type: "Deity",
+    origin: "Aztec/Mesoamerican mythology",
+    domain: "Rain, fertility, water, lightning, caves, vital sustenance",
+    context:
+      "Tlaloc is the ancient Mesoamerican rain deity, one of the oldest and most universally worshipped in the region. He governs rain and water, and his paradise Tlalocan receives those who die by water or lightning.",
+    psychologicalMeaning:
+      "Tlaloc represents the archetype of vital sustenance — the understanding that growth requires both the nourishing rain and the willingness to receive abundance from above.",
+  },
+  // Greek/Roman extras
+  {
+    name: "Dionysus / Bacchus",
+    type: "Deity",
+    origin: "Greek/Roman mythology",
+    domain: "Wine, ecstasy, theater, rebirth, divine madness, liberation",
+    context:
+      "Dionysus is the god of transformation through dissolution — wine loosens the ego's grip, ecstasy opens the soul, theater reveals hidden truth. He embodies the sacred chaos that precedes renewal and was one of the most widely worshipped gods in the ancient world.",
+    psychologicalMeaning:
+      "Dionysus represents the archetype of ecstatic liberation — the sacred dissolution of the rigid ego that opens the soul to transcendence, creativity, and rebirth.",
+  },
+  {
+    name: "Athena / Minerva",
+    type: "Deity",
+    origin: "Greek/Roman mythology",
+    domain: "Wisdom, strategy, crafts, civilization, justice, divine reason",
+    context:
+      "Athena was born fully armored from Zeus's head — the divine feminine wisdom that emerges from the highest intellect. She is strategic rather than impulsive, craft-mastery rather than raw force. She is the patron of Athens and the civilizing principle.",
+    psychologicalMeaning:
+      "Athena embodies the archetype of strategic wisdom — the integration of intelligence and practical capability, the mind that sees clearly and acts with precision.",
+  },
+  {
+    name: "Poseidon / Neptune",
+    type: "Deity",
+    origin: "Greek/Roman mythology",
+    domain: "Seas, earthquakes, horses, primal emotion, the unconscious depths",
+    context:
+      "Poseidon rules the depths of the ocean and the depths of the unconscious — volatile, vast, and capable of both tremendous destruction and tremendous life. His trident can split mountains. He is the lord of all things beneath the surface.",
+    psychologicalMeaning:
+      "Poseidon represents the archetype of the vast emotional unconscious — the primal depths beneath the surface of awareness, powerful and unpredictable, demanding respect and integration.",
+  },
+  {
+    name: "Apollo",
+    type: "Deity",
+    origin: "Greek/Roman mythology",
+    domain: "Sun, music, poetry, prophecy, truth, healing, rational light",
+    context:
+      "Apollo embodies the principle of rational illumination — the clear light of reason, artistic mastery, and the gift of prophecy through inspired clarity. His oracle at Delphi proclaimed: 'Know thyself.' He is the divine patron of all arts that require mastery of form.",
+    psychologicalMeaning:
+      "Apollo represents the archetype of luminous reason — the disciplined creative mind, the prophet who speaks truth, the artist who masters form in service of transcendent beauty.",
+  },
+  // ── Spirits ──────────────────────────────────────────────────────────────────
   {
     name: "The Phoenix",
     type: "Spirit",
@@ -388,7 +607,114 @@ const ENTITIES: SpiritualEntity[] = [
     psychologicalMeaning:
       "The Wolf embodies the archetype of wild belonging — the intelligence that trusts instinct, the strength found in authentic community, and the courage to howl your truth even when others would prefer silence.",
   },
-  // Archetypes
+  {
+    name: "The Unicorn",
+    type: "Spirit",
+    origin: "European heraldry, Middle Eastern accounts, Greek natural history",
+    domain: "Purity, magic, untameable grace, healing, divine feminine power",
+    context:
+      "The unicorn appears in European medieval heraldry and Renaissance art as a symbol of purity and magical power that could only be approached by the pure of heart. In Jungian terms, the unicorn represents the unattainable ideal made accessible through inner purification.",
+    psychologicalMeaning:
+      "The Unicorn embodies the archetype of sacred aspiration — the pure ideal that cannot be seized by force but comes freely to those who have cultivated genuine inner refinement.",
+  },
+  {
+    name: "The Raven",
+    type: "Spirit",
+    origin:
+      "Norse (Huginn/Muninn), Native American (Pacific Northwest), Celtic",
+    domain:
+      "Intelligence, prophecy, transformation, death, magic, cosmic memory",
+    context:
+      "Odin's ravens Huginn (thought) and Muninn (memory) circle the world daily and report all they see. Raven is the Creator trickster in Pacific Northwest mythology — the one who stole fire and light for humanity. Raven bridges worlds with intelligence and cunning.",
+    psychologicalMeaning:
+      "The Raven embodies the archetype of cosmic intelligence — the all-seeing mind that moves between worlds, collects information from every corner of existence, and understands the relationship between thought and memory.",
+  },
+  {
+    name: "The White Stag",
+    type: "Spirit",
+    origin: "Celtic, Arthurian legend, European mythology",
+    domain:
+      "Otherworldly quest, spiritual direction, the divine call, sacred pursuit",
+    context:
+      "The White Stag appears in Celtic and Arthurian legend as an otherworldly creature that leads seekers on quests toward spiritual transformation. It can never be caught by force — only encountered when you are ready.",
+    psychologicalMeaning:
+      "The White Stag embodies the archetype of the sacred call — the vision of highest potential that always remains just ahead, drawing you forward into growth and transformation.",
+  },
+  {
+    name: "The Kitsune",
+    type: "Spirit",
+    origin: "Japanese Shinto mythology",
+    domain:
+      "Intelligence, magic, shape-shifting, wisdom, illusion, divine messenger",
+    context:
+      "The kitsune is the divine fox messenger of Inari in Shinto tradition. With each century of wisdom gained, a kitsune grows an additional tail, reaching nine tails at full enlightenment. They can shape-shift and see through all illusions.",
+    psychologicalMeaning:
+      "The Kitsune embodies the archetype of cunning wisdom — the intelligence that uses shape-shifting and illusion not for deception but to reveal hidden truths and adapt to any environment with grace.",
+  },
+  {
+    name: "The Thunderbird",
+    type: "Spirit",
+    origin: "Native American (Ojibwe, Lakota, Pacific Northwest)",
+    domain: "Storms, power, transformation, sacred forces, cosmic balance",
+    context:
+      "The Thunderbird is one of the most widespread and powerful spirit beings in Native American traditions — a vast eagle-like being whose wings cause thunder and whose eyes flash lightning. It battles the underwater serpent in the eternal balance of sky and water.",
+    psychologicalMeaning:
+      "The Thunderbird embodies the archetype of sky power — the vast, commanding force of the upper world that maintains cosmic balance through its eternal battle with the depths.",
+  },
+  {
+    name: "The Wendigo",
+    type: "Spirit",
+    origin: "Algonquian Native American tradition",
+    domain: "The shadow of excess, consumption, winter, loss of humanity",
+    context:
+      "The Wendigo is an Algonquian spirit representing the danger of excess — particularly the horrifying spiritual transformation that results from cannibalism or extreme selfishness. It represents what humans become when they consume endlessly without regard for others.",
+    psychologicalMeaning:
+      "The Wendigo represents the archetype of the consuming shadow — the warning about what happens when appetite becomes total, when the individual loses their humanity through radical selfishness and excess. A map of what to avoid.",
+  },
+  {
+    name: "Pele",
+    type: "Spirit",
+    origin: "Hawaiian mythology",
+    domain:
+      "Volcanoes, fire, creation and destruction, the sacred flame, transformation",
+    context:
+      "Pele is the Hawaiian goddess of volcanoes who created the Hawaiian Islands through her eruptions. She is both destroyer and creator — her lava flows destroy everything in their path while simultaneously creating new land.",
+    psychologicalMeaning:
+      "Pele embodies the archetype of creative destruction — the understanding that some creation requires the complete dissolution of what existed before, that the fiercest transformation is also the most generative.",
+  },
+  {
+    name: "The Banshee",
+    type: "Spirit",
+    origin: "Irish/Celtic mythology",
+    domain: "Death omens, ancestral connection, grief, the veil between worlds",
+    context:
+      "The banshee (bean sídhe, 'woman of the fairy mound') wails to warn Irish families of an impending death. Far from malevolent, she mourns with the family — her scream is an act of love and warning, bridging the worlds of the living and the dead.",
+    psychologicalMeaning:
+      "The Banshee embodies the archetype of prophetic grief — the sensitivity that perceives coming transitions, the willingness to face and honor endings rather than pretending change isn't coming.",
+  },
+  {
+    name: "The Selkie",
+    type: "Spirit",
+    origin: "Scottish and Irish mythology",
+    domain:
+      "Transformation, grief, the call of wildness, the sea, duality of nature",
+    context:
+      "Selkies are seal-people of Celtic mythology who shed their seal skins to walk on land. If their skin is hidden from them, they cannot return to the sea, and they grieve endlessly for their true nature.",
+    psychologicalMeaning:
+      "The Selkie embodies the archetype of the captured wild self — the soul's longing for its authentic nature when forced to live in a form or environment that is not truly its own. Liberation requires returning what was taken.",
+  },
+  {
+    name: "The Naga",
+    type: "Spirit",
+    origin: "Hindu, Buddhist, and Southeast Asian mythology",
+    domain:
+      "Serpent wisdom, water, cosmic knowledge, guardians of sacred sites",
+    context:
+      "Nagas are divine serpent beings in Hindu and Buddhist mythology — neither simply good nor evil, but powerful guardians of sacred sites, bodies of water, and spiritual knowledge. The Naga king Vasuki was used to churn the cosmic ocean.",
+    psychologicalMeaning:
+      "The Naga embodies the archetype of guardian wisdom — the serpentine intelligence that protects sacred knowledge, demanding genuine respect and spiritual maturity before granting access to deeper truths.",
+  },
+  // ── Archetypes ───────────────────────────────────────────────────────────────
   {
     name: "The Shadow",
     type: "Archetype",
@@ -401,7 +727,7 @@ const ENTITIES: SpiritualEntity[] = [
       "Working with the Shadow means reclaiming rejected aspects of yourself — not to act on every impulse, but to integrate and transform repressed energy into authentic wholeness. The deepest personal power often lies in the Shadow.",
   },
   {
-    name: "The Anima/Animus",
+    name: "The Anima / Animus",
     type: "Archetype",
     origin: "Jungian analytical psychology (Carl Jung)",
     domain:
@@ -418,7 +744,7 @@ const ENTITIES: SpiritualEntity[] = [
     domain:
       "Wholeness, integration, the totality of psyche, individuation, center",
     context:
-      "The Self in Jungian psychology is the archetype of wholeness and the organizing center of the psyche — encompassing both the conscious ego and the vast unconscious. The process of individuation is the lifelong journey of aligning with the Self. It often appears in dreams as a divine figure, mandala, or luminous being.",
+      "The Self in Jungian psychology is the archetype of wholeness and the organizing center of the psyche — encompassing both the conscious ego and the vast unconscious. The process of individuation is the lifelong journey of aligning with the Self.",
     psychologicalMeaning:
       "The Self embodies the archetype of psychological wholeness — the destination of the inner journey, the state in which all aspects of oneself are recognized, accepted, and integrated into a unified, purposeful whole.",
   },
@@ -454,6 +780,306 @@ const ENTITIES: SpiritualEntity[] = [
     psychologicalMeaning:
       "The Hero represents the archetype of self-transformation through conscious challenge — the willingness to leave comfort, face the unknown, integrate shadow, and return as a fuller, more capable version of oneself in service to others.",
   },
+  {
+    name: "The Great Mother",
+    type: "Archetype",
+    origin: "Carl Jung, Universal mythology",
+    domain:
+      "Unconditional love, fertility, nourishment, protection, devouring shadow",
+    context:
+      "The Great Mother is one of the most fundamental archetypes — appearing as Earth goddesses, nature deities, and the nurturing principle in virtually every world culture. She has two faces: the nourishing, life-giving mother and the devouring, possessive shadow mother.",
+    psychologicalMeaning:
+      "The Great Mother embodies the archetype of unconditional nourishment — the love that asks nothing in return, and its shadow: the possessiveness that cannot release its children to become themselves.",
+  },
+  {
+    name: "The Wise Old Man",
+    type: "Archetype",
+    origin: "Carl Jung",
+    domain:
+      "Wisdom accumulated through suffering, guidance, hidden knowledge, the mentor",
+    context:
+      "The Wise Old Man appears in dreams and mythology as the wizard, the hermit, the guide — Gandalf, Merlin, the Greek Tiresias, the Taoist sage. He appears when the seeker has exhausted ordinary resources and needs wisdom beyond what the ego can provide.",
+    psychologicalMeaning:
+      "The Wise Old Man embodies the organizing principle of transcendent wisdom — knowledge that comes not from books but from genuine engagement with life's deepest experiences, offered in service to the next generation.",
+  },
+  {
+    name: "The Divine Child / Puer Aeternus",
+    type: "Archetype",
+    origin: "Carl Jung",
+    domain:
+      "Innocence, new beginnings, potential, magical thinking, eternal youth",
+    context:
+      "The Divine Child archetype appears as baby Horus, the Christ child, infant Krishna — representing the newly born self, the seed of the transcendent function, pure potential before it has been shaped by the world. Its shadow, the Puer Aeternus, refuses to grow up.",
+    psychologicalMeaning:
+      "The Divine Child represents the archetype of pure potential — the miraculous capacity for new beginnings, the refusal to be limited by what has been, and the innocence that perceives reality without the distortion of accumulated wounds.",
+  },
+  {
+    name: "The Magician",
+    type: "Archetype",
+    origin: "Universal / Carl Jung",
+    domain:
+      "Transformation, mastery of forces, knowledge as power, alchemy, the mediator",
+    context:
+      "The Magician is the archetype of transformation through mastery — the alchemist who knows the hidden laws and can work with them to transform base matter (or experience) into gold. Merlin, Thoth, Gandalf, the Tarot's Magician — all embody this principle.",
+    psychologicalMeaning:
+      "The Magician embodies the archetype of conscious transformation — the understanding that reality can be shaped through the mastery of attention, intention, and knowledge of how forces work.",
+  },
+  {
+    name: "The Outlaw / Rebel",
+    type: "Archetype",
+    origin: "Universal cultural mythology",
+    domain:
+      "Freedom, rule-breaking, revolution, authenticity, the refusal of limitation",
+    context:
+      "The Outlaw archetype appears as Robin Hood, Prometheus, Loki — the one who breaks unjust rules to restore a deeper truth. Not random chaos but principled rebellion against what is false or oppressive.",
+    psychologicalMeaning:
+      "The Outlaw represents the archetype of principled transgression — the courageous refusal to comply with systems, rules, or beliefs that violate authentic truth, in service of a more genuine reality.",
+  },
+  {
+    name: "The Lover",
+    type: "Archetype",
+    origin: "Carl Jung, Universal",
+    domain: "Passion, connection, beauty, embodiment, the sacred union",
+    context:
+      "The Lover archetype is not merely romantic — it is the capacity for deep, passionate engagement with life itself. It is present in the mystic's union with the divine, the artist's love of their craft, and the lover's total presence with another person.",
+    psychologicalMeaning:
+      "The Lover embodies the archetype of total engagement — the willingness to be fully present, fully feeling, fully connected to whatever is in front of you, experiencing life at its most vivid and alive.",
+  },
+  {
+    name: "The Caregiver / Wounded Healer",
+    type: "Archetype",
+    origin: "Universal (Chiron, Greek mythology)",
+    domain:
+      "Compassion, service, nurturing others, the wounded healer, self-sacrifice",
+    context:
+      "The Caregiver appears as doctors, healers, nurses, mothers, and teachers — those who place the wellbeing of others at the center of their existence. The Wounded Healer (Chiron in Greek myth) is its deepest expression — the one who heals others through the wisdom of their own wounds.",
+    psychologicalMeaning:
+      "The Caregiver embodies the archetype of compassionate service — the capacity to find meaning through alleviating suffering, and the wisdom to recognize that the most powerful healing comes from the healer's own integrated wounds.",
+  },
+  {
+    name: "The Ruler / Sovereign",
+    type: "Archetype",
+    origin: "Universal",
+    domain:
+      "Order, responsibility, leadership, sovereignty, the creation of structure",
+    context:
+      "The Ruler archetype appears in every culture as the divine monarch who creates and maintains order. The highest expression is the Philosopher King — power in complete service to the flourishing of all. Its shadow is the tyrant.",
+    psychologicalMeaning:
+      "The Ruler embodies the archetype of sovereign responsibility — the understanding that true power serves rather than dominates, and that genuine authority comes not from force but from the trust of those who are governed.",
+  },
+  // ── Egregores ────────────────────────────────────────────────────────────────
+  {
+    name: "The Nation-State Egregore",
+    type: "Egregore",
+    subCategory: "Collective Egregore",
+    origin: "Collective consciousness theory, political philosophy",
+    domain:
+      "Collective identity, patriotism, shared mythologies, mass belief, cultural momentum",
+    context:
+      "When millions of people pour belief, loyalty, emotion, and intention into a nation-state, an egregore forms — a living psychic entity that begins to influence the very people who created it. It shapes culture, language, war, and art. The egregores of 'America,' 'Rome,' and 'Empire' have each generated distinct fields of collective meaning that outlive individual participants.",
+    psychologicalMeaning:
+      "The nation-state egregore represents the power of shared narrative — how collective stories and symbols create a felt reality that transcends individual experience.",
+    archetypalNote:
+      "Egregores are collective thoughtform constructs — symbolic models from esoteric and philosophical traditions.",
+  },
+  {
+    name: "The Corporate Egregore",
+    type: "Egregore",
+    subCategory: "Collective Egregore",
+    origin: "Business esoteric theory, Chaos Magic",
+    domain:
+      "Brand consciousness, corporate culture, economic power, mass loyalty, collective identity",
+    context:
+      "Large corporations like Apple, Coca-Cola, or Nike develop egregoric fields — felt atmospheres of brand identity that influence employee behavior, customer emotion, and cultural meaning far beyond their products. The corporate egregore feeds on collective attention, loyalty, and belief.",
+    psychologicalMeaning:
+      "The corporate egregore represents the shadow of collective productivity — how shared purpose can become a self-perpetuating entity that serves itself as much as the people who created it.",
+    archetypalNote:
+      "Egregores are collective thoughtform constructs — symbolic models from esoteric and philosophical traditions.",
+  },
+  {
+    name: "The Religious Egregore",
+    type: "Egregore",
+    subCategory: "Collective Egregore",
+    origin: "Theosophical Society, Dion Fortune",
+    domain:
+      "Collective prayer, ritual power, shared faith, communion, spiritual amplification",
+    context:
+      "Every religious denomination generates an egregore through collective prayer, ritual, and belief. The Catholic Mass egregore, the Islamic Ummah egregore, or the Buddhist Sangha egregore are energetic fields created by millions of devotees aligning their intention across centuries.",
+    psychologicalMeaning:
+      "The religious egregore embodies the amplifying power of shared spiritual practice — how collective intention creates something greater than the sum of its parts.",
+    archetypalNote:
+      "Egregores are collective thoughtform constructs — symbolic models from esoteric and philosophical traditions.",
+  },
+  {
+    name: "Egregore of the Hero",
+    type: "Egregore",
+    subCategory: "Cultural Egregore",
+    origin: "Cultural mythology, collective unconscious",
+    domain:
+      "Idealized human potential, hero worship, mass inspiration, collective aspiration",
+    context:
+      "Superman, Batman, and similar cultural heroes have become genuine egregores — fed by decades of collective belief, storytelling, and emotional investment. Their archetypal energy functions as a living thoughtform accessible through the collective unconscious.",
+    psychologicalMeaning:
+      "The Hero egregore embodies collective aspiration — humanity's shared dream of its own highest potential made manifest as a psychic force.",
+    archetypalNote:
+      "Egregores are collective thoughtform constructs — symbolic models from esoteric and philosophical traditions.",
+  },
+  {
+    name: "The Revolution Egregore",
+    type: "Egregore",
+    subCategory: "Collective Egregore",
+    origin: "Political philosophy, collective consciousness",
+    domain:
+      "Liberation, upheaval, collective will, radical change, transformative momentum",
+    context:
+      "Revolutions — French, American, Marxist — generate powerful egregores through the intense emotional investment of masses in a transformative cause. These egregores can outlive their originating events, continuing to influence political imagination centuries later.",
+    psychologicalMeaning:
+      "The Revolution egregore represents the collective shadow of oppressive power — the explosive emergence of suppressed will seeking freedom and self-determination.",
+    archetypalNote:
+      "Egregores are collective thoughtform constructs — symbolic models from esoteric and philosophical traditions.",
+  },
+  {
+    name: "The Zeitgeist",
+    type: "Egregore",
+    subCategory: "Cultural Egregore",
+    origin: "German Idealist philosophy (Hegel), Western cultural theory",
+    domain:
+      "Cultural momentum, collective mood, era-defining consciousness, invisible social water",
+    context:
+      "The Zeitgeist is the defining spirit of an era — the collective mood, values, anxieties, and aspirations that characterize a generation or age. The 1960s Zeitgeist, the Renaissance Zeitgeist, the AI Age Zeitgeist each function as egregoric fields shaping individual experience without people's conscious awareness.",
+    psychologicalMeaning:
+      "The Zeitgeist represents the invisible water everyone swims in — the collective unconscious mood that shapes individual thought while remaining largely unexamined.",
+    archetypalNote:
+      "Egregores are collective thoughtform constructs — symbolic models from esoteric and philosophical traditions.",
+  },
+  {
+    name: "The Sports Team Egregore",
+    type: "Egregore",
+    subCategory: "Tribal Egregore",
+    origin: "Sports psychology, group energy dynamics",
+    domain:
+      "Tribal loyalty, competitive spirit, collective energy, shared identity, ceremonial contest",
+    context:
+      "Sports teams with passionate fan bases develop genuine egregores — the '12th man' phenomenon in sports is a real egregoric effect where collective belief and emotional energy materially influences game outcomes. Stadium rituals, chants, and colors all feed the egregore.",
+    psychologicalMeaning:
+      "The sports egregore represents the primal need for tribal belonging and collective experience — channeling competitive instinct into shared identity and ceremonial contest.",
+    archetypalNote:
+      "Egregores are collective thoughtform constructs — symbolic models from esoteric and philosophical traditions.",
+  },
+  {
+    name: "The Meme Egregore",
+    type: "Egregore",
+    subCategory: "Digital Egregore",
+    origin: "Chaos Magic, digital culture theory, memetics",
+    domain:
+      "Viral consciousness, digital mythology, collective attention, meme magic, internet thoughtforms",
+    context:
+      "In the digital age, powerful memes and online communities generate egregores at unprecedented speed. Kek/Pepe the Frog became a genuine egregore through concentrated collective attention and ritual-like repetition by millions. The internet creates conditions for rapid egregore formation through shared symbols, humor, and collective emotional investment.",
+    psychologicalMeaning:
+      "The meme egregore represents the democratization of collective thought-form creation — how concentrated group attention can materialize new cultural entities with surprising speed.",
+    archetypalNote:
+      "Egregores are collective thoughtform constructs — symbolic models from esoteric and philosophical traditions.",
+  },
+  {
+    name: "The Artistic Movement Egregore",
+    type: "Egregore",
+    subCategory: "Cultural Egregore",
+    origin: "Cultural history, consciousness studies",
+    domain:
+      "Creative inspiration, aesthetic revolution, cultural evolution, collective creativity",
+    context:
+      "The Surrealist egregore, the Jazz egregore, the Renaissance egregore — artistic movements generate collective fields of inspiration that individual artists tap into. Many artists describe feeling 'possessed' by a larger creative force when producing their most powerful work.",
+    psychologicalMeaning:
+      "The artistic movement egregore represents the collective creative soul of humanity — how shared aesthetic vision creates a living field of inspiration that individual creators both contribute to and draw from.",
+    archetypalNote:
+      "Egregores are collective thoughtform constructs — symbolic models from esoteric and philosophical traditions.",
+  },
+  {
+    name: "The Ancient Order Egregore",
+    type: "Egregore",
+    subCategory: "Order Egregore",
+    origin: "Hermeticism, Freemasonry, Rosicrucianism",
+    domain:
+      "Esoteric knowledge, initiatory power, collective magical will, lineage consciousness",
+    context:
+      "Organizations like the Freemasons, Rosicrucians, Hermetic Order of the Golden Dawn, and OTO have consciously cultivated egregores over centuries. These organizational thoughtforms carry accumulated magical intention, symbolic meaning, and initiatory power. New members are initiated into the egregore's field.",
+    psychologicalMeaning:
+      "The order egregore represents the living transmission of accumulated wisdom and practice — how lineages of knowledge preserve and amplify their essence across generations.",
+    archetypalNote:
+      "Egregores are collective thoughtform constructs — symbolic models from esoteric and philosophical traditions.",
+  },
+  {
+    name: "The Chaos Egregore (Eris)",
+    type: "Egregore",
+    subCategory: "Cultivated Egregore",
+    origin: "Discordianism, Chaos Magic",
+    domain:
+      "Creative disorder, randomness as generative force, breaking of fixed patterns, innovation",
+    context:
+      "Discordians consciously work with Eris/Chaos as an egregoric force — the intentional cultivation of creative disorder that shatters stagnant structures and opens new possibility spaces. The Chaos egregore has been actively cultivated in modern Chaos Magic traditions.",
+    psychologicalMeaning:
+      "The Chaos egregore represents the generative void — the uncomfortable but necessary dissolution of fixed structures that creates the conditions for genuine innovation and emergence.",
+    archetypalNote:
+      "Egregores are collective thoughtform constructs — symbolic models from esoteric and philosophical traditions.",
+  },
+  {
+    name: "The Tulpa",
+    type: "Egregore",
+    subCategory: "Personal Construct",
+    origin:
+      "Tibetan Buddhism (Tulku), Western Occultism (Alexandra David-Néel)",
+    domain:
+      "Intentional creation of conscious entities, focused will, autonomous mental companions",
+    context:
+      "A tulpa is a thoughtform created through sustained focused intention, most associated with Tibetan mystical practice. Alexandra David-Néel described creating a tulpa in her 1929 account. Modern practitioners describe tulpas as independently thinking mental companions with their own personalities.",
+    psychologicalMeaning:
+      "The tulpa represents the capacity of focused intention and creative visualization to generate persistent, autonomous-feeling sub-personalities — a demonstration of the mind's extraordinary creative power.",
+    archetypalNote:
+      "Egregores are collective thoughtform constructs — symbolic models from esoteric and philosophical traditions.",
+  },
+  {
+    name: "The Group Mind",
+    type: "Egregore",
+    subCategory: "Collective Egregore",
+    origin: "Theosophy, collective consciousness research",
+    domain:
+      "Shared consciousness, synchronized intention, collective intelligence, emergent awareness",
+    context:
+      "When groups align deeply in meditation, ritual, or focused intention, a group mind or hive consciousness can emerge — a shared field of awareness that transcends individual minds. Mystery schools, meditation groups, and ritual circles cultivate this state deliberately.",
+    psychologicalMeaning:
+      "The group mind represents the emergent property of deeply synchronized consciousness — how collective focused awareness can create states of knowing and capability that exceed what any individual could access alone.",
+    archetypalNote:
+      "Egregores are collective thoughtform constructs — symbolic models from esoteric and philosophical traditions.",
+  },
+  {
+    name: "The Servitor",
+    type: "Egregore",
+    subCategory: "Personal Construct",
+    origin: "Modern Chaos Magic (Phil Hine, Peter Carroll)",
+    domain:
+      "Intentional magical assistance, focused task-completion, directed will, spiritual automation",
+    context:
+      "A servitor is a self-created egregore designed for a specific purpose by a magical practitioner — a 'spiritual robot' built from focused intention, symbol, and will to perform a designated function. Unlike a tulpa, a servitor has a specific mission and limited autonomy.",
+    psychologicalMeaning:
+      "The servitor represents the practice of conscious intention programming — the deliberate creation of focused mental constructs that automate specific desired outcomes through the power of concentrated will.",
+    archetypalNote:
+      "Egregores are collective thoughtform constructs — symbolic models from esoteric and philosophical traditions.",
+  },
+  {
+    name: "The Ancestral Egregore",
+    type: "Egregore",
+    subCategory: "Bloodline Egregore",
+    origin:
+      "Shamanic traditions, Ancestor Veneration, Family Constellation therapy",
+    domain:
+      "Ancestral patterns, inherited beliefs, bloodline power, karmic inheritance, generational healing",
+    context:
+      "Every family bloodline carries an egregoric field — accumulated patterns of belief, emotional response, trauma, and strength passed through generations both genetically and energetically. Ancestor veneration practices in African, Asian, and indigenous traditions consciously engage with these ancestral egregores.",
+    psychologicalMeaning:
+      "The ancestral egregore represents the inheritance of collective experience — both the wounds and the gifts carried in bloodline memory, available to be consciously engaged, healed, and transcended.",
+    archetypalNote:
+      "Egregores are collective thoughtform constructs — symbolic models from esoteric and philosophical traditions.",
+  },
 ];
 
 const TYPE_COLORS: Record<EntityType, string> = {
@@ -462,6 +1088,7 @@ const TYPE_COLORS: Record<EntityType, string> = {
   Deity: "oklch(0.68 0.2 30)",
   Spirit: "oklch(0.62 0.22 295)",
   Archetype: "oklch(0.65 0.2 220)",
+  Egregore: "oklch(0.65 0.22 150)",
 };
 
 const ENTITY_TYPES: Array<"All" | EntityType> = [
@@ -471,6 +1098,7 @@ const ENTITY_TYPES: Array<"All" | EntityType> = [
   "Deity",
   "Spirit",
   "Archetype",
+  "Egregore",
 ];
 
 interface SpiritualEntitiesPageProps {
@@ -491,7 +1119,8 @@ export default function SpiritualEntitiesPage({
         e.name.toLowerCase().includes(search.toLowerCase()) ||
         e.domain.toLowerCase().includes(search.toLowerCase()) ||
         e.origin.toLowerCase().includes(search.toLowerCase()) ||
-        e.context.toLowerCase().includes(search.toLowerCase());
+        e.context.toLowerCase().includes(search.toLowerCase()) ||
+        (e.subCategory?.toLowerCase().includes(search.toLowerCase()) ?? false);
       const matchesType = activeType === "All" || e.type === activeType;
       return matchesSearch && matchesType;
     });
@@ -515,9 +1144,9 @@ export default function SpiritualEntitiesPage({
           Spiritual Entities
         </h1>
         <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
-          An encyclopedic reference to angels, deities, archetypal spirits, and
-          mythological beings. Channel any entity's essence and symbolic energy
-          into your subliminal practice.
+          An encyclopedic reference to angels, deities, spirits, egregores,
+          archetypes, and mythological beings. Channel any entity's essence and
+          symbolic energy into your subliminal practice.
         </p>
         <div className="flex items-center justify-center gap-2 flex-wrap">
           <Badge
@@ -571,6 +1200,16 @@ export default function SpiritualEntitiesPage({
           >
             {ENTITIES.filter((e) => e.type === "Archetype").length} Archetypes
           </Badge>
+          <Badge
+            className="text-xs font-mono"
+            style={{
+              background: "oklch(0.65 0.22 150 / 0.2)",
+              color: "oklch(0.65 0.22 150)",
+              border: "1px solid oklch(0.65 0.22 150 / 0.4)",
+            }}
+          >
+            {ENTITIES.filter((e) => e.type === "Egregore").length} Egregores
+          </Badge>
         </div>
       </motion.div>
 
@@ -584,14 +1223,16 @@ export default function SpiritualEntitiesPage({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
+            data-ocid="entities.search_input"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search entities, domains, origins..."
+            placeholder="Search entities, domains, origins, subcategories..."
             className="pl-10 pr-10 bg-secondary/30 border-border/50 focus:border-primary/50"
           />
           {search && (
             <button
               type="button"
+              data-ocid="entities.search.close_button"
               onClick={() => setSearch("")}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
@@ -600,7 +1241,7 @@ export default function SpiritualEntitiesPage({
           )}
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" data-ocid="entities.filter.tab">
           {ENTITY_TYPES.map((type) => {
             const isActive = activeType === type;
             const color =
@@ -609,6 +1250,7 @@ export default function SpiritualEntitiesPage({
               <button
                 key={type}
                 type="button"
+                data-ocid={`entities.${type.toLowerCase()}.tab`}
                 onClick={() => setActiveType(type)}
                 className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 border"
                 style={{
@@ -626,7 +1268,7 @@ export default function SpiritualEntitiesPage({
         </div>
       </motion.div>
 
-      {search && (
+      {(search || activeType !== "All") && (
         <p className="text-muted-foreground text-sm">
           Showing {filtered.length} of {ENTITIES.length} entities
         </p>
@@ -644,12 +1286,14 @@ export default function SpiritualEntitiesPage({
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3, delay: idx * 0.02 }}
+                transition={{ duration: 0.3, delay: idx * 0.015 }}
                 className="rounded-2xl border bg-secondary/20 overflow-hidden"
                 style={{ borderColor: `${color}30` }}
+                data-ocid={`entities.item.${idx + 1}`}
               >
                 <button
                   type="button"
+                  data-ocid={`entities.card.${idx + 1}`}
                   onClick={() => setExpandedId(isExpanded ? null : entity.name)}
                   className="w-full text-left p-4 hover:bg-secondary/30 transition-colors"
                 >
@@ -672,6 +1316,18 @@ export default function SpiritualEntitiesPage({
                         >
                           {entity.type}
                         </Badge>
+                        {entity.subCategory && (
+                          <Badge
+                            className="text-xs shrink-0 font-normal"
+                            style={{
+                              background: `${color}10`,
+                              color: `${color}bb`,
+                              border: `1px solid ${color}25`,
+                            }}
+                          >
+                            {entity.subCategory}
+                          </Badge>
+                        )}
                       </div>
                       <p className="text-xs text-muted-foreground">
                         {entity.origin}
@@ -742,6 +1398,7 @@ export default function SpiritualEntitiesPage({
 
                         <Button
                           size="sm"
+                          data-ocid="entities.use.button"
                           onClick={() =>
                             onUseForSubliminal(
                               `${entity.name} energy and essence`,
@@ -772,6 +1429,7 @@ export default function SpiritualEntitiesPage({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="text-center py-16 space-y-3"
+          data-ocid="entities.empty_state"
         >
           <Ghost className="w-12 h-12 text-muted-foreground/40 mx-auto" />
           <p className="text-muted-foreground">
@@ -780,6 +1438,7 @@ export default function SpiritualEntitiesPage({
           <Button
             variant="ghost"
             size="sm"
+            data-ocid="entities.clear.button"
             onClick={() => {
               setSearch("");
               setActiveType("All");
