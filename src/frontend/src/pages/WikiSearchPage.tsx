@@ -1258,6 +1258,12 @@ const POWER_WIKIS: WikiInfo[] = [
     domain: "americangods.fandom.com",
     hub: "Mythology",
   },
+  {
+    id: "ghostpedia",
+    name: "Ghostpedia",
+    domain: "ghostpedia.fandom.com",
+    hub: "Mythology",
+  },
 ];
 
 // ── Tag-scoped search utilities ─────────────────────────────────────────────
@@ -1549,6 +1555,7 @@ const POWERS_WIKIS = POWER_WIKIS.filter((w) =>
     "american-gods",
     "smite",
     "hades",
+    "ghostpedia",
   ].includes(w.id),
 );
 
@@ -1790,6 +1797,7 @@ export default function WikiSearchPage({
                 "Blitzo",
                 "Stolas",
                 "Lucifer",
+                "Ghostpedia: Ghost",
               ].map((s) => (
                 <button
                   key={s}
