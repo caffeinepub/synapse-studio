@@ -1,6 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { useState } from "react";
 import NavBar from "./components/NavBar";
+import ChatBotsPage from "./pages/ChatBotsPage";
 import EnergyLibraryPage from "./pages/EnergyLibraryPage";
 import GeneratorPage, { type SubliminalContext } from "./pages/GeneratorPage";
 import HealingMethodsPage from "./pages/HealingMethodsPage";
@@ -11,15 +12,20 @@ import SettingsPage from "./pages/SettingsPage";
 import SigilsPage from "./pages/SigilsPage";
 import SpellsPage from "./pages/SpellsPage";
 import SpiritualEntitiesPage from "./pages/SpiritualEntitiesPage";
+import SynapsesAIPage from "./pages/SynapsesAIPage";
+import TrainableBotPage from "./pages/TrainableBotPage";
 import VideoEditorPage from "./pages/VideoEditorPage";
 import WikiSearchPage from "./pages/WikiSearchPage";
 import YouTubePage from "./pages/YouTubePage";
 
 type Page =
   | "generator"
+  | "synapses"
   | "energy"
   | "kinesis"
   | "wiki"
+  | "chatbots"
+  | "trainable"
   | "religions"
   | "entities"
   | "spells"
@@ -90,12 +96,24 @@ export default function App() {
               onSubliminalUpdate={setSubliminalCtx}
             />
           )}
+          {currentPage === "synapses" && (
+            <SynapsesAIPage
+              subliminalCtx={subliminalCtx}
+              onUseForSubliminal={handleUseForSubliminal}
+            />
+          )}
           {currentPage === "energy" && <EnergyLibraryPage />}
           {currentPage === "kinesis" && (
             <KinesisArchivePage onNavigate={handleNavigate} />
           )}
           {currentPage === "wiki" && (
             <WikiSearchPage onUseForSubliminal={handleUseForSubliminal} />
+          )}
+          {currentPage === "chatbots" && (
+            <ChatBotsPage onUseForSubliminal={handleUseForSubliminal} />
+          )}
+          {currentPage === "trainable" && (
+            <TrainableBotPage onUseForSubliminal={handleUseForSubliminal} />
           )}
           {currentPage === "religions" && (
             <ReligionsPage

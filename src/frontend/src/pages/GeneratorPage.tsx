@@ -1267,6 +1267,41 @@ export default function GeneratorPage({
   // Wealth presets panel
   const [wealthPresetsOpen, setWealthPresetsOpen] = useState(false);
 
+  // ── Advanced Functions panel ──────────────────────────────────────────────
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+
+  // 1. Deity/Entity Invocation
+  const [deityEnabled, setDeityEnabled] = useState(false);
+  const [deityName, setDeityName] = useState("");
+  const [deityPantheon, setDeityPantheon] = useState("");
+
+  // 2. Spell Weaving
+  const [spellEnabled, setSpellEnabled] = useState(false);
+  const [spellArchetype, setSpellArchetype] = useState("Attraction");
+  const [spellCustom, setSpellCustom] = useState("");
+
+  // 3. Soul Contract
+  const [soulContractEnabled, setSoulContractEnabled] = useState(false);
+  const [soulContractEntity, setSoulContractEntity] = useState("the Universe");
+
+  // 4. Shadow Work Integration
+  const [shadowWorkEnabled, setShadowWorkEnabled] = useState(false);
+  const [shadowWorkBlock, setShadowWorkBlock] = useState("");
+
+  // 5. Reality Scripting
+  const [realityScriptEnabled, setRealityScriptEnabled] = useState(false);
+  const [realityScriptTimeAgo, setRealityScriptTimeAgo] =
+    useState("months ago");
+
+  // 6. Frequency Attunement
+  const [frequencyAttunementEnabled, setFrequencyAttunementEnabled] =
+    useState(false);
+  const [frequencyAttunementHz, setFrequencyAttunementHz] = useState("528");
+
+  // 7. Sigil Activation
+  const [sigilActivationEnabled, setSigilActivationEnabled] = useState(false);
+  const [sigilName, setSigilName] = useState("");
+
   // Step 2 state
   const [affirmationCount, setAffirmationCount] = useState(50);
   const [affirmations, setAffirmations] = useState<string[]>([]);
@@ -1327,6 +1362,13 @@ export default function GeneratorPage({
   const [saveTitle, setSaveTitle] = useState("");
   const [projectsOpen, setProjectsOpen] = useState(false);
   const [loadedJSON, setLoadedJSON] = useState<string | null>(null);
+
+  // Auto-sync frequencyAttunementHz from frequencyHz when Frequency Attunement is toggled on
+  useEffect(() => {
+    if (frequencyAttunementEnabled && frequencyHz) {
+      setFrequencyAttunementHz(frequencyHz);
+    }
+  }, [frequencyAttunementEnabled, frequencyHz]);
 
   // Consume topic injected from Wiki Search
   useEffect(() => {
@@ -1549,6 +1591,26 @@ export default function GeneratorPage({
       return;
     }
     setIsGenerating(true);
+
+    const advancedConfig = {
+      deityEnabled,
+      deityName,
+      deityPantheon,
+      spellEnabled,
+      spellArchetype,
+      spellCustom,
+      soulContractEnabled,
+      soulContractEntity,
+      shadowWorkEnabled,
+      shadowWorkBlock,
+      realityScriptEnabled,
+      realityScriptTimeAgo,
+      frequencyAttunementEnabled,
+      frequencyAttunementHz,
+      sigilActivationEnabled,
+      sigilName,
+    };
+
     try {
       const aiResult = await generateAffirmationsWithAI(
         topic,
@@ -1571,6 +1633,7 @@ export default function GeneratorPage({
         modes.fantasy && itemEnabled ? itemTimeFrame : undefined,
         modes.fantasy && symbioticEnabled ? symbioticLocation : undefined,
         modes.fantasy && symbioticEnabled ? symbioticTimeFrame : undefined,
+        advancedConfig,
       );
 
       if (aiResult && aiResult.length > 0) {
@@ -1619,6 +1682,7 @@ export default function GeneratorPage({
         hasItem ? itemTimeFrame : undefined,
         hasSymbiotic ? symbioticLocation : undefined,
         hasSymbiotic ? symbioticTimeFrame : undefined,
+        advancedConfig,
       );
       const expanded = expandToCount(localResult, affirmationCount);
       setAffirmations(expanded);
@@ -1772,6 +1836,37 @@ export default function GeneratorPage({
           audio_codec: "aac",
         },
         ffmpeg_command: ffmpegCmd,
+        advanced_functions: {
+          deity_invocation: deityEnabled
+            ? {
+                enabled: true,
+                deity: deityName,
+                pantheon: deityPantheon || null,
+              }
+            : { enabled: false },
+          spell_weaving: spellEnabled
+            ? {
+                enabled: true,
+                archetype: spellArchetype,
+                custom: spellCustom || null,
+              }
+            : { enabled: false },
+          soul_contract: soulContractEnabled
+            ? { enabled: true, entity: soulContractEntity }
+            : { enabled: false },
+          shadow_work: shadowWorkEnabled
+            ? { enabled: true, block: shadowWorkBlock || null }
+            : { enabled: false },
+          reality_scripting: realityScriptEnabled
+            ? { enabled: true, time_ago: realityScriptTimeAgo }
+            : { enabled: false },
+          frequency_attunement: frequencyAttunementEnabled
+            ? { enabled: true, hz: frequencyAttunementHz }
+            : { enabled: false },
+          sigil_activation: sigilActivationEnabled
+            ? { enabled: true, sigil: sigilName }
+            : { enabled: false },
+        },
       };
 
       setProjectJSON(JSON.stringify(payload));
@@ -2591,6 +2686,475 @@ export default function GeneratorPage({
                 : `${selectedChakras.length} chakra${selectedChakras.length > 1 ? "s" : ""} selected`}
             </p>
           )}
+        </div>
+
+        {/* ── Advanced Functions Section ────────────────────────── */}
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={() => setAdvancedOpen((v) => !v)}
+            className="flex items-center gap-2 text-sm font-medium text-purple-400/80 hover:text-purple-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-400/40 rounded"
+            data-ocid="generator.advanced_functions.toggle"
+          >
+            <Wand2 className="w-4 h-4" />
+            Advanced Functions
+            <Badge
+              variant="outline"
+              className="text-[10px] px-1.5 py-0 border-purple-500/40 text-purple-400"
+            >
+              {
+                [
+                  deityEnabled,
+                  spellEnabled,
+                  soulContractEnabled,
+                  shadowWorkEnabled,
+                  realityScriptEnabled,
+                  frequencyAttunementEnabled,
+                  sigilActivationEnabled,
+                ].filter(Boolean).length
+              }{" "}
+              active
+            </Badge>
+            <ChevronDown
+              className={`w-3 h-3 transition-transform duration-200 ${advancedOpen ? "rotate-180" : ""}`}
+            />
+          </button>
+
+          <AnimatePresence>
+            {advancedOpen && (
+              <motion.div
+                key="advanced-panel"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden"
+              >
+                <div className="space-y-3 p-4 rounded-xl border border-purple-500/20 bg-purple-500/5">
+                  <p className="text-xs text-purple-400/60 leading-snug">
+                    Weave additional energetic operations into every affirmation
+                    batch. All active functions are layered on top of your base
+                    settings.
+                  </p>
+
+                  {/* 1. Deity / Entity Invocation */}
+                  <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-amber-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Star className="w-3.5 h-3.5 text-amber-400" />
+                        <Label
+                          className="text-sm font-semibold text-amber-300 cursor-pointer"
+                          htmlFor="deity-toggle"
+                        >
+                          Deity / Entity Invocation
+                        </Label>
+                      </div>
+                      <Switch
+                        id="deity-toggle"
+                        checked={deityEnabled}
+                        onCheckedChange={setDeityEnabled}
+                        data-ocid="generator.deity.toggle"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      Invoke a deity or entity to bless and co-create this
+                      subliminal
+                    </p>
+                    <AnimatePresence>
+                      {deityEnabled && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-2 overflow-hidden"
+                        >
+                          <Input
+                            value={deityName}
+                            onChange={(e) => setDeityName(e.target.value)}
+                            placeholder="Deity or entity name (e.g. Hecate, Odin, Sekhmet, Oshun)..."
+                            className="bg-input/50 border-amber-500/30 focus:border-amber-500/60 text-sm"
+                            data-ocid="generator.deity_name.input"
+                          />
+                          <Input
+                            value={deityPantheon}
+                            onChange={(e) => setDeityPantheon(e.target.value)}
+                            placeholder="Pantheon / origin (optional — e.g. Greek, Norse, Egyptian, Yoruba)..."
+                            className="bg-input/50 border-amber-500/30 focus:border-amber-500/60 text-sm"
+                            data-ocid="generator.deity_pantheon.input"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* 2. Spell Weaving */}
+                  <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-purple-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Wand2 className="w-3.5 h-3.5 text-purple-400" />
+                        <Label
+                          className="text-sm font-semibold text-purple-300 cursor-pointer"
+                          htmlFor="spell-toggle"
+                        >
+                          Spell Weaving
+                        </Label>
+                      </div>
+                      <Switch
+                        id="spell-toggle"
+                        checked={spellEnabled}
+                        onCheckedChange={setSpellEnabled}
+                        data-ocid="generator.spell.toggle"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      Weave a specific energetic operation into every
+                      affirmation
+                    </p>
+                    <AnimatePresence>
+                      {spellEnabled && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-2.5 overflow-hidden"
+                        >
+                          <div className="flex flex-wrap gap-1.5">
+                            {[
+                              "Attraction",
+                              "Transmutation",
+                              "Amplification",
+                              "Binding",
+                              "Banishing",
+                              "Illumination",
+                              "Abundance",
+                              "Protection Ward",
+                            ].map((arch) => (
+                              <button
+                                key={arch}
+                                type="button"
+                                onClick={() => setSpellArchetype(arch)}
+                                className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${
+                                  spellArchetype === arch
+                                    ? "bg-purple-500/30 text-purple-200 border-purple-400/60"
+                                    : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-purple-400/40 hover:text-purple-300"
+                                }`}
+                              >
+                                {arch}
+                              </button>
+                            ))}
+                          </div>
+                          <Input
+                            value={spellCustom}
+                            onChange={(e) => setSpellCustom(e.target.value)}
+                            placeholder="Custom spell type (optional — overrides preset above)..."
+                            className="bg-input/50 border-purple-500/30 focus:border-purple-500/60 text-sm"
+                            data-ocid="generator.spell_custom.input"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* 3. Soul Contract */}
+                  <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-sky-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CircleDot className="w-3.5 h-3.5 text-sky-400" />
+                        <Label
+                          className="text-sm font-semibold text-sky-300 cursor-pointer"
+                          htmlFor="soulcontract-toggle"
+                        >
+                          Soul Contract
+                        </Label>
+                      </div>
+                      <Switch
+                        id="soulcontract-toggle"
+                        checked={soulContractEnabled}
+                        onCheckedChange={setSoulContractEnabled}
+                        data-ocid="generator.soul_contract.toggle"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      Declare a sacred agreement that seals your reality as
+                      already done
+                    </p>
+                    <AnimatePresence>
+                      {soulContractEnabled && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-2 overflow-hidden"
+                        >
+                          <div className="flex flex-wrap gap-1.5">
+                            {[
+                              "the Universe",
+                              "Higher Self",
+                              "God/Source",
+                              "My Soul",
+                            ].map((ent) => (
+                              <button
+                                key={ent}
+                                type="button"
+                                onClick={() => setSoulContractEntity(ent)}
+                                className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${
+                                  soulContractEntity === ent
+                                    ? "bg-sky-500/30 text-sky-200 border-sky-400/60"
+                                    : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-sky-400/40 hover:text-sky-300"
+                                }`}
+                              >
+                                {ent}
+                              </button>
+                            ))}
+                          </div>
+                          <Input
+                            value={soulContractEntity}
+                            onChange={(e) =>
+                              setSoulContractEntity(e.target.value)
+                            }
+                            placeholder="Entity / counterparty (e.g. the Universe, Higher Self, God/Source)..."
+                            className="bg-input/50 border-sky-500/30 focus:border-sky-500/60 text-sm"
+                            data-ocid="generator.soul_contract_entity.input"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* 4. Shadow Work Integration */}
+                  <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-rose-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Eye className="w-3.5 h-3.5 text-rose-400" />
+                        <Label
+                          className="text-sm font-semibold text-rose-300 cursor-pointer"
+                          htmlFor="shadowwork-toggle"
+                        >
+                          Shadow Work Integration
+                        </Label>
+                      </div>
+                      <Switch
+                        id="shadowwork-toggle"
+                        checked={shadowWorkEnabled}
+                        onCheckedChange={setShadowWorkEnabled}
+                        data-ocid="generator.shadow_work.toggle"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      Release the shadow resistance around this topic and
+                      reclaim your power
+                    </p>
+                    <AnimatePresence>
+                      {shadowWorkEnabled && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-2 overflow-hidden"
+                        >
+                          <Input
+                            value={shadowWorkBlock}
+                            onChange={(e) => setShadowWorkBlock(e.target.value)}
+                            placeholder="Specific block to address (optional — e.g. fear of success, imposter syndrome)..."
+                            className="bg-input/50 border-rose-500/30 focus:border-rose-500/60 text-sm"
+                            data-ocid="generator.shadow_work_block.input"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* 5. Reality Scripting */}
+                  <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-emerald-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Save className="w-3.5 h-3.5 text-emerald-400" />
+                        <Label
+                          className="text-sm font-semibold text-emerald-300 cursor-pointer"
+                          htmlFor="realityscript-toggle"
+                        >
+                          Reality Scripting
+                        </Label>
+                      </div>
+                      <Switch
+                        id="realityscript-toggle"
+                        checked={realityScriptEnabled}
+                        onCheckedChange={setRealityScriptEnabled}
+                        data-ocid="generator.reality_script.toggle"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      Affirmations that read as if your reality already changed
+                      — past-tense story style
+                    </p>
+                    <AnimatePresence>
+                      {realityScriptEnabled && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-2 overflow-hidden"
+                        >
+                          <div className="flex flex-wrap gap-1.5">
+                            {[
+                              "days ago",
+                              "weeks ago",
+                              "months ago",
+                              "years ago",
+                            ].map((ago) => (
+                              <button
+                                key={ago}
+                                type="button"
+                                onClick={() => setRealityScriptTimeAgo(ago)}
+                                className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${
+                                  realityScriptTimeAgo === ago
+                                    ? "bg-emerald-500/30 text-emerald-200 border-emerald-400/60"
+                                    : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-emerald-400/40 hover:text-emerald-300"
+                                }`}
+                              >
+                                {ago}
+                              </button>
+                            ))}
+                          </div>
+                          <Input
+                            value={realityScriptTimeAgo}
+                            onChange={(e) =>
+                              setRealityScriptTimeAgo(e.target.value)
+                            }
+                            placeholder="Custom time ago (e.g. 6 months ago, a year ago)..."
+                            className="bg-input/50 border-emerald-500/30 focus:border-emerald-500/60 text-sm"
+                            data-ocid="generator.reality_script_timeago.input"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* 6. Frequency Attunement */}
+                  <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-cyan-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Atom className="w-3.5 h-3.5 text-cyan-400" />
+                        <Label
+                          className="text-sm font-semibold text-cyan-300 cursor-pointer"
+                          htmlFor="freqattune-toggle"
+                        >
+                          Frequency Attunement
+                        </Label>
+                      </div>
+                      <Switch
+                        id="freqattune-toggle"
+                        checked={frequencyAttunementEnabled}
+                        onCheckedChange={setFrequencyAttunementEnabled}
+                        data-ocid="generator.freq_attunement.toggle"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      Tie your chosen frequency into the affirmations — programs
+                      the Hz directly into the subliminal language
+                    </p>
+                    <AnimatePresence>
+                      {frequencyAttunementEnabled && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-2.5 overflow-hidden"
+                        >
+                          <div className="flex flex-wrap gap-1.5">
+                            {[
+                              "40",
+                              "174",
+                              "285",
+                              "396",
+                              "417",
+                              "432",
+                              "528",
+                              "639",
+                              "741",
+                              "852",
+                              "963",
+                              "1111",
+                            ].map((hz) => (
+                              <button
+                                key={hz}
+                                type="button"
+                                onClick={() => setFrequencyAttunementHz(hz)}
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-medium border transition-all ${
+                                  frequencyAttunementHz === hz
+                                    ? "bg-cyan-500/30 text-cyan-200 border-cyan-400/60"
+                                    : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-cyan-400/40 hover:text-cyan-300"
+                                }`}
+                              >
+                                {hz}Hz
+                              </button>
+                            ))}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              value={frequencyAttunementHz}
+                              onChange={(e) =>
+                                setFrequencyAttunementHz(e.target.value)
+                              }
+                              placeholder="Hz value (e.g. 528)..."
+                              className="bg-input/50 border-cyan-500/30 focus:border-cyan-500/60 text-sm"
+                              data-ocid="generator.freq_attunement_hz.input"
+                            />
+                            <span className="text-xs text-cyan-400/60 whitespace-nowrap">
+                              Hz
+                            </span>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* 7. Sigil Activation */}
+                  <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-orange-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Zap className="w-3.5 h-3.5 text-orange-400" />
+                        <Label
+                          className="text-sm font-semibold text-orange-300 cursor-pointer"
+                          htmlFor="sigil-toggle"
+                        >
+                          Sigil Activation
+                        </Label>
+                      </div>
+                      <Switch
+                        id="sigil-toggle"
+                        checked={sigilActivationEnabled}
+                        onCheckedChange={setSigilActivationEnabled}
+                        data-ocid="generator.sigil_activation.toggle"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      Activate and charge a sigil — affirmations declare it
+                      working on your behalf
+                    </p>
+                    <AnimatePresence>
+                      {sigilActivationEnabled && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-2 overflow-hidden"
+                        >
+                          <Input
+                            value={sigilName}
+                            onChange={(e) => setSigilName(e.target.value)}
+                            placeholder="Sigil name (e.g. Hecate's Wheel, Bind Rune, personal sigil, or from Sigil Codex)..."
+                            className="bg-input/50 border-orange-500/30 focus:border-orange-500/60 text-sm"
+                            data-ocid="generator.sigil_name.input"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </motion.section>
 

@@ -1260,9 +1260,9 @@ const POWER_WIKIS: WikiInfo[] = [
   },
   {
     id: "ghostpedia",
-    name: "Ghostpedia",
-    domain: "ghostpedia.fandom.com",
-    hub: "Mythology",
+    name: "Ghostpedia (The Band Ghost)",
+    domain: "thebandghost.fandom.com",
+    hub: "Music",
   },
 ];
 
@@ -1797,7 +1797,7 @@ export default function WikiSearchPage({
                 "Blitzo",
                 "Stolas",
                 "Lucifer",
-                "Ghostpedia: Ghost",
+                "Ghostpedia: Papa Emeritus",
               ].map((s) => (
                 <button
                   key={s}
@@ -2238,6 +2238,7 @@ export default function WikiSearchPage({
             "Film",
             "Gaming",
             "Mythology",
+            "Music",
           ] as const
         ).map((hub) => {
           const wikis = POWER_WIKIS.filter((w) => w.hub === hub);

@@ -89,20 +89,62 @@ export class ExternalBlob {
         return this;
     }
 }
+export interface Memory {
+    id: bigint;
+    topic: string;
+    content: string;
+    sentiment: bigint;
+    timestamp: bigint;
+    botId: bigint;
+    memoryType: string;
+}
+export interface Bot {
+    id: bigint;
+    personality: string;
+    name: string;
+    linkedWiki?: string;
+    avatar: string;
+}
 export interface backendInterface {
+    addMemory(botId: bigint, memoryType: string, content: string, topic: string, sentiment: bigint): Promise<bigint>;
     buildProjectJSON(topic: string, affirmations: Array<string>, boosterEnabled: boolean, fantasyEnabled: boolean, fantasyInput: string, protectionEnabled: boolean, chakraName: string, voiceType: string, voiceSpeed: number, voicePitch: number, repetitionCount: bigint, whisperOverlay: boolean, backgroundMusicType: string, subliminalFrequency: string, musicVolume: number, subliminalVolume: number, waveformOverlay: boolean, stereoMovement: boolean, themeStyle: string, colorPalette: string, resolution: string, durationSeconds: bigint, frameRate: bigint): Promise<string>;
+    clearMemoriesForBot(botId: bigint): Promise<{
+        removedCount: bigint;
+    }>;
+    createBot(name: string, avatar: string, personality: string, linkedWiki: string | null): Promise<bigint>;
+    deleteBot(id: bigint): Promise<boolean>;
+    deleteMemory(id: bigint): Promise<boolean>;
     deleteProject(id: bigint): Promise<boolean>;
     generateAffirmations(topic: string, boosterEnabled: boolean, fantasyEnabled: boolean, protectionEnabled: boolean, chakraName: string): Promise<Array<string>>;
+    getAllBots(): Promise<Array<Bot>>;
     getAllChakras(): Promise<string>;
     getAllKinesisEntries(): Promise<string>;
     getBeliefSystems(): Promise<string>;
+    getBot(id: bigint): Promise<Bot | null>;
     getFantasyMapping(abilityName: string): Promise<string>;
+    getMemoriesForBot(botId: bigint): Promise<Array<Memory>>;
     getProject(id: bigint): Promise<string | null>;
+    getRelevantMemories(botId: bigint, topic: string, topN: bigint): Promise<Array<Memory>>;
     listProjects(): Promise<Array<[bigint, string, bigint]>>;
     saveProject(title: string, jsonOutput: string): Promise<bigint>;
 }
+import type { Bot as _Bot } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
+    async addMemory(arg0: bigint, arg1: string, arg2: string, arg3: string, arg4: bigint): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.addMemory(arg0, arg1, arg2, arg3, arg4);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.addMemory(arg0, arg1, arg2, arg3, arg4);
+            return result;
+        }
+    }
     async buildProjectJSON(arg0: string, arg1: Array<string>, arg2: boolean, arg3: boolean, arg4: string, arg5: boolean, arg6: string, arg7: string, arg8: number, arg9: number, arg10: bigint, arg11: boolean, arg12: string, arg13: string, arg14: number, arg15: number, arg16: boolean, arg17: boolean, arg18: string, arg19: string, arg20: string, arg21: bigint, arg22: bigint): Promise<string> {
         if (this.processError) {
             try {
@@ -114,6 +156,64 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.buildProjectJSON(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15, arg16, arg17, arg18, arg19, arg20, arg21, arg22);
+            return result;
+        }
+    }
+    async clearMemoriesForBot(arg0: bigint): Promise<{
+        removedCount: bigint;
+    }> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.clearMemoriesForBot(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.clearMemoriesForBot(arg0);
+            return result;
+        }
+    }
+    async createBot(arg0: string, arg1: string, arg2: string, arg3: string | null): Promise<bigint> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.createBot(arg0, arg1, arg2, to_candid_opt_n1(this._uploadFile, this._downloadFile, arg3));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.createBot(arg0, arg1, arg2, to_candid_opt_n1(this._uploadFile, this._downloadFile, arg3));
+            return result;
+        }
+    }
+    async deleteBot(arg0: bigint): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteBot(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteBot(arg0);
+            return result;
+        }
+    }
+    async deleteMemory(arg0: bigint): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteMemory(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteMemory(arg0);
             return result;
         }
     }
@@ -143,6 +243,20 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.generateAffirmations(arg0, arg1, arg2, arg3, arg4);
             return result;
+        }
+    }
+    async getAllBots(): Promise<Array<Bot>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllBots();
+                return from_candid_vec_n2(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllBots();
+            return from_candid_vec_n2(this._uploadFile, this._downloadFile, result);
         }
     }
     async getAllChakras(): Promise<string> {
@@ -187,6 +301,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getBot(arg0: bigint): Promise<Bot | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getBot(arg0);
+                return from_candid_opt_n6(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getBot(arg0);
+            return from_candid_opt_n6(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async getFantasyMapping(arg0: string): Promise<string> {
         if (this.processError) {
             try {
@@ -201,18 +329,46 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async getMemoriesForBot(arg0: bigint): Promise<Array<Memory>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getMemoriesForBot(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getMemoriesForBot(arg0);
+            return result;
+        }
+    }
     async getProject(arg0: bigint): Promise<string | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getProject(arg0);
-                return from_candid_opt_n1(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n5(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getProject(arg0);
-            return from_candid_opt_n1(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n5(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getRelevantMemories(arg0: bigint, arg1: string, arg2: bigint): Promise<Array<Memory>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getRelevantMemories(arg0, arg1, arg2);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getRelevantMemories(arg0, arg1, arg2);
+            return result;
         }
     }
     async listProjects(): Promise<Array<[bigint, string, bigint]>> {
@@ -244,8 +400,41 @@ export class Backend implements backendInterface {
         }
     }
 }
-function from_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
+function from_candid_Bot_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Bot): Bot {
+    return from_candid_record_n4(_uploadFile, _downloadFile, value);
+}
+function from_candid_opt_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
     return value.length === 0 ? null : value[0];
+}
+function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_Bot]): Bot | null {
+    return value.length === 0 ? null : from_candid_Bot_n3(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_record_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    id: bigint;
+    personality: string;
+    name: string;
+    linkedWiki: [] | [string];
+    avatar: string;
+}): {
+    id: bigint;
+    personality: string;
+    name: string;
+    linkedWiki?: string;
+    avatar: string;
+} {
+    return {
+        id: value.id,
+        personality: value.personality,
+        name: value.name,
+        linkedWiki: record_opt_to_undefined(from_candid_opt_n5(_uploadFile, _downloadFile, value.linkedWiki)),
+        avatar: value.avatar
+    };
+}
+function from_candid_vec_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Bot>): Array<Bot> {
+    return value.map((x)=>from_candid_Bot_n3(_uploadFile, _downloadFile, x));
+}
+function to_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: string | null): [] | [string] {
+    return value === null ? candid_none() : candid_some(value);
 }
 export interface CreateActorOptions {
     agent?: Agent;

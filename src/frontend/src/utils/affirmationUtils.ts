@@ -215,6 +215,53 @@ function buildAffirmation(
   return `${starter} ${T} and ${myStarter} knows it — ${enhancer}.`;
 }
 
+export interface AdvancedFunctions {
+  // Deity / Entity Invocation
+  deityEnabled?: boolean;
+  deityName?: string;
+  deityPantheon?: string;
+
+  // Spell Weaving
+  spellEnabled?: boolean;
+  spellArchetype?: string; // e.g. "Attraction", "Transmutation", "Amplification", "Binding", "Banishing", "Illumination", "Abundance", "Protection Ward"
+  spellCustom?: string;
+
+  // Soul Contract
+  soulContractEnabled?: boolean;
+  soulContractEntity?: string; // "Universe", "Higher Self", or a named entity
+
+  // Shadow Work Integration
+  shadowWorkEnabled?: boolean;
+  shadowWorkBlock?: string; // optional: specific block/resistance to address
+
+  // Reality Scripting
+  realityScriptEnabled?: boolean;
+  realityScriptTimeAgo?: string; // e.g. "months ago", "years ago"
+
+  // Frequency Attunement
+  frequencyAttunementEnabled?: boolean;
+  frequencyAttunementHz?: string; // e.g. "528"
+
+  // Sigil Activation
+  sigilActivationEnabled?: boolean;
+  sigilName?: string;
+}
+
+const FREQUENCY_MEANINGS: Record<string, string> = {
+  "40": "deep focus and gamma synchronization",
+  "174": "foundation healing and pain relief",
+  "285": "cellular tissue healing and regeneration",
+  "396": "liberation from guilt and fear",
+  "417": "transformation and breaking free from old patterns",
+  "432": "natural earth resonance and heart harmony",
+  "528": "DNA repair and miraculous transformation",
+  "639": "connection, love, and harmonious relationships",
+  "741": "spiritual awakening and expanded consciousness",
+  "852": "deep intuition and third eye activation",
+  "963": "crown chakra activation and divine connection",
+  "1111": "angelic alignment and manifestation gateway",
+};
+
 export function generateAffirmations(
   topic: string,
   boosterEnabled: boolean,
@@ -236,6 +283,7 @@ export function generateAffirmations(
   itemTimeFrame?: string,
   symbioticLocation?: string,
   symbioticTimeFrame?: string,
+  advanced: AdvancedFunctions = {},
 ): string[] {
   const intent = extractIntent(topic);
   const T = intent;
@@ -528,6 +576,183 @@ export function generateAffirmations(
       `My ${chakraName} chakra is open, radiant, and perfectly aligned with ${T} — right now.`,
       `I align my energy with the pure frequency of the ${chakraName} chakra — it deepens my ${T} at a cellular level.`,
       `The ${chakraName} center within me is fully awakened and tuned to ${T} — it is done.`,
+    );
+  }
+
+  // ── Advanced Functions ────────────────────────────────────────────────────
+
+  // 1. Deity / Entity Invocation
+  if (advanced.deityEnabled && advanced.deityName?.trim()) {
+    const D = advanced.deityName.trim();
+    const pan = advanced.deityPantheon?.trim()
+      ? ` of ${advanced.deityPantheon.trim()}`
+      : "";
+    result.push(
+      `I invoke ${D}${pan} — their power flows through my ${T} now, amplifying it at every level.`,
+      `${D} stands beside me as I embody ${T} — their divine presence seals this into reality.`,
+      `I am blessed and empowered by ${D}${pan} in my pursuit of ${T} — this is real and it is done.`,
+      `The energy of ${D} merges with mine — together we anchor ${T} into my physical reality permanently.`,
+      `${D}'s blessing is woven into every affirmation — my ${T} is divinely charged and unstoppable.`,
+      `I am aligned with ${D} and they co-create my reality of ${T} alongside me — it is inevitable.`,
+      `${D} has heard my call — their power activates my ${T} at a subconscious and cellular level.`,
+      `I draw on the ancient power of ${D}${pan} — it accelerates my ${T} beyond all limitation.`,
+    );
+  }
+
+  // 2. Spell Weaving
+  if (advanced.spellEnabled) {
+    const archetype = (
+      advanced.spellCustom?.trim() ||
+      advanced.spellArchetype?.trim() ||
+      "Attraction"
+    ).toLowerCase();
+    const spellMap: Record<string, string[]> = {
+      attraction: [
+        `I cast a living attraction spell on my ${T} — it draws toward me with magnetic force, right now.`,
+        `Every cell of my being radiates an attraction field for ${T} — it has no choice but to arrive.`,
+        `The spell is cast — ${T} is magnetized to me at every level, in every moment.`,
+        `I am the magnet and ${T} is the iron — the attraction is law, it is done.`,
+        `My attraction spell for ${T} grows stronger every single day — effortlessly.`,
+      ],
+      transmutation: [
+        `I transmute every obstacle into fuel for my ${T} — the alchemy is done and it is real.`,
+        `My ${T} is transmuted at a cellular level — the old pattern is dissolved and the new is sealed.`,
+        `The transmutation spell is active — everything that was not ${T} has been transformed into it.`,
+        `I am the alchemist of my reality — I have transmuted my being into pure ${T}.`,
+        `Every shadow around ${T} is now fuel — transmuted, refined, and returned to me as power.`,
+      ],
+      amplification: [
+        `I amplify my ${T} with every breath — it multiplies exponentially in every direction.`,
+        `The amplification spell is cast — my ${T} is magnified beyond all previous limits, right now.`,
+        `My ${T} is amplified at a subconscious level and the effect compounds every moment.`,
+        `Every thought I have about ${T} amplifies it further — the spell grows with my attention.`,
+        `I am running an active amplification spell on ${T} — the results are inevitable and accelerating.`,
+      ],
+      binding: [
+        `I bind ${T} permanently into my reality — it is sealed, anchored, and cannot leave.`,
+        `The binding is complete — ${T} is woven into the fabric of my existence at a cellular level.`,
+        `${cap(T)} is bound to me eternally — this agreement is sealed and cannot be undone.`,
+        `I have cast a binding on my ${T} and my higher self has confirmed — it is done.`,
+        `The binding spell is active — ${T} and I are permanently linked, inseparable, and real.`,
+      ],
+      banishing: [
+        `I banish every block, doubt, and resistance to my ${T} — they are gone, now, permanently.`,
+        `The banishing is complete — everything opposing my ${T} has been cleared at a root level.`,
+        `I cast a banishing on all limitations around ${T} — they dissolve and do not return.`,
+        `Every obstacle to my ${T} is banished — the path is clear, the way is open, it is done.`,
+        `My banishing spell has removed every energetic barrier to ${T} — the field is clear.`,
+      ],
+      illumination: [
+        `The illumination spell brings full clarity to my ${T} — I see the path and I walk it now.`,
+        `I illuminate every hidden truth about my ${T} — understanding flows through me at a cellular level.`,
+        `My ${T} is bathed in pure illumination — all confusion is dissolved and clarity is permanent.`,
+        `I cast illumination on ${T} and the truth is revealed — I know exactly who I am becoming.`,
+        `Light pours into my ${T} — every shadow is revealed and transformed into wisdom, right now.`,
+      ],
+      abundance: [
+        `I cast an abundance spell on my ${T} — it multiplies and overflows in every direction.`,
+        `The abundance spell is active — my ${T} is unlimited, expanding, and arriving continuously.`,
+        `I live in an abundance of ${T} — it flows to me naturally, effortlessly, every single day.`,
+        `The abundance spell seeds my reality — ${T} grows without effort and compounds without limit.`,
+        `My ${T} is abundant beyond measure — the spell is cast and the harvest is already here.`,
+      ],
+      "protection ward": [
+        `I place a protection ward around my ${T} — nothing can diminish or take it from me.`,
+        `The protection ward is active — my ${T} is shielded, sealed, and immune to all interference.`,
+        `I have warded my ${T} with the strongest protection — it is safe, stable, and permanent.`,
+        `No force can unravel my ${T} — the ward is set, the energy is locked, it is done.`,
+        `My protection ward guards my ${T} at every level — spiritually, energetically, and physically.`,
+      ],
+    };
+    const spellLines = spellMap[archetype] ?? spellMap.attraction;
+    // Also add lines for any custom spell type not in the map
+    if (!spellMap[archetype]) {
+      result.push(
+        `I cast a ${archetype} spell on my ${T} — it is active, charged, and working now.`,
+        `The ${archetype} spell is woven through my ${T} — every affirmation carries this intent.`,
+        `I direct ${archetype} energy toward my ${T} and it responds — the spell is done.`,
+        `My ${archetype} magic amplifies my ${T} — the energy is real and the result is inevitable.`,
+      );
+    } else {
+      result.push(...spellLines);
+    }
+  }
+
+  // 3. Soul Contract
+  if (advanced.soulContractEnabled) {
+    const entity = advanced.soulContractEntity?.trim() || "the Universe";
+    result.push(
+      `I have a soul contract with ${entity} for my ${T} — this agreement is ancient, sealed, and unbreakable.`,
+      `My soul agreed to ${T} before this lifetime — the contract is in effect and reality honors it now.`,
+      `${entity} and I have sealed a sacred agreement — my ${T} is written into the fabric of my soul.`,
+      `This soul contract is active — ${T} is mine by divine agreement and nothing can override it.`,
+      `I invoke my soul contract with ${entity} — ${T} is delivered to me in full, on time, as agreed.`,
+      `The sacred agreement between me and ${entity} for ${T} is already fulfilled — I claim it now.`,
+      `My higher self signed this contract — ${T} is guaranteed and the universe is delivering.`,
+      `The soul contract is done — ${T} is part of my eternal blueprint and it is already real.`,
+    );
+  }
+
+  // 4. Shadow Work Integration
+  if (advanced.shadowWorkEnabled) {
+    const block = advanced.shadowWorkBlock?.trim() || `blocks around ${T}`;
+    result.push(
+      `I lovingly release the shadow that has been keeping me from ${T} — it is dissolved now.`,
+      `Every fear, every doubt, every wound around ${T} is seen, held, and released — I am free.`,
+      `I integrate my ${block} — I welcome the shadow, transform it, and reclaim my power.`,
+      `The part of me that feared ${T} is now my greatest ally — I have done the work, it is done.`,
+      `I release the old story that said I couldn't have ${T} — that narrative is over, at a root level.`,
+      `I have met my shadow around ${T} and I have chosen myself — from now on, I choose ${T}.`,
+      `Every ${block} is dissolved at a cellular level — I step forward into ${T} whole and unafraid.`,
+      `The shadow integration is complete — what blocked ${T} now fuels it — it is inevitable.`,
+      `I choose ${T} not in spite of my shadows, but because I have faced them — I am ready.`,
+    );
+  }
+
+  // 5. Reality Scripting
+  if (advanced.realityScriptEnabled) {
+    const ago = advanced.realityScriptTimeAgo?.trim() || "months ago";
+    result.push(
+      `My life already changed ${ago} — ${T} has been my reality for a long time now.`,
+      `I remember when ${T} wasn't yet mine — that feels so distant now, because ${T} is simply my life.`,
+      `I look back on who I was before ${T} with gratitude — the transformation happened and it is permanent.`,
+      `${ago}, something shifted — ${T} arrived and has never left. It is the baseline of my existence.`,
+      `My life is written in the new script — ${T} is the chapter I'm living now, fully and completely.`,
+      `The version of me living with ${T} is the only real version — everything else was temporary.`,
+      `I already live in the reality where ${T} is mine — I wake up in it every single day.`,
+      `The script is already written — I am living the story where ${T} has always been mine.`,
+    );
+  }
+
+  // 6. Frequency Attunement
+  if (
+    advanced.frequencyAttunementEnabled &&
+    advanced.frequencyAttunementHz?.trim()
+  ) {
+    const hz = advanced.frequencyAttunementHz.trim();
+    const meaning =
+      FREQUENCY_MEANINGS[hz] ?? "elevated resonance and alignment";
+    result.push(
+      `I am attuned to ${hz}Hz — the frequency of ${meaning} — it programs my ${T} at a cellular level.`,
+      `${hz}Hz runs through every cell of my being — my ${T} is permanently encoded at this frequency.`,
+      `I resonate at ${hz}Hz — the exact frequency that activates my ${T} at a subconscious level.`,
+      `My ${T} is vibrating at ${hz}Hz — aligned with ${meaning} — right now and from now on.`,
+      `The ${hz}Hz frequency is active in my body and mind — it accelerates and deepens my ${T}.`,
+      `Every affirmation I receive is delivered on the ${hz}Hz carrier wave — it is absorbed completely.`,
+    );
+  }
+
+  // 7. Sigil Activation
+  if (advanced.sigilActivationEnabled && advanced.sigilName?.trim()) {
+    const SIG = advanced.sigilName.trim();
+    result.push(
+      `The sigil of ${SIG} is active and charged — it is working on my ${T} right now at every level.`,
+      `I have activated the ${SIG} sigil and directed its energy toward my ${T} — the intention is sealed.`,
+      `The ${SIG} sigil is alive in my field — it anchors my ${T} into reality, effortlessly and completely.`,
+      `Every time I see or think of the ${SIG} sigil, my ${T} is reinforced — it is done.`,
+      `The ${SIG} sigil has been charged with my full intention for ${T} — it works continuously on my behalf.`,
+      `I activate the ${SIG} sigil — it bridges the energetic and physical, bringing my ${T} into form.`,
+      `The ${SIG} sigil is a permanent anchor for my ${T} — sealed, active, and delivering results now.`,
     );
   }
 

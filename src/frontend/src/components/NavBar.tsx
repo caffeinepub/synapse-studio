@@ -1,12 +1,15 @@
 import {
   Archive,
   BookOpen,
+  Bot,
   Brain,
+  BrainCircuit,
   Film,
   Ghost,
   Globe,
   Heart,
   Menu,
+  MessageCircle,
   Moon,
   Search,
   Settings,
@@ -21,9 +24,12 @@ import { useState } from "react";
 
 type Page =
   | "generator"
+  | "synapses"
   | "energy"
   | "kinesis"
   | "wiki"
+  | "chatbots"
+  | "trainable"
   | "religions"
   | "entities"
   | "spells"
@@ -47,6 +53,12 @@ const navItems = [
     description: "Subliminal Generator",
   },
   {
+    id: "synapses" as Page,
+    label: "Synapses AI",
+    icon: Bot,
+    description: "Your AI Subliminal Guide",
+  },
+  {
     id: "energy" as Page,
     label: "Energy Library",
     icon: BookOpen,
@@ -63,6 +75,18 @@ const navItems = [
     label: "Wiki Search",
     icon: Search,
     description: "Fandom Character & Powers Search",
+  },
+  {
+    id: "chatbots" as Page,
+    label: "Chat Bots",
+    icon: MessageCircle,
+    description: "AI Chatbots & Custom Bots",
+  },
+  {
+    id: "trainable" as Page,
+    label: "Learning Bots",
+    icon: BrainCircuit,
+    description: "AI Bots That Learn & Remember",
   },
   {
     id: "religions" as Page,

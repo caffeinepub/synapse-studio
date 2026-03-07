@@ -10,7 +10,24 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface Bot {
+  'id' : bigint,
+  'personality' : string,
+  'name' : string,
+  'linkedWiki' : [] | [string],
+  'avatar' : string,
+}
+export interface Memory {
+  'id' : bigint,
+  'topic' : string,
+  'content' : string,
+  'sentiment' : bigint,
+  'timestamp' : bigint,
+  'botId' : bigint,
+  'memoryType' : string,
+}
 export interface _SERVICE {
+  'addMemory' : ActorMethod<[bigint, string, string, string, bigint], bigint>,
   'buildProjectJSON' : ActorMethod<
     [
       string,
@@ -39,16 +56,24 @@ export interface _SERVICE {
     ],
     string
   >,
+  'clearMemoriesForBot' : ActorMethod<[bigint], { 'removedCount' : bigint }>,
+  'createBot' : ActorMethod<[string, string, string, [] | [string]], bigint>,
+  'deleteBot' : ActorMethod<[bigint], boolean>,
+  'deleteMemory' : ActorMethod<[bigint], boolean>,
   'deleteProject' : ActorMethod<[bigint], boolean>,
   'generateAffirmations' : ActorMethod<
     [string, boolean, boolean, boolean, string],
     Array<string>
   >,
+  'getAllBots' : ActorMethod<[], Array<Bot>>,
   'getAllChakras' : ActorMethod<[], string>,
   'getAllKinesisEntries' : ActorMethod<[], string>,
   'getBeliefSystems' : ActorMethod<[], string>,
+  'getBot' : ActorMethod<[bigint], [] | [Bot]>,
   'getFantasyMapping' : ActorMethod<[string], string>,
+  'getMemoriesForBot' : ActorMethod<[bigint], Array<Memory>>,
   'getProject' : ActorMethod<[bigint], [] | [string]>,
+  'getRelevantMemories' : ActorMethod<[bigint, string, bigint], Array<Memory>>,
   'listProjects' : ActorMethod<[], Array<[bigint, string, bigint]>>,
   'saveProject' : ActorMethod<[string, string], bigint>,
 }

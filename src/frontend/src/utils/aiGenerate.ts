@@ -1,4 +1,4 @@
-import type { BoosterLevel } from "./affirmationUtils";
+import type { AdvancedFunctions, BoosterLevel } from "./affirmationUtils";
 
 export interface AISettings {
   provider: "groq" | "gemini" | "none";
@@ -39,6 +39,7 @@ export async function generateAffirmationsWithAI(
   itemTimeFrame?: string,
   symbioticLocation?: string,
   symbioticTimeFrame?: string,
+  advanced: AdvancedFunctions = {},
 ): Promise<string[] | null> {
   const settings = getAISettings();
   if (!settings) return null;
@@ -142,6 +143,65 @@ export async function generateAffirmationsWithAI(
     const chakraList = chakraName.includes(", ") ? chakraName : chakraName;
     modeLines.push(
       `CHAKRA ALIGNMENT MODE is active: Include 2–3 affirmations per chakra for these chakras: ${chakraList}. Reference each chakra by name and tie it directly to the topic using enhancer vocabulary (e.g. "at a cellular level", "right now", "it is done").`,
+    );
+  }
+
+  // ── Advanced Functions ──────────────────────────────────────────────────
+  if (advanced.deityEnabled && advanced.deityName?.trim()) {
+    const D = advanced.deityName.trim();
+    const pan = advanced.deityPantheon?.trim()
+      ? ` of ${advanced.deityPantheon.trim()}`
+      : "";
+    modeLines.push(
+      `DEITY/ENTITY INVOCATION is active: Generate 6–8 affirmations that invoke the deity or entity "${D}"${pan} as a co-creator and empowering presence for the listener's ${topic}. Use language like "I invoke ${D} — their power flows through my [topic] now", "${D} stands beside me as I embody [topic]", "I am blessed by ${D} in my pursuit of [topic]", "${D}'s energy merges with mine and anchors [topic] into reality". The presence should feel real, powerful, and divinely confirming the listener's subliminal intention.`,
+    );
+  }
+
+  if (advanced.spellEnabled) {
+    const archetype =
+      advanced.spellCustom?.trim() ||
+      advanced.spellArchetype?.trim() ||
+      "Attraction";
+    modeLines.push(
+      `SPELL WEAVING is active: Generate 5 affirmations that weave the energetic operation of a "${archetype}" spell directly into the listener's ${topic}. The spell should feel like a real energetic working — not metaphorical. Use present-tense language that declares the spell is cast, active, and producing results. For example: "I cast a living ${archetype} spell on my [topic] — it is active and working right now", "The ${archetype} spell is woven through my [topic] — every affirmation carries this intent". These should feel like genuine magical declarations.`,
+    );
+  }
+
+  if (advanced.soulContractEnabled) {
+    const entity = advanced.soulContractEntity?.trim() || "the Universe";
+    modeLines.push(
+      `SOUL CONTRACT is active: Generate 6–8 affirmations framed as sacred agreements between the listener and ${entity}. The soul contract declares the listener's ${topic} as a divine, pre-agreed reality that cannot be undone. Use language like "I have a soul contract with ${entity} for [topic] — this agreement is ancient and sealed", "My soul agreed to [topic] before this lifetime — the contract is in effect now", "${entity} and I have sealed this — [topic] is written into my soul's blueprint". These should feel like the most binding declaration possible.`,
+    );
+  }
+
+  if (advanced.shadowWorkEnabled) {
+    const block = advanced.shadowWorkBlock?.trim() || `blocks around ${topic}`;
+    modeLines.push(
+      `SHADOW WORK INTEGRATION is active: Generate 6–9 affirmations that first name/release the shadow resistance around the listener's ${topic} (the ${block}), then transition into claiming the topic with full power. The arc should go: see the shadow → release it with love → reclaim power → step fully into [topic]. Use language like "I lovingly release the shadow keeping me from [topic]", "Every fear around [topic] is seen, held, and dissolved", "I have integrated the [block] and I now step fully into [topic]", "The shadow work is complete — [topic] is mine". These are both healing and empowering.`,
+    );
+  }
+
+  if (advanced.realityScriptEnabled) {
+    const ago = advanced.realityScriptTimeAgo?.trim() || "months ago";
+    modeLines.push(
+      `REALITY SCRIPTING is active: Generate 6–8 affirmations written in "already happened" past-tense / story-style that describe the listener's ${topic} as something that already changed their life ${ago}. These should read like entries from a future diary or memory. Use language like "My life already changed ${ago} — [topic] has been my reality ever since", "I remember when [topic] wasn't yet mine — that feels so distant now", "${ago} something shifted and [topic] arrived and never left", "I look back with gratitude on who I was before [topic]". These complement the present-tense affirmations by making the reality feel already-lived-in.`,
+    );
+  }
+
+  if (
+    advanced.frequencyAttunementEnabled &&
+    advanced.frequencyAttunementHz?.trim()
+  ) {
+    const hz = advanced.frequencyAttunementHz.trim();
+    modeLines.push(
+      `FREQUENCY ATTUNEMENT is active: Generate 5–6 affirmations that specifically tie the ${hz}Hz frequency to the listener's ${topic}. Reference the Hz value directly and describe it as actively programming or encoding the topic into the listener's body, mind, and subconscious. Use language like "I am attuned to ${hz}Hz — it programs my [topic] at a cellular level", "${hz}Hz runs through every cell — my [topic] is encoded at this frequency", "I resonate at ${hz}Hz and it activates my [topic] right now". These should feel like the frequency is a real carrier wave for the subliminal intention.`,
+    );
+  }
+
+  if (advanced.sigilActivationEnabled && advanced.sigilName?.trim()) {
+    const SIG = advanced.sigilName.trim();
+    modeLines.push(
+      `SIGIL ACTIVATION is active: Generate 5–7 affirmations that declare the sigil "${SIG}" is fully charged and actively working on the listener's ${topic}. The sigil should be treated as a living energetic tool that bridges intention and reality. Use language like "The sigil of ${SIG} is active and charged — it is working on my [topic] right now", "I activate the ${SIG} sigil and direct its energy toward [topic] — the intention is sealed", "The ${SIG} sigil anchors [topic] into reality effortlessly", "Every time I focus on the ${SIG} sigil, [topic] is reinforced — it is done". These should feel like a declaration of an active magical tool.`,
     );
   }
 

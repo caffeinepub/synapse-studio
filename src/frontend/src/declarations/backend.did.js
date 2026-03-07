@@ -8,7 +8,29 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const Bot = IDL.Record({
+  'id' : IDL.Nat,
+  'personality' : IDL.Text,
+  'name' : IDL.Text,
+  'linkedWiki' : IDL.Opt(IDL.Text),
+  'avatar' : IDL.Text,
+});
+export const Memory = IDL.Record({
+  'id' : IDL.Nat,
+  'topic' : IDL.Text,
+  'content' : IDL.Text,
+  'sentiment' : IDL.Int,
+  'timestamp' : IDL.Int,
+  'botId' : IDL.Nat,
+  'memoryType' : IDL.Text,
+});
+
 export const idlService = IDL.Service({
+  'addMemory' : IDL.Func(
+      [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Int],
+      [IDL.Nat],
+      [],
+    ),
   'buildProjectJSON' : IDL.Func(
       [
         IDL.Text,
@@ -38,17 +60,37 @@ export const idlService = IDL.Service({
       [IDL.Text],
       ['query'],
     ),
+  'clearMemoriesForBot' : IDL.Func(
+      [IDL.Nat],
+      [IDL.Record({ 'removedCount' : IDL.Nat })],
+      [],
+    ),
+  'createBot' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(IDL.Text)],
+      [IDL.Nat],
+      [],
+    ),
+  'deleteBot' : IDL.Func([IDL.Nat], [IDL.Bool], []),
+  'deleteMemory' : IDL.Func([IDL.Nat], [IDL.Bool], []),
   'deleteProject' : IDL.Func([IDL.Nat], [IDL.Bool], []),
   'generateAffirmations' : IDL.Func(
       [IDL.Text, IDL.Bool, IDL.Bool, IDL.Bool, IDL.Text],
       [IDL.Vec(IDL.Text)],
       ['query'],
     ),
+  'getAllBots' : IDL.Func([], [IDL.Vec(Bot)], ['query']),
   'getAllChakras' : IDL.Func([], [IDL.Text], ['query']),
   'getAllKinesisEntries' : IDL.Func([], [IDL.Text], ['query']),
   'getBeliefSystems' : IDL.Func([], [IDL.Text], ['query']),
+  'getBot' : IDL.Func([IDL.Nat], [IDL.Opt(Bot)], ['query']),
   'getFantasyMapping' : IDL.Func([IDL.Text], [IDL.Text], ['query']),
+  'getMemoriesForBot' : IDL.Func([IDL.Nat], [IDL.Vec(Memory)], ['query']),
   'getProject' : IDL.Func([IDL.Nat], [IDL.Opt(IDL.Text)], ['query']),
+  'getRelevantMemories' : IDL.Func(
+      [IDL.Nat, IDL.Text, IDL.Nat],
+      [IDL.Vec(Memory)],
+      ['query'],
+    ),
   'listProjects' : IDL.Func(
       [],
       [IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Text, IDL.Int))],
@@ -60,7 +102,29 @@ export const idlService = IDL.Service({
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const Bot = IDL.Record({
+    'id' : IDL.Nat,
+    'personality' : IDL.Text,
+    'name' : IDL.Text,
+    'linkedWiki' : IDL.Opt(IDL.Text),
+    'avatar' : IDL.Text,
+  });
+  const Memory = IDL.Record({
+    'id' : IDL.Nat,
+    'topic' : IDL.Text,
+    'content' : IDL.Text,
+    'sentiment' : IDL.Int,
+    'timestamp' : IDL.Int,
+    'botId' : IDL.Nat,
+    'memoryType' : IDL.Text,
+  });
+  
   return IDL.Service({
+    'addMemory' : IDL.Func(
+        [IDL.Nat, IDL.Text, IDL.Text, IDL.Text, IDL.Int],
+        [IDL.Nat],
+        [],
+      ),
     'buildProjectJSON' : IDL.Func(
         [
           IDL.Text,
@@ -90,17 +154,37 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Text],
         ['query'],
       ),
+    'clearMemoriesForBot' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Record({ 'removedCount' : IDL.Nat })],
+        [],
+      ),
+    'createBot' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Opt(IDL.Text)],
+        [IDL.Nat],
+        [],
+      ),
+    'deleteBot' : IDL.Func([IDL.Nat], [IDL.Bool], []),
+    'deleteMemory' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'deleteProject' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'generateAffirmations' : IDL.Func(
         [IDL.Text, IDL.Bool, IDL.Bool, IDL.Bool, IDL.Text],
         [IDL.Vec(IDL.Text)],
         ['query'],
       ),
+    'getAllBots' : IDL.Func([], [IDL.Vec(Bot)], ['query']),
     'getAllChakras' : IDL.Func([], [IDL.Text], ['query']),
     'getAllKinesisEntries' : IDL.Func([], [IDL.Text], ['query']),
     'getBeliefSystems' : IDL.Func([], [IDL.Text], ['query']),
+    'getBot' : IDL.Func([IDL.Nat], [IDL.Opt(Bot)], ['query']),
     'getFantasyMapping' : IDL.Func([IDL.Text], [IDL.Text], ['query']),
+    'getMemoriesForBot' : IDL.Func([IDL.Nat], [IDL.Vec(Memory)], ['query']),
     'getProject' : IDL.Func([IDL.Nat], [IDL.Opt(IDL.Text)], ['query']),
+    'getRelevantMemories' : IDL.Func(
+        [IDL.Nat, IDL.Text, IDL.Nat],
+        [IDL.Vec(Memory)],
+        ['query'],
+      ),
     'listProjects' : IDL.Func(
         [],
         [IDL.Vec(IDL.Tuple(IDL.Nat, IDL.Text, IDL.Int))],

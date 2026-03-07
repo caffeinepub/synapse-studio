@@ -5,8 +5,12 @@ import Time "mo:core/Time";
 import Order "mo:core/Order";
 import Text "mo:core/Text";
 import Array "mo:core/Array";
+import Int "mo:core/Int";
+import Float "mo:core/Float";
 import Runtime "mo:core/Runtime";
 import Iter "mo:core/Iter";
+ // separate migration module
+
 
 actor {
   type Project = {
@@ -25,6 +29,30 @@ actor {
   var nextProjectId = 1; // Initialize nextProjectId to 1
 
   let projects = Map.empty<Nat, Project>();
+
+  type Bot = {
+    id : Nat;
+    name : Text;
+    avatar : Text;
+    personality : Text;
+    linkedWiki : ?Text;
+  };
+
+  type Memory = {
+    id : Nat;
+    botId : Nat;
+    memoryType : Text; // "conversation", "training", "wiki", "feedback"
+    content : Text;
+    topic : Text;
+    timestamp : Int;
+    sentiment : Int; // 1 = positive, 0 = neutral, -1 = negative
+  };
+
+  let bots = Map.empty<Nat, Bot>();
+  let memories = Map.empty<Nat, Memory>();
+
+  var nextBotId = 1;
+  var nextMemoryId = 1;
 
   func validateChakra(chakraName : Text) {
     let validChakras = [
@@ -204,5 +232,177 @@ actor {
 
   public query ({ caller }) func getBeliefSystems() : async Text {
     "[{\"name\": \"Manifestation\", \"summary\": \"Creating reality through intention.\"}]";
+  };
+
+  // Bot Management
+  public shared ({ caller }) func createBot(name : Text, avatar : Text, personality : Text, linkedWiki : ?Text) : async Nat {
+    let bot : Bot = {
+      id = nextBotId;
+      name;
+      avatar;
+      personality;
+      linkedWiki;
+    };
+    bots.add(bot.id, bot);
+    nextBotId += 1;
+    bot.id;
+  };
+
+  public query ({ caller }) func getBot(id : Nat) : async ?Bot {
+    bots.get(id);
+  };
+
+  public query ({ caller }) func getAllBots() : async [Bot] {
+    bots.values().toArray();
+  };
+
+  public shared ({ caller }) func deleteBot(id : Nat) : async Bool {
+    switch (bots.get(id)) {
+      case (null) { false };
+      case (?_) {
+        // Remove memories associated with this bot
+        let memoryIdsToRemove = List.empty<Nat>();
+        for (memory in memories.values()) {
+          if (memory.botId == id) {
+            memoryIdsToRemove.add(memory.id);
+          };
+        };
+        for (memoryId in memoryIdsToRemove.values()) {
+          memories.remove(memoryId);
+        };
+        bots.remove(id);
+        true;
+      };
+    };
+  };
+
+  // Memory Management
+  public shared ({ caller }) func addMemory(botId : Nat, memoryType : Text, content : Text, topic : Text, sentiment : Int) : async Nat {
+    switch (bots.get(botId)) {
+      case (null) { Runtime.trap("Bot not found") };
+      case (?_) {
+        let memory : Memory = {
+          id = nextMemoryId;
+          botId;
+          memoryType;
+          content;
+          topic;
+          timestamp = Time.now();
+          sentiment;
+        };
+        memories.add(memory.id, memory);
+        nextMemoryId += 1;
+        memory.id;
+      };
+    };
+  };
+
+  public query ({ caller }) func getMemoriesForBot(botId : Nat) : async [Memory] {
+    memories.values().toArray().filter(
+      func(memory) {
+        memory.botId == botId;
+      }
+    );
+  };
+
+  public shared ({ caller }) func deleteMemory(id : Nat) : async Bool {
+    switch (memories.get(id)) {
+      case (null) { false };
+      case (?_) {
+        memories.remove(id);
+        true;
+      };
+    };
+  };
+
+  public shared ({ caller }) func clearMemoriesForBot(botId : Nat) : async {
+    removedCount : Nat;
+  } {
+    var removedCount = 0;
+    let memoryIdsToRemove = List.empty<Nat>();
+    for (memory in memories.values()) {
+      if (memory.botId == botId) {
+        memoryIdsToRemove.add(memory.id);
+      };
+    };
+    for (memoryId in memoryIdsToRemove.values()) {
+      memories.remove(memoryId);
+      removedCount += 1;
+    };
+    { removedCount };
+  };
+
+  type MemoryWithScore = {
+    memory : Memory;
+    score : Float;
+  };
+
+  func calculateRelevanceScore(memory : Memory, topic : Text) : Float {
+    var score : Float = 0.0;
+
+    let topicLower = topic.toLower();
+    let contentLower = memory.content.toLower();
+    let memoryTopicLower = memory.topic.toLower();
+
+    func containsKeyword(text : Text, keyword : Text) : Bool {
+      text.contains(#text keyword);
+    };
+
+    if (containsKeyword(contentLower, topicLower)) {
+      score += 1.0;
+    };
+    if (containsKeyword(memoryTopicLower, topicLower)) {
+      score += 1.0;
+    };
+
+    switch (memory.sentiment) {
+      case (1) { score += 0.2 };
+      case (0) { score += 0.1 };
+      case (-1) { score -= 0.1 };
+      case (_) {};
+    };
+
+    let currentTime = Time.now();
+    let timeDiff = Int.abs(currentTime - memory.timestamp);
+    if (timeDiff < 1_000_000_000 * 60 * 60 * 24 * 7) { // 1 week in nanoseconds
+      score += 0.2;
+    } else if (timeDiff < 1_000_000_000 * 60 * 60 * 24 * 30) { // 1 month
+      score += 0.1;
+    };
+
+    score;
+  };
+
+  public query ({ caller }) func getRelevantMemories(botId : Nat, topic : Text, topN : Nat) : async [Memory] {
+    let botMemories = memories.values().toArray().filter(
+      func(memory) {
+        memory.botId == botId;
+      }
+    );
+
+    let memoriesWithScores = List.empty<MemoryWithScore>();
+    for (memory in botMemories.values()) {
+      let score = calculateRelevanceScore(memory, topic);
+      memoriesWithScores.add({ memory; score });
+    };
+
+    let sortedMemories = memoriesWithScores.toArray().sort(
+      func(a, b) { Float.compare(b.score, a.score) }
+    );
+
+    let sortedByScore = List.fromArray<MemoryWithScore>(sortedMemories);
+
+    let resultMemories = sortedByScore.toArray().map(
+      func(mws) { mws.memory }
+    );
+
+    resultMemories.sliceToArray(0, Nat.min(topN, resultMemories.size()));
+  };
+
+  func sliceToArray<T>(array : [T], start : Nat, end : Nat) : [T] {
+    let length = array.size();
+    let s = Nat.min(start, length);
+    let e = Nat.min(Nat.max(end, s), length);
+    array.sliceToArray(s, Nat.min(e, length));
   };
 };
