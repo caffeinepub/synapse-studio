@@ -39,12 +39,14 @@ import {
   Film,
   Flame,
   FolderOpen,
+  Layers,
   Leaf,
   Loader2,
   MapPin,
   Music,
   Package,
   Play,
+  Plus,
   Save,
   Shield,
   Square,
@@ -53,11 +55,13 @@ import {
   Trash2,
   TrendingUp,
   User,
+  Users,
   Video,
   Volume2,
   VolumeX,
   Wand2,
   Wind,
+  X,
   Zap,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -70,7 +74,7 @@ import {
   useListProjects,
   useSaveProject,
 } from "../hooks/useQueries";
-import type { BoosterLevel } from "../utils/affirmationUtils";
+import type { BoosterLevel, PersonalTarget } from "../utils/affirmationUtils";
 import { generateAffirmationsWithAI } from "../utils/aiGenerate";
 import {
   connectFrequencyToneToCtx,
@@ -1326,6 +1330,17 @@ export default function GeneratorPage({
   // Wealth presets panel
   const [wealthPresetsOpen, setWealthPresetsOpen] = useState(false);
 
+  // ── Personal Subliminal ───────────────────────────────────────────────────
+  const [personalEnabled, setPersonalEnabled] = useState(false);
+  const [personalTargets, setPersonalTargets] = useState<PersonalTarget[]>([
+    { id: crypto.randomUUID(), name: "", relationship: "" },
+  ]);
+
+  // ── Multi-Subliminal Stack ────────────────────────────────────────────────
+  const [stackEnabled, setStackEnabled] = useState(false);
+  const [stackedTopics, setStackedTopics] = useState<string[]>([]);
+  const [stackInputValue, setStackInputValue] = useState("");
+
   // ── Advanced Functions panel ──────────────────────────────────────────────
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
@@ -1673,9 +1688,25 @@ export default function GeneratorPage({
       sigilName,
     };
 
+    // Effective topic for AI: join all stacked topics
+    const effectiveTopic =
+      stackEnabled && stackedTopics.length > 0
+        ? [topic, ...stackedTopics].join(", ")
+        : topic;
+
+    // Active personal targets (non-empty names only)
+    const activePersonalTargets =
+      personalEnabled && personalTargets.filter((p) => p.name.trim()).length > 0
+        ? personalTargets.filter((p) => p.name.trim())
+        : undefined;
+
+    // Active stacked topics
+    const activeStackedTopics =
+      stackEnabled && stackedTopics.length > 0 ? stackedTopics : undefined;
+
     try {
       const aiResult = await generateAffirmationsWithAI(
-        topic,
+        effectiveTopic,
         modes.booster,
         modes.fantasy,
         modes.protection,
@@ -1696,6 +1727,8 @@ export default function GeneratorPage({
         modes.fantasy && symbioticEnabled ? symbioticLocation : undefined,
         modes.fantasy && symbioticEnabled ? symbioticTimeFrame : undefined,
         advancedConfig,
+        activePersonalTargets,
+        activeStackedTopics,
       );
 
       if (aiResult && aiResult.length > 0) {
@@ -1745,6 +1778,8 @@ export default function GeneratorPage({
         hasSymbiotic ? symbioticLocation : undefined,
         hasSymbiotic ? symbioticTimeFrame : undefined,
         advancedConfig,
+        activePersonalTargets,
+        activeStackedTopics,
       );
       const expanded = expandToCount(localResult, affirmationCount);
       setAffirmations(expanded);
@@ -1928,6 +1963,16 @@ export default function GeneratorPage({
           sigil_activation: sigilActivationEnabled
             ? { enabled: true, sigil: sigilName }
             : { enabled: false },
+        },
+        personal_subliminal: {
+          enabled: personalEnabled,
+          targets: personalEnabled
+            ? personalTargets.filter((p) => p.name.trim())
+            : [],
+        },
+        multi_stack: {
+          enabled: stackEnabled,
+          topics: stackEnabled ? stackedTopics : [],
         },
       };
 
@@ -2167,6 +2212,416 @@ export default function GeneratorPage({
               );
             })}
           </div>
+        </div>
+
+        {/* ── Personal Subliminal Panel ───────────────────────── */}
+        <div className="space-y-0">
+          <button
+            type="button"
+            onClick={() => setPersonalEnabled((v) => !v)}
+            data-ocid="generator.personal_subliminal.toggle"
+            className={`w-full relative p-4 rounded-xl text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[oklch(0.62_0.22_180)/50] ${
+              personalEnabled
+                ? "border border-[oklch(0.62_0.22_180)/60] bg-[oklch(0.62_0.22_180)/8]"
+                : "mode-card-inactive hover:border-border"
+            }`}
+            aria-pressed={personalEnabled}
+          >
+            <div className="flex items-start gap-3">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                style={{
+                  background: personalEnabled
+                    ? "oklch(0.62 0.22 180 / 0.2)"
+                    : "oklch(0.16 0.018 270 / 0.5)",
+                }}
+              >
+                <Users
+                  className="w-4 h-4"
+                  style={{
+                    color: personalEnabled
+                      ? "oklch(0.62 0.22 180)"
+                      : "oklch(0.56 0.02 270)",
+                  }}
+                />
+              </div>
+              <div>
+                <p
+                  className="font-heading text-sm font-semibold"
+                  style={{
+                    color: personalEnabled ? "oklch(0.62 0.22 180)" : undefined,
+                  }}
+                >
+                  Personal Subliminal
+                </p>
+                <p className="text-xs text-muted-foreground mt-0.5 leading-snug">
+                  Dedicate this subliminal to help specific people
+                </p>
+              </div>
+            </div>
+            {personalEnabled && (
+              <div
+                className="absolute top-2 right-2 w-2 h-2 rounded-full"
+                style={{ background: "oklch(0.62 0.22 180)" }}
+              />
+            )}
+          </button>
+
+          <AnimatePresence>
+            {personalEnabled && (
+              <motion.div
+                key="personal-subpanel"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden"
+              >
+                <div
+                  className="space-y-3 p-4 rounded-b-xl border border-t-0 mt-0"
+                  style={{
+                    borderColor: "oklch(0.62 0.22 180 / 0.4)",
+                    background: "oklch(0.62 0.22 180 / 0.05)",
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <Users
+                      className="w-4 h-4"
+                      style={{ color: "oklch(0.62 0.22 180)" }}
+                    />
+                    <span
+                      className="text-sm font-heading font-semibold"
+                      style={{ color: "oklch(0.62 0.22 180)" }}
+                    >
+                      People to Help
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-snug">
+                    Affirmations will be written for/about these people, fully
+                    compatible with all active modes.
+                  </p>
+
+                  {/* Person rows */}
+                  <div className="space-y-2">
+                    {personalTargets.map((target, idx) => (
+                      <div
+                        key={target.id}
+                        className="flex items-center gap-2"
+                        data-ocid={`generator.personal_target.item.${idx + 1}`}
+                      >
+                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <Input
+                            value={target.name}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setPersonalTargets((prev) =>
+                                prev.map((p) =>
+                                  p.id === target.id ? { ...p, name: val } : p,
+                                ),
+                              );
+                            }}
+                            placeholder="Name — e.g. Sarah, Mom, Alex..."
+                            className="bg-input/50 border-[oklch(0.62_0.22_180)/30] focus:border-[oklch(0.62_0.22_180)/60] text-sm h-9"
+                            data-ocid={`generator.personal_target_name.input.${idx + 1}`}
+                          />
+                          <Input
+                            value={target.relationship}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setPersonalTargets((prev) =>
+                                prev.map((p) =>
+                                  p.id === target.id
+                                    ? { ...p, relationship: val }
+                                    : p,
+                                ),
+                              );
+                            }}
+                            placeholder="Relationship — e.g. best friend, sister, partner..."
+                            className="bg-input/50 border-[oklch(0.62_0.22_180)/30] focus:border-[oklch(0.62_0.22_180)/60] text-sm h-9"
+                            data-ocid={`generator.personal_target_relationship.input.${idx + 1}`}
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setPersonalTargets((prev) =>
+                              prev.filter((p) => p.id !== target.id),
+                            )
+                          }
+                          disabled={personalTargets.length <= 1}
+                          className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/40"
+                          data-ocid={`generator.personal_remove_person.button.${idx + 1}`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Add button */}
+                  {personalTargets.length < 10 && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setPersonalTargets((prev) => [
+                          ...prev,
+                          {
+                            id: crypto.randomUUID(),
+                            name: "",
+                            relationship: "",
+                          },
+                        ])
+                      }
+                      className="flex items-center gap-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[oklch(0.62_0.22_180)/40] rounded"
+                      style={{ color: "oklch(0.62 0.22 180 / 0.75)" }}
+                      data-ocid="generator.personal_add_person.button"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Add Another Person
+                    </button>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* ── Multi-Subliminal Stack Panel ─────────────────────── */}
+        <div className="space-y-0">
+          <button
+            type="button"
+            onClick={() => setStackEnabled((v) => !v)}
+            data-ocid="generator.stack.toggle"
+            className={`w-full relative p-4 rounded-xl text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[oklch(0.72_0.2_48)/50] ${
+              stackEnabled
+                ? "border border-[oklch(0.72_0.2_48)/60] bg-[oklch(0.72_0.2_48)/8]"
+                : "mode-card-inactive hover:border-border"
+            }`}
+            aria-pressed={stackEnabled}
+          >
+            <div className="flex items-start gap-3">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5"
+                style={{
+                  background: stackEnabled
+                    ? "oklch(0.72 0.2 48 / 0.2)"
+                    : "oklch(0.16 0.018 270 / 0.5)",
+                }}
+              >
+                <Layers
+                  className="w-4 h-4"
+                  style={{
+                    color: stackEnabled
+                      ? "oklch(0.72 0.2 48)"
+                      : "oklch(0.56 0.02 270)",
+                  }}
+                />
+              </div>
+              <div className="flex-1 flex items-start justify-between">
+                <div>
+                  <p
+                    className="font-heading text-sm font-semibold"
+                    style={{
+                      color: stackEnabled ? "oklch(0.72 0.2 48)" : undefined,
+                    }}
+                  >
+                    Multi-Subliminal Stack
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5 leading-snug">
+                    Generate affirmations across multiple topics at once
+                  </p>
+                </div>
+                {stackedTopics.length > 0 && (
+                  <span
+                    className="shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full border ml-2"
+                    style={{
+                      color: "oklch(0.72 0.2 48)",
+                      borderColor: "oklch(0.72 0.2 48 / 0.5)",
+                      background: "oklch(0.72 0.2 48 / 0.15)",
+                    }}
+                  >
+                    {stackedTopics.length} stacked
+                  </span>
+                )}
+              </div>
+            </div>
+            {stackEnabled && (
+              <div
+                className="absolute top-2 right-2 w-2 h-2 rounded-full"
+                style={{ background: "oklch(0.72 0.2 48)" }}
+              />
+            )}
+          </button>
+
+          <AnimatePresence>
+            {stackEnabled && (
+              <motion.div
+                key="stack-subpanel"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden"
+              >
+                <div
+                  className="space-y-3 p-4 rounded-b-xl border border-t-0"
+                  style={{
+                    borderColor: "oklch(0.72 0.2 48 / 0.4)",
+                    background: "oklch(0.72 0.2 48 / 0.05)",
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <Layers
+                      className="w-4 h-4"
+                      style={{ color: "oklch(0.72 0.2 48)" }}
+                    />
+                    <span
+                      className="text-sm font-heading font-semibold"
+                      style={{ color: "oklch(0.72 0.2 48)" }}
+                    >
+                      Topic Stack
+                    </span>
+                  </div>
+
+                  {/* Add input */}
+                  <div className="flex gap-2">
+                    <Input
+                      value={stackInputValue}
+                      onChange={(e) => setStackInputValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          const val = stackInputValue.trim();
+                          if (val && !stackedTopics.includes(val)) {
+                            setStackedTopics((prev) => [...prev, val]);
+                            setStackInputValue("");
+                          }
+                        }
+                      }}
+                      placeholder="Add a topic to stack (e.g. Self-confidence)..."
+                      className="bg-input/50 border-[oklch(0.72_0.2_48)/30] focus:border-[oklch(0.72_0.2_48)/60] text-sm flex-1 h-9"
+                      data-ocid="generator.stack_topic.input"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        const val = stackInputValue.trim();
+                        if (val && !stackedTopics.includes(val)) {
+                          setStackedTopics((prev) => [...prev, val]);
+                          setStackInputValue("");
+                        }
+                      }}
+                      className="h-9 border-[oklch(0.72_0.2_48)/40] text-amber-400 hover:bg-[oklch(0.72_0.2_48)/10] hover:text-amber-300 focus-visible:ring-amber-400/40"
+                      data-ocid="generator.stack_add.button"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add
+                    </Button>
+                  </div>
+
+                  {/* Quick-add presets */}
+                  <div>
+                    <p className="text-[10px] text-muted-foreground mb-2">
+                      Quick-add presets — tap to add to stack:
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {[
+                        "Financial abundance",
+                        "Self-confidence",
+                        "Love & relationships",
+                        "Health & healing",
+                        "Spiritual growth",
+                        "Career success",
+                        "Inner peace",
+                        "Physical transformation",
+                        "Creativity",
+                        "Protection",
+                        "Manifestation power",
+                        "Sleep & relaxation",
+                      ].map((preset) => {
+                        const isAdded = stackedTopics.includes(preset);
+                        return (
+                          <button
+                            key={preset}
+                            type="button"
+                            onClick={() => {
+                              if (!isAdded) {
+                                setStackedTopics((prev) => [...prev, preset]);
+                              } else {
+                                setStackedTopics((prev) =>
+                                  prev.filter((t) => t !== preset),
+                                );
+                              }
+                            }}
+                            className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/30 ${
+                              isAdded
+                                ? "text-amber-200 border-amber-400/60"
+                                : "text-muted-foreground border-border/40 hover:border-amber-400/40 hover:text-amber-300"
+                            }`}
+                            style={
+                              isAdded
+                                ? { background: "oklch(0.72 0.2 48 / 0.25)" }
+                                : { background: "oklch(0.16 0.018 270 / 0.4)" }
+                            }
+                          >
+                            {isAdded ? "✓ " : ""}
+                            {preset}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Stacked topics list */}
+                  {stackedTopics.length > 0 ? (
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] text-muted-foreground font-medium">
+                        Stacked topics:
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {stackedTopics.map((t, idx) => (
+                          <span
+                            key={t}
+                            className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border"
+                            style={{
+                              color: "oklch(0.72 0.2 48)",
+                              borderColor: "oklch(0.72 0.2 48 / 0.5)",
+                              background: "oklch(0.72 0.2 48 / 0.12)",
+                            }}
+                          >
+                            {t}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setStackedTopics((prev) =>
+                                  prev.filter((_, i) => i !== idx),
+                                )
+                              }
+                              className="ml-0.5 rounded-full hover:opacity-70 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400/40"
+                              data-ocid={`generator.stack_remove.button.${idx + 1}`}
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground/60 italic">
+                      No topics stacked yet — add topics above
+                    </p>
+                  )}
+
+                  <p className="text-[10px] text-muted-foreground/70 leading-snug">
+                    All stacked topics will be combined in one affirmation
+                    batch. Count is distributed across topics.
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Booster Level sub-panel */}

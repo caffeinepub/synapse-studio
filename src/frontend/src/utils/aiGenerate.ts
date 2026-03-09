@@ -1,4 +1,8 @@
-import type { AdvancedFunctions, BoosterLevel } from "./affirmationUtils";
+import type {
+  AdvancedFunctions,
+  BoosterLevel,
+  PersonalTarget,
+} from "./affirmationUtils";
 
 export interface AISettings {
   provider: "groq" | "gemini" | "none";
@@ -40,6 +44,8 @@ export async function generateAffirmationsWithAI(
   symbioticLocation?: string,
   symbioticTimeFrame?: string,
   advanced: AdvancedFunctions = {},
+  personalTargets?: PersonalTarget[],
+  stackedTopics?: string[],
 ): Promise<string[] | null> {
   const settings = getAISettings();
   if (!settings) return null;
@@ -202,6 +208,27 @@ export async function generateAffirmationsWithAI(
     const SIG = advanced.sigilName.trim();
     modeLines.push(
       `SIGIL ACTIVATION is active: Generate 5–7 affirmations that declare the sigil "${SIG}" is fully charged and actively working on the listener's ${topic}. The sigil should be treated as a living energetic tool that bridges intention and reality. Use language like "The sigil of ${SIG} is active and charged — it is working on my [topic] right now", "I activate the ${SIG} sigil and direct its energy toward [topic] — the intention is sealed", "The ${SIG} sigil anchors [topic] into reality effortlessly", "Every time I focus on the ${SIG} sigil, [topic] is reinforced — it is done". These should feel like a declaration of an active magical tool.`,
+    );
+  }
+
+  // ── Personal Subliminal ──────────────────────────────────────────────────
+  const validTargets = personalTargets?.filter((p) => p.name.trim()) ?? [];
+  if (validTargets.length > 0) {
+    const targetList = validTargets
+      .map(
+        (p) =>
+          `Name: ${p.name.trim()}, Relationship: ${p.relationship.trim() || "unspecified"}`,
+      )
+      .join("\n");
+    modeLines.push(
+      `PERSONAL SUBLIMINAL MODE is active: This subliminal is being created FOR specific people. After generating the standard first-person affirmations, also generate 5–7 affirmations per person using their name. For each person, use language like "[Name] is", "[Name] has", "[Name] attracts", "[Name] embodies", "My [relationship] [Name] is", "[Name]'s life is transforming — right now". These affirmations are about helping [Name] ([relationship]) receive the benefits of this subliminal. Include their relationship in some affirmations (e.g. "My sister Sarah is..."). All active modes apply to the personal affirmations too.\n\nPeople to dedicate this subliminal to:\n${targetList}`,
+    );
+  }
+
+  // ── Multi-Topic Stack ────────────────────────────────────────────────────
+  if (stackedTopics && stackedTopics.length > 0) {
+    modeLines.push(
+      `MULTI-TOPIC STACK is active: In addition to the primary topic, also generate affirmations for these additional topics: ${stackedTopics.join(", ")}. Distribute affirmations across all topics. No headers or labels — just generate them all interleaved or in groups. Each topic should receive meaningful coverage.`,
     );
   }
 

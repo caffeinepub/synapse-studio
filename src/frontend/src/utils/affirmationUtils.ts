@@ -262,6 +262,41 @@ const FREQUENCY_MEANINGS: Record<string, string> = {
   "1111": "angelic alignment and manifestation gateway",
 };
 
+export interface PersonalTarget {
+  id: string;
+  name: string;
+  relationship: string;
+}
+
+/** Build affirmations FOR a specific person using third-person or "for [Name]" framing */
+function buildAffirmationForPerson(
+  T: string,
+  name: string,
+  relationship: string,
+  slot: number,
+): string {
+  const rel = relationship.trim() || "this person";
+  const relLabel = relationship.trim() ? `my ${relationship.trim()} ` : "";
+  const enhancer = pick(ENHANCERS, slot + 4);
+
+  const patterns = [
+    `${name} is ${T} — ${enhancer}.`,
+    `${name} has everything they need to embody ${T} — ${enhancer}.`,
+    `${name} attracts ${T} — every moment, without effort.`,
+    `${relLabel}${name} radiates ${T} — deep within them, it is done.`,
+    `My ${rel} ${name} embodies ${T} — at a cellular level — right now.`,
+    `${name} is becoming more ${T} every single day — it is inevitable.`,
+    `${name}'s reality is filled with ${T} — starting today.`,
+    `I send ${name} the energy of ${T} — they receive it fully — it is done.`,
+    `${relLabel}${name} is blessed with ${T} — effortlessly and completely.`,
+    `${name} deserves ${T} and it is manifesting for them now — at every level.`,
+    `The subliminal I create for ${name} activates ${T} in their life — it is real and working.`,
+    `${name}'s subconscious is now programmed with ${T} — at a cellular level.`,
+  ];
+
+  return patterns[slot % patterns.length];
+}
+
 export function generateAffirmations(
   topic: string,
   boosterEnabled: boolean,
@@ -284,6 +319,8 @@ export function generateAffirmations(
   symbioticLocation?: string,
   symbioticTimeFrame?: string,
   advanced: AdvancedFunctions = {},
+  personalTargets?: PersonalTarget[],
+  stackedTopics?: string[],
 ): string[] {
   const intent = extractIntent(topic);
   const T = intent;
@@ -754,6 +791,60 @@ export function generateAffirmations(
       `I activate the ${SIG} sigil — it bridges the energetic and physical, bringing my ${T} into form.`,
       `The ${SIG} sigil is a permanent anchor for my ${T} — sealed, active, and delivering results now.`,
     );
+  }
+
+  // ── Personal Subliminal ───────────────────────────────────────────────────
+  const validTargets = personalTargets?.filter((p) => p.name.trim()) ?? [];
+  if (validTargets.length > 0) {
+    for (const target of validTargets) {
+      const name = target.name.trim();
+      const rel = target.relationship.trim();
+      // 5-6 affirmations per person
+      for (let i = 0; i < 6; i++) {
+        result.push(buildAffirmationForPerson(T, name, rel, i));
+      }
+      // Also weave active modes for the person
+      if (boosterEnabled && boosterLevel === "extremely_powerful") {
+        result.push(
+          `${name} UNSTOPPABLY embodies ${T} — their entire being IS this — it is absolute and done.`,
+          `Reality bends to ${name}'s ${T} — without question — deep within them — it is inevitable.`,
+        );
+      }
+      if (fantasyEnabled) {
+        result.push(
+          `${name} possesses ${T} — it is physically real and active in their life right now.`,
+          `The fabric of reality has opened for ${name} — ${T} is now a tangible part of their world.`,
+        );
+      }
+      if (protectionEnabled) {
+        result.push(
+          `${name}'s ${T} is protected, stable, and growing stronger — every moment — it is done.`,
+          `My ${rel || "person"} ${name} is grounded and shielded in their ${T} — naturally and effortlessly.`,
+        );
+      }
+    }
+  }
+
+  // ── Multi-Subliminal Stack ────────────────────────────────────────────────
+  if (stackedTopics && stackedTopics.length > 0) {
+    const perTopic = Math.max(5, Math.floor(15 / (stackedTopics.length + 1)));
+    for (const stackTopic of stackedTopics) {
+      const ST = extractIntent(stackTopic);
+      const stackSlots = seededShuffle(
+        Array.from({ length: perTopic }, (_, i) => i),
+        ST.length + 7,
+      );
+      for (let idx = 0; idx < perTopic; idx++) {
+        const strength = boosterEnabled
+          ? boosterLevel === "extremely_powerful"
+            ? 2
+            : boosterLevel === "minimal"
+              ? 0
+              : 1
+          : 1;
+        result.push(buildAffirmation(ST, stackSlots[idx], strength));
+      }
+    }
   }
 
   return result;
