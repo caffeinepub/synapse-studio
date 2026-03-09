@@ -192,6 +192,24 @@
     background: oklch(var(--card) / 0.7);
     backdrop-filter: blur(12px);
     border: 1px solid oklch(var(--border) / 0.6);
+    box-shadow:
+      inset 0 1px 0 oklch(1 0 0 / 0.06),
+      0 0 0 1px oklch(var(--border) / 0.4);
+  }
+
+  /* Page header with accent bar */
+  .page-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  /* Nav pill active state */
+  .nav-pill-active {
+    background: oklch(var(--primary) / 0.15);
+    border: 1px solid oklch(var(--primary) / 0.3);
+    color: oklch(var(--primary));
+    box-shadow: 0 0 12px oklch(var(--primary) / 0.12);
   }
 
   /* Mode toggle cards */
@@ -295,10 +313,10 @@
   .bg-shimmer {
     background: linear-gradient(
       135deg,
-      oklch(0.08 0.01 280),
-      oklch(0.1 0.025 295),
-      oklch(0.08 0.015 260),
-      oklch(0.1 0.02 290)
+      oklch(0.07 0.018 285),
+      oklch(0.09 0.03 295),
+      oklch(0.07 0.02 265),
+      oklch(0.09 0.025 280)
     );
     background-size: 400% 400%;
     animation: shimmer 12s ease infinite;
@@ -320,5 +338,14 @@
 
   .float {
     animation: float 4s ease-in-out infinite;
+  }
+
+  @keyframes orbit {
+    0% { transform: rotate(0deg) translateX(60px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
+  }
+
+  .orbit {
+    animation: orbit 12s linear infinite;
   }
 }

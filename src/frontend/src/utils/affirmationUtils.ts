@@ -758,3 +758,124 @@ export function generateAffirmations(
 
   return result;
 }
+
+// ─── Mature theme vocabulary ──────────────────────────────────────────────────
+
+const MATURE_STARTERS = [
+  "I command",
+  "I own",
+  "I exude",
+  "I project",
+  "I dominate",
+  "I radiate",
+  "I embody",
+  "I claim",
+  "I unleash",
+  "I seduce reality with",
+];
+
+const MATURE_ENHANCERS = [
+  "with undeniable power",
+  "in every room I enter",
+  "without apology",
+  "and the world responds",
+  "in a way that cannot be ignored",
+  "at the deepest cellular level",
+  "completely and without limit",
+  "and nothing can diminish this",
+  "from a place of total mastery",
+  "because I was born for this",
+];
+
+const MATURE_KEYWORDS = [
+  "charisma",
+  "magnetic",
+  "dating",
+  "irresistible",
+  "allure",
+  "sensual",
+  "seductive",
+  "sexuality",
+  "dominance",
+  "alpha",
+  "feminine energy",
+  "masculine energy",
+  "divine feminine",
+  "divine masculine",
+  "body confidence",
+  "physical attraction",
+  "shadow alchemy",
+  "dark archetype",
+  "void work",
+  "taboo",
+  "underworld",
+  "trickster",
+  "liminal",
+  "death and rebirth",
+  "empire",
+  "financial dominance",
+  "millionaire",
+  "executive",
+  "ambition",
+  "power and influence",
+  "generational wealth",
+  "magnetic allure",
+  "sacred sexuality",
+  "inner beauty",
+  "physical magnetism",
+];
+
+export function detectMatureTheme(topic: string): boolean {
+  const lower = topic.toLowerCase();
+  return MATURE_KEYWORDS.some((k) => lower.includes(k));
+}
+
+/**
+ * Generate mature-theme boosted affirmations for a topic that matches mature keywords.
+ * These are appended to the main affirmation set when a mature theme is detected.
+ */
+export function generateMatureAffirmations(
+  topic: string,
+  boosterEnabled: boolean,
+  boosterLevel: BoosterLevel = "standard",
+): string[] {
+  if (!detectMatureTheme(topic)) return [];
+
+  const T = extractIntent(topic);
+  const result: string[] = [];
+
+  const getStrength = (slot: number): 0 | 1 | 2 => {
+    if (!boosterEnabled) return 1;
+    switch (boosterLevel) {
+      case "minimal":
+        return 0;
+      case "extremely_powerful":
+        return 2;
+      case "evolving": {
+        const third = Math.floor(8 / 3);
+        if (slot < third) return 0;
+        if (slot < third * 2) return 1;
+        return 2;
+      }
+      default:
+        return 1;
+    }
+  };
+
+  for (let i = 0; i < 8; i++) {
+    const starter = pick(MATURE_STARTERS, i + T.length);
+    const enhancer = pick(MATURE_ENHANCERS, i + T.length + 5);
+    const strength = getStrength(i);
+    if (strength === 2) {
+      result.push(
+        `${starter} ${T} ABSOLUTELY and COMPLETELY \u2014 ${enhancer}.`,
+      );
+    } else if (strength === 0) {
+      result.push(`${starter} ${T} gently \u2014 ${enhancer}.`);
+    } else {
+      result.push(`${starter} ${T} \u2014 ${enhancer}.`);
+    }
+  }
+
+  return result;
+}

@@ -1,42 +1,32 @@
 # Synapse Studio
 
 ## Current State
-A full-stack subliminal AI creation platform with: Studio generator, Energy Library, Kinesis Archive, Wiki Search, Chat Bots, Learning Bots, Religions, Entities, Spells, Sigils, Rituals, Healing Methods, Settings, YouTube page, and Video Editor. The app has an AI config system (Groq/Gemini/rule-based) stored in localStorage. The backend supports bot/memory management via `createBot`, `addMemory`, `getRelevantMemories`, etc.
+The generator (GeneratorPage.tsx + affirmationUtils.ts) supports topic-based affirmation generation with Booster, Fantasy-to-Reality, Protection, and Chakra Alignment modes. Advanced functions include Deity Invocation, Spell Weaving, Soul Contract, Shadow Work, Reality Scripting, Frequency Attunement, and Sigil Activation. Wealth presets exist as a quick-fill button. There is no dedicated adult/mature themes category.
 
 ## Requested Changes (Diff)
 
 ### Add
-- **Synapses AI Assistant page** (`SynapsesAIPage.tsx`) — a dedicated, fully-featured AI assistant for Synapse Studio
-  - Personalized assistant named "Synapses" with a distinct identity (not a generic chatbot)
-  - Full-width chat interface with animated message bubbles, timestamps, copy-to-clipboard
-  - Context-aware: knows about the user's current subliminal (topic, modes, affirmations), wiki search results, and all app pages
-  - Quick action chips: "Help me create a subliminal", "Explain Booster mode", "Find a character", "Generate affirmations", "What frequencies do I need?", "Explain chakra alignment"
-  - Synapses-branded system prompt that describes all available features in Synapse Studio
-  - Uses the user's configured AI provider (Groq/Gemini) via the same `getAIConfig()` pattern as the rest of the app, with a fallback rule-based engine
-  - Typing indicator (animated dots) while waiting for response
-  - Suggested follow-up chips after each AI response
-  - "Use in Generator" button on responses that contain affirmations or topic suggestions
-  - Session memory: conversation stored in localStorage per session
-  - Clear chat button
-  - Visual identity: deep violet/indigo gradient, "SYNAPSES" branding with neural network icon pulse animation
-
-- **Nav entry**: "Synapses AI" with a Bot/Cpu icon added to NavBar and App.tsx routing
+- **Adult Themes panel** in Step 1 of GeneratorPage, positioned after Advanced Functions accordion
+- Four theme categories with quick-select preset chips:
+  1. **Confidence & Attractiveness** — Charisma, Magnetic Presence, Dating Success, Irresistible Aura, Social Dominance, Alpha Energy, Physical Attraction, Seductive Confidence
+  2. **Wealth & Ambition** — Financial Dominance, Millionaire Identity, Power & Influence, Empire Building, Executive Presence, Fearless Ambition, Passive Income Mastery, Generational Wealth
+  3. **Sensuality & Self-Image** — Body Confidence, Divine Feminine Energy, Divine Masculine Energy, Magnetic Allure, Inner Beauty Radiance, Sensual Presence, Physical Magnetism, Sacred Sexuality
+  4. **Mature Spiritual Themes** — Shadow Alchemy, Dark Archetype Mastery, Void Work, Taboo Mythology, Death & Rebirth, The Underworld Path, Trickster Energy, Liminal Power
+- Each chip click fills the topic field and optionally pre-selects the most relevant mode
+- A distinctive visual style (deep red/rose accent) to differentiate from standard presets
+- Affirmation engine additions in affirmationUtils.ts: new vocabulary set for mature/adult themes that produces richer, more direct, identity-level language for sensuality, ambition, dominance, and dark spirituality — woven into base generation when topic matches these themes
 
 ### Modify
-- `NavBar.tsx` — add "synapses" page item with `Bot` icon from lucide-react
-- `App.tsx` — add `"synapses"` to the Page union type and render `<SynapsesAIPage>` with `subliminalCtx` and `onUseForSubliminal` props
+- GeneratorPage.tsx: add an "Adult Themes" collapsible panel below the Advanced Functions section in Step 1
+- affirmationUtils.ts: add a `MATURE_ENHANCERS` vocabulary set and `buildMatureAffirmation` helper used when the topic matches adult theme keywords, producing more direct and bold language
 
 ### Remove
 - Nothing removed
 
 ## Implementation Plan
-1. Write `SynapsesAIPage.tsx` with:
-   - Full chat UI with message history, typing indicator, quick action chips, copy buttons
-   - Context-aware system prompt that includes the user's current subliminal state
-   - AI API integration (Groq/Gemini fallback) using the same `getAIConfig()` helper pattern
-   - Rule-based Synapses-branded fallback responses when no API key is set
-   - Suggested follow-up responses after each AI message
-   - `onUseForSubliminal` integration for sending topics to the generator
-   - localStorage-based session chat history
-2. Update `NavBar.tsx` to add "Synapses AI" nav item
-3. Update `App.tsx` to add the page type and route
+1. In affirmationUtils.ts, add MATURE_ENHANCERS and MATURE_STARTERS arrays with vocabulary appropriate for confident, bold, mature language (dominance, allure, power, shadow work)
+2. Add a `detectMatureTheme()` helper that returns true when topic contains keywords from the adult theme categories
+3. Modify `generateAffirmations()` to use mature vocabulary set when topic matches
+4. In GeneratorPage.tsx, add an `adultThemesOpen` state and an Adult Themes collapsible panel with four category sections
+5. Each preset chip sets the topic input and scrolls to the generator
+6. Style with rose/crimson accent to distinguish from standard wealth presets

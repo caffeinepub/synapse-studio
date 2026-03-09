@@ -1,15 +1,14 @@
 import {
   Archive,
+  BookMarked,
   BookOpen,
-  Bot,
   Brain,
-  BrainCircuit,
   Film,
   Ghost,
   Globe,
   Heart,
+  Library,
   Menu,
-  MessageCircle,
   Moon,
   Search,
   Settings,
@@ -24,12 +23,9 @@ import { useState } from "react";
 
 type Page =
   | "generator"
-  | "synapses"
   | "energy"
   | "kinesis"
   | "wiki"
-  | "chatbots"
-  | "trainable"
   | "religions"
   | "entities"
   | "spells"
@@ -38,111 +34,143 @@ type Page =
   | "healing"
   | "settings"
   | "youtube"
-  | "videoeditor";
+  | "videoeditor"
+  | "journal"
+  | "vault";
 
 interface NavBarProps {
   currentPage: Page;
   onNavigate: (page: Page) => void;
 }
 
-const navItems = [
+interface NavItem {
+  id: Page;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  description: string;
+  group: string;
+}
+
+const navItems: NavItem[] = [
+  // Core
   {
-    id: "generator" as Page,
+    id: "generator",
     label: "Studio",
     icon: Zap,
     description: "Subliminal Generator",
+    group: "core",
   },
   {
-    id: "synapses" as Page,
-    label: "Synapses AI",
-    icon: Bot,
-    description: "Your AI Subliminal Guide",
+    id: "journal",
+    label: "Journal",
+    icon: BookMarked,
+    description: "Subliminal Session Log",
+    group: "core",
   },
   {
-    id: "energy" as Page,
+    id: "vault",
+    label: "Vault",
+    icon: Library,
+    description: "Saved Affirmations",
+    group: "core",
+  },
+  // Discover
+  {
+    id: "energy",
     label: "Energy Library",
     icon: BookOpen,
     description: "Chakras & Consciousness",
+    group: "discover",
   },
   {
-    id: "kinesis" as Page,
-    label: "Kinesis Archive",
+    id: "kinesis",
+    label: "Kinesis",
     icon: Archive,
     description: "Encyclopedia of Powers",
+    group: "discover",
   },
   {
-    id: "wiki" as Page,
+    id: "wiki",
     label: "Wiki Search",
     icon: Search,
     description: "Fandom Character & Powers Search",
+    group: "discover",
   },
+  // Spiritual
   {
-    id: "chatbots" as Page,
-    label: "Chat Bots",
-    icon: MessageCircle,
-    description: "AI Chatbots & Custom Bots",
-  },
-  {
-    id: "trainable" as Page,
-    label: "Learning Bots",
-    icon: BrainCircuit,
-    description: "AI Bots That Learn & Remember",
-  },
-  {
-    id: "religions" as Page,
+    id: "religions",
     label: "Religions",
     icon: Globe,
     description: "World Religions Encyclopedia",
+    group: "spiritual",
   },
   {
-    id: "entities" as Page,
+    id: "entities",
     label: "Entities",
     icon: Ghost,
     description: "Spiritual Entities & Archetypes",
+    group: "spiritual",
   },
   {
-    id: "spells" as Page,
+    id: "spells",
     label: "Spells",
     icon: Wand2,
     description: "Spells & Magical Traditions",
+    group: "spiritual",
   },
   {
-    id: "sigils" as Page,
+    id: "sigils",
     label: "Sigils",
     icon: Star,
     description: "Sigil Codex & Sacred Symbols",
+    group: "spiritual",
   },
   {
-    id: "rituals" as Page,
+    id: "rituals",
     label: "Rituals",
     icon: Moon,
     description: "Rituals & Sacred Systems",
+    group: "spiritual",
   },
   {
-    id: "healing" as Page,
+    id: "healing",
     label: "Healing",
     icon: Heart,
     description: "Healing Methods & Modalities",
+    group: "spiritual",
   },
+  // Create
   {
-    id: "settings" as Page,
-    label: "Settings",
-    icon: Settings,
-    description: "AI Configuration",
-  },
-  {
-    id: "youtube" as Page,
+    id: "youtube",
     label: "YouTube",
     icon: Youtube,
     description: "Video Content Creator",
+    group: "create",
   },
   {
-    id: "videoeditor" as Page,
+    id: "videoeditor",
     label: "Video Editor",
     icon: Film,
     description: "Frequency, TTS, Audio & Thumbnail",
+    group: "create",
+  },
+  // System
+  {
+    id: "settings",
+    label: "Settings",
+    icon: Settings,
+    description: "AI Configuration",
+    group: "system",
   },
 ];
+
+const GROUP_LABELS: Record<string, string> = {
+  core: "Core",
+  discover: "Discover",
+  spiritual: "Spiritual",
+  create: "Create",
+  system: "System",
+};
 
 export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -188,28 +216,17 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
                     type="button"
                     key={item.id}
                     onClick={() => handleNavigate(item.id)}
-                    className={`relative flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 whitespace-nowrap
+                    className={`nav-pill relative flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 whitespace-nowrap
                       ${
                         isActive
-                          ? "text-primary bg-primary/10 border border-primary/30"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                          ? "nav-pill-active bg-primary/15 border border-primary/30 text-primary"
+                          : "text-muted-foreground border border-transparent hover:text-foreground hover:bg-muted/50"
                       }`}
                     aria-current={isActive ? "page" : undefined}
+                    data-ocid={`nav.${item.id}.link`}
                   >
                     <Icon className="w-3.5 h-3.5 shrink-0" />
                     <span className="hidden lg:inline">{item.label}</span>
-                    {isActive && (
-                      <motion.div
-                        layoutId="nav-indicator"
-                        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full"
-                        style={{ background: "oklch(0.62 0.22 295)" }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 400,
-                          damping: 30,
-                        }}
-                      />
-                    )}
                   </button>
                 );
               })}
@@ -222,6 +239,7 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
               className="md:hidden flex items-center justify-center w-10 h-10 rounded-lg border border-border/40 bg-secondary/20 hover:bg-secondary/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 shrink-0"
               aria-label={mobileOpen ? "Close navigation" : "Open navigation"}
               aria-expanded={mobileOpen}
+              data-ocid="nav.menu.button"
             >
               {mobileOpen ? (
                 <X className="w-5 h-5 text-foreground" />
@@ -269,51 +287,67 @@ export default function NavBar({ currentPage, onNavigate }: NavBarProps) {
                   onClick={() => setMobileOpen(false)}
                   className="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-secondary/40 transition-colors"
                   aria-label="Close navigation"
+                  data-ocid="nav.close.button"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Nav items */}
+              {/* Nav items grouped */}
               <div className="flex-1 overflow-y-auto py-3 px-3">
-                {navItems.map((item, idx) => {
-                  const Icon = item.icon;
-                  const isActive = currentPage === item.id;
+                {Object.entries(GROUP_LABELS).map(([group, groupLabel]) => {
+                  const groupItems = navItems.filter(
+                    (item) => item.group === group,
+                  );
+                  if (groupItems.length === 0) return null;
                   return (
-                    <motion.button
-                      key={item.id}
-                      type="button"
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.04 }}
-                      onClick={() => handleNavigate(item.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl mb-1 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 min-h-[52px]
-                        ${
-                          isActive
-                            ? "bg-primary/15 border border-primary/30 text-primary"
-                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
-                        }`}
-                      aria-current={isActive ? "page" : undefined}
-                    >
-                      <div
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                          isActive ? "bg-primary/20" : "bg-secondary/50"
-                        }`}
-                      >
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-heading font-semibold text-sm">
-                          {item.label}
-                        </p>
-                        <p className="text-[11px] text-muted-foreground/70 truncate">
-                          {item.description}
-                        </p>
-                      </div>
-                      {isActive && (
-                        <div className="ml-auto w-2 h-2 rounded-full bg-primary shrink-0" />
-                      )}
-                    </motion.button>
+                    <div key={group} className="mb-2">
+                      <p className="px-4 py-1.5 text-[9px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/40">
+                        {groupLabel}
+                      </p>
+                      {groupItems.map((item, idx) => {
+                        const Icon = item.icon;
+                        const isActive = currentPage === item.id;
+                        return (
+                          <motion.button
+                            key={item.id}
+                            type="button"
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: idx * 0.04 }}
+                            onClick={() => handleNavigate(item.id)}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl mb-0.5 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 min-h-[48px]
+                              ${
+                                isActive
+                                  ? "bg-primary/15 border border-primary/30 text-primary"
+                                  : "text-muted-foreground border border-transparent hover:text-foreground hover:bg-secondary/40"
+                              }`}
+                            aria-current={isActive ? "page" : undefined}
+                            data-ocid={`nav.${item.id}.link`}
+                          >
+                            <div
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                                isActive ? "bg-primary/20" : "bg-secondary/50"
+                              }`}
+                            >
+                              <Icon className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="font-heading font-semibold text-sm">
+                                {item.label}
+                              </p>
+                              <p className="text-[10px] text-muted-foreground/60 truncate">
+                                {item.description}
+                              </p>
+                            </div>
+                            {isActive && (
+                              <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                            )}
+                          </motion.button>
+                        );
+                      })}
+                      <div className="h-px bg-border/20 mx-4 mt-1 mb-2 last:hidden" />
+                    </div>
                   );
                 })}
               </div>

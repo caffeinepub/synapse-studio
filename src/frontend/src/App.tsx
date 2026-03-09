@@ -1,10 +1,10 @@
 import { Toaster } from "@/components/ui/sonner";
 import { useState } from "react";
 import NavBar from "./components/NavBar";
-import ChatBotsPage from "./pages/ChatBotsPage";
 import EnergyLibraryPage from "./pages/EnergyLibraryPage";
 import GeneratorPage, { type SubliminalContext } from "./pages/GeneratorPage";
 import HealingMethodsPage from "./pages/HealingMethodsPage";
+import JournalPage from "./pages/JournalPage";
 import KinesisArchivePage from "./pages/KinesisArchivePage";
 import ReligionsPage from "./pages/ReligionsPage";
 import RitualsPage from "./pages/RitualsPage";
@@ -12,20 +12,16 @@ import SettingsPage from "./pages/SettingsPage";
 import SigilsPage from "./pages/SigilsPage";
 import SpellsPage from "./pages/SpellsPage";
 import SpiritualEntitiesPage from "./pages/SpiritualEntitiesPage";
-import SynapsesAIPage from "./pages/SynapsesAIPage";
-import TrainableBotPage from "./pages/TrainableBotPage";
+import VaultPage from "./pages/VaultPage";
 import VideoEditorPage from "./pages/VideoEditorPage";
 import WikiSearchPage from "./pages/WikiSearchPage";
 import YouTubePage from "./pages/YouTubePage";
 
 type Page =
   | "generator"
-  | "synapses"
   | "energy"
   | "kinesis"
   | "wiki"
-  | "chatbots"
-  | "trainable"
   | "religions"
   | "entities"
   | "spells"
@@ -34,7 +30,9 @@ type Page =
   | "settings"
   | "youtube"
   | "videoeditor"
-  | "sigils";
+  | "sigils"
+  | "journal"
+  | "vault";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("generator");
@@ -81,7 +79,7 @@ export default function App() {
         className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[300px] pointer-events-none z-0"
         style={{
           background:
-            "radial-gradient(ellipse at top, oklch(0.62 0.22 295 / 0.12), transparent 70%)",
+            "radial-gradient(ellipse at top, oklch(0.62 0.22 295 / 0.18), transparent 70%)",
         }}
       />
 
@@ -96,12 +94,6 @@ export default function App() {
               onSubliminalUpdate={setSubliminalCtx}
             />
           )}
-          {currentPage === "synapses" && (
-            <SynapsesAIPage
-              subliminalCtx={subliminalCtx}
-              onUseForSubliminal={handleUseForSubliminal}
-            />
-          )}
           {currentPage === "energy" && <EnergyLibraryPage />}
           {currentPage === "kinesis" && (
             <KinesisArchivePage onNavigate={handleNavigate} />
@@ -109,11 +101,11 @@ export default function App() {
           {currentPage === "wiki" && (
             <WikiSearchPage onUseForSubliminal={handleUseForSubliminal} />
           )}
-          {currentPage === "chatbots" && (
-            <ChatBotsPage onUseForSubliminal={handleUseForSubliminal} />
+          {currentPage === "journal" && (
+            <JournalPage onUseForSubliminal={handleUseForSubliminal} />
           )}
-          {currentPage === "trainable" && (
-            <TrainableBotPage onUseForSubliminal={handleUseForSubliminal} />
+          {currentPage === "vault" && (
+            <VaultPage onUseForSubliminal={handleUseForSubliminal} />
           )}
           {currentPage === "religions" && (
             <ReligionsPage

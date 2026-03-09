@@ -99,6 +99,65 @@ const CHAKRA_COLORS: Record<string, string> = {
   Crown: "oklch(0.55 0.22 310)",
 };
 
+const ADULT_THEME_PRESETS = [
+  {
+    category: "Confidence & Attractiveness",
+    color: "oklch(0.62 0.22 0)",
+    presets: [
+      "Charisma",
+      "Magnetic Presence",
+      "Dating Success",
+      "Irresistible Aura",
+      "Social Dominance",
+      "Alpha Energy",
+      "Physical Attraction",
+      "Seductive Confidence",
+    ],
+  },
+  {
+    category: "Wealth & Ambition",
+    color: "oklch(0.72 0.2 48)",
+    presets: [
+      "Financial Dominance",
+      "Millionaire Identity",
+      "Power and Influence",
+      "Empire Building",
+      "Executive Presence",
+      "Fearless Ambition",
+      "Passive Income Mastery",
+      "Generational Wealth",
+    ],
+  },
+  {
+    category: "Sensuality & Self-Image",
+    color: "oklch(0.62 0.22 330)",
+    presets: [
+      "Body Confidence",
+      "Divine Feminine Energy",
+      "Divine Masculine Energy",
+      "Magnetic Allure",
+      "Inner Beauty Radiance",
+      "Sensual Presence",
+      "Physical Magnetism",
+      "Sacred Sexuality",
+    ],
+  },
+  {
+    category: "Mature Spiritual Themes",
+    color: "oklch(0.45 0.2 280)",
+    presets: [
+      "Shadow Alchemy",
+      "Dark Archetype Mastery",
+      "Void Work",
+      "Taboo Mythology",
+      "Death and Rebirth",
+      "The Underworld Path",
+      "Trickster Energy",
+      "Liminal Power",
+    ],
+  },
+] as const;
+
 type ModeKey = "booster" | "fantasy" | "protection" | "chakraAlignment";
 
 interface ModeConfig {
@@ -1269,6 +1328,9 @@ export default function GeneratorPage({
 
   // ── Advanced Functions panel ──────────────────────────────────────────────
   const [advancedOpen, setAdvancedOpen] = useState(false);
+
+  // ── Adult Themes panel ────────────────────────────────────────────────────
+  const [adultThemesOpen, setAdultThemesOpen] = useState(false);
 
   // 1. Deity/Entity Invocation
   const [deityEnabled, setDeityEnabled] = useState(false);
@@ -3151,6 +3213,81 @@ export default function GeneratorPage({
                       )}
                     </AnimatePresence>
                   </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* ── Adult Themes ──────────────────────────────────────── */}
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={() => setAdultThemesOpen((v) => !v)}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-rose-500/30 bg-rose-950/20 hover:bg-rose-900/30 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/40"
+            data-ocid="adult_themes.toggle"
+          >
+            <div className="flex items-center gap-2">
+              <Flame className="w-4 h-4 text-rose-400" />
+              <span className="text-sm font-semibold text-rose-300">
+                Adult Themes
+              </span>
+              <span className="text-xs text-rose-500/70 ml-1 hidden sm:inline">
+                Quick-fill presets for mature subliminals
+              </span>
+            </div>
+            {adultThemesOpen ? (
+              <ChevronUp className="w-4 h-4 text-rose-400" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-rose-400" />
+            )}
+          </button>
+
+          <AnimatePresence>
+            {adultThemesOpen && (
+              <motion.div
+                key="adult-themes-panel"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden"
+              >
+                <div className="space-y-4 p-4 rounded-xl border border-rose-500/20 bg-rose-950/10">
+                  {ADULT_THEME_PRESETS.map((group) => (
+                    <div key={group.category}>
+                      <p
+                        className="text-xs font-semibold mb-2"
+                        style={{ color: group.color }}
+                      >
+                        {group.category}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {group.presets.map((preset) => (
+                          <motion.button
+                            key={preset}
+                            type="button"
+                            data-ocid={`adult_themes.${preset.toLowerCase().replace(/[\s/]+/g, "_")}.button`}
+                            className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500/40"
+                            style={{
+                              borderColor: `color-mix(in oklch, ${group.color} 40%, transparent)`,
+                              color: group.color,
+                              backgroundColor: `color-mix(in oklch, ${group.color} 10%, transparent)`,
+                            }}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => {
+                              setTopic(preset);
+                              setAdultThemesOpen(false);
+                              window.scrollTo({ top: 0, behavior: "smooth" });
+                            }}
+                          >
+                            {preset}
+                          </motion.button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </motion.div>
             )}
