@@ -1220,6 +1220,198 @@ const ENTITIES: SpiritualEntity[] = [
     archetypalNote:
       "Egregores are collective thoughtform constructs — symbolic models from esoteric and philosophical traditions.",
   },
+  {
+    name: "Artemis / Diana",
+    type: "Deity",
+    origin: "Greek / Roman mythology",
+    domain:
+      "Moon, hunt, wilderness, independence, feminine sovereignty, childbirth protection",
+    context:
+      "Artemis is the twin sister of Apollo and one of the twelve Olympians — the goddess of the hunt, the moon, and untamed nature. As Diana in Roman tradition, she was equally revered as protector of the forest and guardian of women's independence. She represents the archetype of the sovereign woman who answers to no one.",
+    psychologicalMeaning:
+      "Artemis embodies fierce self-sufficiency, the refusal to be domesticated by others' expectations, and the power of solitude as a creative and regenerative force. She represents the part of us that runs free.",
+    relatedSpells: ["Lunar Drawing Down", "Protection Circle", "Candle Magic"],
+    relatedSigils: ["Triple Moon", "Triquetra"],
+  },
+  {
+    name: "Hades / Pluto",
+    type: "Deity",
+    origin: "Greek / Roman mythology",
+    domain:
+      "Underworld, hidden wealth, death cycles, sovereignty over the unseen, transformation",
+    context:
+      "Hades rules the underworld in Greek mythology — not as a figure of evil but as the impartial sovereign of all that is hidden, including the enormous mineral wealth beneath the earth. As Pluto in Roman tradition, his name literally means 'wealth.' He represents the riches that exist in depth, shadow, and invisible dimensions.",
+    psychologicalMeaning:
+      "Hades represents the treasure buried in what we avoid — the wealth locked inside our deepest fears, suppressed memories, and shadow aspects. His domain is also completion: the full cycle of transformation that includes the necessary descent.",
+    relatedSpells: [
+      "Shadow Work Integration",
+      "Cord Cutting",
+      "Void Meditation",
+    ],
+    relatedSigils: ["Sigil of the Abyss", "Black Sun (Sonnenrad)"],
+  },
+  {
+    name: "Hermes Trismegistus",
+    type: "Deity",
+    subCategory: "Hermetic Archetype",
+    origin: "Hermetic tradition, Greco-Egyptian synthesis",
+    domain:
+      "Alchemy, divine wisdom, the Emerald Tablet, all knowledge, the messenger between worlds",
+    context:
+      "Hermes Trismegistus — Thrice-Greatest Hermes — is the legendary author of the Hermetic Corpus, including the Emerald Tablet ('As above, so below'). He represents the synthesis of Greek Hermes and Egyptian Thoth into a single supremely wise figure who holds the keys to alchemy, astrology, and theurgy.",
+    psychologicalMeaning:
+      "Hermes Trismegistus embodies the archetype of the Master Knower — the one who has unified all systems of knowledge into a single coherent understanding of how reality works. He represents the mind that sees the pattern beneath all patterns.",
+    relatedSpells: ["Invocation", "Talisman Creation", "Sigil Charging"],
+    relatedSigils: ["Caduceus", "Enochian Seal", "Hexagram (Star of David)"],
+  },
+  {
+    name: "Yemoja / Yemaya",
+    type: "Deity",
+    origin: "Yoruba / African diaspora (Candomblé, Santería, Vodou)",
+    domain:
+      "Ocean, motherhood, fertility, healing, the unconscious, emotional depth",
+    context:
+      "Yemoja (Yoruba) or Yemaya (African diaspora) is the Orisha of the ocean and the mother of all living things. She is the great mother archetype of African traditional religion — nurturing, powerful, and capable of tremendous destructive force when disrespected. She is syncretized with the Virgin Mary in many diaspora traditions.",
+    psychologicalMeaning:
+      "Yemoja represents the boundless depth of the unconscious and the unconditional love of the archetypal mother. She embodies the capacity for profound emotional healing that comes from finally feeling held, seen, and loved without condition.",
+    relatedSpells: [
+      "Healing Transmission",
+      "Lunar Drawing Down",
+      "Ancestor Altar Ritual",
+    ],
+    relatedSigils: ["Triple Moon", "Trident of Poseidon"],
+  },
+  {
+    name: "Coyote",
+    type: "Archetype",
+    subCategory: "Trickster / Shapeshifter",
+    origin:
+      "Native American traditions (various nations, especially Plains and Southwest)",
+    domain:
+      "Trickery, humor, shapeshifting, boundary-crossing, wisdom through mistakes, laughter as medicine",
+    context:
+      "Coyote is one of the most significant figures in Native American mythology — a trickster deity who both creates and destroys, teaches through chaos, and breaks the rules that prevent growth. Unlike purely malevolent tricksters, Coyote's tricks often reveal deeper truths and serve the larger community even when they cause temporary disruption.",
+    psychologicalMeaning:
+      "Coyote represents the part of us that refuses to be serious when seriousness has become a prison — the capacity to laugh at our own attachments, break our own rules, and find the unexpected path through impossible situations.",
+    relatedSpells: [
+      "Chaos Magick Sigil",
+      "Cross-Roads Ritual",
+      "Glamour Weaving",
+    ],
+    relatedSigils: ["Chaos Star", "Sigil of the Abyss"],
+  },
+  {
+    name: "Sekhmet",
+    type: "Deity",
+    origin: "Ancient Egyptian mythology, Kemetic tradition",
+    domain:
+      "Fierce healing, war, disease and its cure, righteous anger, lioness power, solar force",
+    context:
+      "Sekhmet is the lioness-headed goddess of Egypt — both the bringer of plagues and their cure, the warrior of Ra and the great healer. Her name means 'she who is powerful.' She embodies the paradox that the same force capable of destruction is also the force capable of the most profound healing when properly directed.",
+    psychologicalMeaning:
+      "Sekhmet represents the healing power of righteous anger — the energy that says 'enough' and acts with absolute conviction. She is the archetype of the healer who does not flinch from the severity of what must be done to restore true health.",
+    relatedSpells: [
+      "Protection Circle",
+      "Candle Magic",
+      "Healing Transmission",
+    ],
+    relatedSigils: ["Eye of Ra", "Sigil of Horus"],
+  },
+  {
+    name: "Baba Yaga",
+    type: "Archetype",
+    subCategory: "Dark Feminine / Initiatory Guide",
+    origin: "Slavic mythology (Russia, Ukraine, Poland)",
+    domain:
+      "Initiation through ordeal, forest wisdom, transformation, death and rebirth, the tests of readiness",
+    context:
+      "Baba Yaga is the wild witch of Slavic mythology who lives in a hut on chicken legs in the deep forest. She is neither good nor evil — she tests those who come to her with tasks that separate the worthy from the unready. Those who meet her tests receive her wisdom and magical gifts; those who fail are consumed.",
+    psychologicalMeaning:
+      "Baba Yaga embodies the initiatory experience — the ordeal that strips away pretense and tests whether you are truly ready for the next level. She is the archetype of wisdom that cannot be inherited but must be earned through the willingness to be fully tested.",
+    relatedSpells: [
+      "Shadow Work Integration",
+      "Cross-Roads Ritual",
+      "Ancestor Altar Ritual",
+    ],
+    relatedSigils: ["Sigil of the Abyss", "Black Sun (Sonnenrad)"],
+  },
+  {
+    name: "Cerridwen",
+    type: "Deity",
+    origin: "Celtic mythology (Welsh tradition)",
+    domain:
+      "Cauldron of transformation, dark goddess, wisdom, bardic inspiration, death and rebirth cycles",
+    context:
+      "Cerridwen is the Welsh witch-goddess who brews the cauldron of Awen — divine inspiration — for a year and a day. Her myth involves her servant Gwion Bach accidentally tasting three drops of the brew, initiating a shapeshifting chase that ends in death and rebirth as the bard Taliesin. She embodies the transformative process itself.",
+    psychologicalMeaning:
+      "Cerridwen represents the deep alchemical transformation that cannot be rushed — the year-long brewing of wisdom, the way that true inspiration comes not as a gift but as the product of sustained effort and the willingness to be unmade and remade.",
+    relatedSpells: [
+      "Cauldron Spell",
+      "Shadow Work Integration",
+      "Ancestor Altar Ritual",
+    ],
+    relatedSigils: ["Triquetra", "Cauldron Sigil", "Triple Moon"],
+  },
+  {
+    name: "Raijin",
+    type: "Deity",
+    origin: "Japanese mythology, Shinto tradition",
+    domain:
+      "Thunder, lightning, storms, drums, the percussion of creation, purification through sound",
+    context:
+      "Raijin is the Japanese god of thunder and lightning, often depicted as a fearsome figure surrounded by drums that he beats to create the sound of thunder. He is typically paired with Fujin (wind god). In Shinto belief, Raijin's thunder drives away evil and purifies the air — the storm is not a punishment but a cosmic cleansing.",
+    psychologicalMeaning:
+      "Raijin represents the purifying power of explosive release — the emotional thunderstorm that clears accumulated tension and restores fresh air to the inner landscape. He is the archetype of cathartic expression.",
+    relatedSpells: ["Fire Spell", "Protection Circle", "Cord Binding Oath"],
+    relatedSigils: ["Tempest Rune", "Algiz (Rune)"],
+  },
+  {
+    name: "Saraqael",
+    type: "Angel",
+    origin: "Jewish apocalyptic tradition (Book of Enoch), Hermetic angelology",
+    domain:
+      "Visions, secrets, hidden knowledge, the revelation of what is concealed, the mysteries of the deep",
+    context:
+      "Saraqael (also Sariel or Suriel) is one of the seven archangels named in the Book of Enoch, associated with the revelation of hidden things and the unlocking of divine secrets. He is the angel of visions — the messenger who reveals what is concealed, illuminates the unseen dimensions of reality, and delivers prophetic sight.",
+    psychologicalMeaning:
+      "Saraqael represents the part of consciousness that already knows what is hidden — the intuitive faculty that pierces through appearances to the underlying truth. He embodies the courage to see clearly even when what is revealed is challenging.",
+    relatedSpells: ["Invocation", "Sigil Charging", "Talisman Creation"],
+    relatedSigils: ["Enochian Seal", "Bind Rune of Awakening"],
+  },
+  {
+    name: "The Outsider",
+    type: "Archetype",
+    subCategory: "Liminal / Threshold Archetype",
+    origin:
+      "Jungian psychology, existentialist philosophy, cross-cultural mythology",
+    domain:
+      "Liminality, the threshold, non-belonging as power, the observer position, radical perspective",
+    context:
+      "The Outsider is the universal archetype of the one who stands at the boundary — neither fully inside nor outside any system. The Outsider exists in every tradition: the stranger who arrives in the village, the fool who speaks truth to kings, the exile who sees the homeland more clearly from a distance.",
+    psychologicalMeaning:
+      "The Outsider represents the power that comes from not being fully captured by any single system's rules or stories. The outsider position grants the freedom to see what insiders cannot — and the capacity to change what they cannot imagine changing.",
+    relatedSpells: [
+      "Cross-Roads Ritual",
+      "Chaos Magick Sigil",
+      "Void Meditation",
+    ],
+    relatedSigils: ["Chaos Star", "Sigil of the Abyss"],
+  },
+  {
+    name: "The Eternal Child",
+    type: "Archetype",
+    subCategory: "Puer Aeternus (Renewal Variant)",
+    origin:
+      "Jungian psychology, mythology of divine children across traditions",
+    domain:
+      "Perpetual renewal, beginner's mind, wonder, the power of fresh starts, innocence as a spiritual force",
+    context:
+      "The Eternal Child (Puer Aeternus in its regenerative aspect) represents the archetype of perpetual beginning — the capacity to meet every moment fresh, to find wonder in what is ordinary, and to begin again without the weight of past failures. Unlike the avoidant puer who refuses to grow, this variant embodies the spiritual gift of perennial renewal.",
+    psychologicalMeaning:
+      "The Eternal Child represents the beginner's mind that Zen masters describe — the openness that allows learning to continue indefinitely. It is the gift of finding everything interesting, the refusal to let familiarity collapse into boredom.",
+    relatedSpells: ["Glamour Weaving", "Candle Magic", "Solar Charging Ritual"],
+    relatedSigils: ["Flower of Life", "Bind Rune of Awakening"],
+  },
 ];
 
 const TYPE_COLORS: Record<EntityType, string> = {

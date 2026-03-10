@@ -613,6 +613,176 @@ const SPELLS: Spell[] = [
     affirmationConversion:
       "Healing work becomes self-regeneration: 'I am a channel of healing and restoration. My body knows how to heal itself perfectly and completely. Every cell of my being vibrates with life, health, and vitality. I am continuously renewed, regenerated, and restored to wholeness.'",
   },
+  {
+    name: "Cord Binding Oath",
+    tradition: "Ceremonial",
+    purpose:
+      "A formal energetic agreement or sacred vow made with the self, the universe, or a spiritual witness. The cord represents a binding commitment — not constriction but covenant. Used to seal intentions, mark initiations, and formalize inner commitments with external symbolic power.",
+    components: [
+      "A cord in a meaningful color",
+      "Clear statement of the oath or commitment",
+      "Three knots (beginning, middle, completion)",
+      "Candle witness in white or silver",
+      "Declaration at dawn, noon, or midnight",
+    ],
+    symbolicMeaning:
+      "Binding oaths exist across every tradition — from the Norse blót to Arthurian knighthood vows to Masonic oaths. The act of binding symbolizes the transformation of intention into covenant, which carries the weight of symbolic law.",
+    affirmationConversion:
+      "Sacred commitment becomes identity: 'I am fully committed to my highest path. My intentions are sealed and certain. I follow through on every sacred promise I make to myself. My word is law within my reality.'",
+  },
+  {
+    name: "Ancestor Altar Ritual",
+    tradition: "Wicca",
+    purpose:
+      "A ritual practice of consciously connecting with ancestral lineages — blood ancestors, spiritual ancestors, and archetypal forebears — to receive their wisdom, healing, and support. The altar creates a liminal space between the living and the lineage.",
+    components: [
+      "Photos or objects representing ancestors",
+      "Candle in white or black",
+      "Water offering",
+      "Favorite food or drink of ancestors",
+      "Verbal call and invitation",
+    ],
+    symbolicMeaning:
+      "Ancestor reverence is one of the most universal spiritual practices on earth, present across African, Asian, European, and Indigenous traditions. The altar represents the acknowledgment that individual identity emerges from a vast web of those who came before.",
+    affirmationConversion:
+      "Ancestral connection becomes inherited power: 'I carry the strength and wisdom of all who came before me. My ancestors guide and protect me. I heal the patterns of my lineage and transmit only love and power forward. I stand on the shoulders of giants.'",
+  },
+  {
+    name: "Witch's Ladder",
+    tradition: "Wicca",
+    purpose:
+      "A knotted cord, string, or rope with beads or feathers tied at intervals, used as a physical focus for repetitive spell work or counting meditation. Each knot or bead holds a programmed intention that is activated with each pass of the fingers.",
+    components: [
+      "Cord or rope (natural fiber preferred)",
+      "Nine knots or a chosen sacred number",
+      "Beads, feathers, or shells at intervals",
+      "Spoken or sung intention per knot",
+      "Storage on altar or worn on body",
+    ],
+    symbolicMeaning:
+      "Knotwork magic draws from Norse völva traditions, Voodoo cord magic, and the rosary. The ladder represents a structured escalation — each knot both records and deepens the intention, building cumulative energetic charge.",
+    affirmationConversion:
+      "Repetitive knotwork becomes neurological patterning: 'With every repetition, my affirmations go deeper. My subconscious mind receives and accepts all that I declare. Each cycle strengthens the certainty of my manifestation.'",
+  },
+  {
+    name: "Cross-Roads Ritual",
+    tradition: "Ceremonial",
+    purpose:
+      "A ritual performed at symbolic or literal crossroads — a point of decision, transition, and liminal power. The crossroads is the domain of trickster figures, guides of the dead, and deities of transition. It is used to release old paths and open new ones.",
+    components: [
+      "A crossroads (real or symbolic — chalk on floor)",
+      "An offering for the crossroads deity",
+      "Something to release (written, then buried or burned)",
+      "A declaration of new direction",
+      "Departure without looking back",
+    ],
+    symbolicMeaning:
+      "Crossroads appear in African diaspora traditions (Eshu/Elegba), European devil-deal mythology, Norse path-lore, and Greek Hecate worship. The crossroads is the space where all possible futures exist simultaneously — before one path is chosen.",
+    affirmationConversion:
+      "The crossroads becomes decision clarity: 'I release all paths that no longer serve me. I stand at the crossroads with complete clarity and choose my highest path. My new direction is open, clear, and fully supported.'",
+  },
+  {
+    name: "Glamour Weaving",
+    tradition: "Sigil Work",
+    purpose:
+      "An advanced image-shaping practice — not merely cosmetic, but a full energetic projection of how one wishes to be perceived. Drawing from fae glamour mythology and theatrical magic, this spell shapes the psychic impression you make before words are even spoken.",
+    components: [
+      "Mirror work and intentional self-gaze",
+      "Aura visualization in a chosen color",
+      "Spoken projection statement",
+      "Optional: perfume or oil worn with intention",
+      "Movement or walk practice with the projected energy",
+    ],
+    symbolicMeaning:
+      "Glamour magic draws from Irish/Scottish faerie lore where the fae could alter perception at will. In Chaos Magic it represents mastery of the signal you broadcast — the energetic presentation that precedes and shapes all interaction.",
+    affirmationConversion:
+      "Glamour projection becomes magnetic presence: 'I project exactly the energy I choose. My presence is captivating, memorable, and powerful. People experience me as I intend them to. My energy enters the room before I do.'",
+  },
+  {
+    name: "Solar Charging Ritual",
+    tradition: "Elemental",
+    purpose:
+      "A sun-based energy work practice that uses direct solar exposure, visualization, and intention to charge the body, objects, or sigils with solar vitality. Used for boosting confidence, courage, health, and active manifestation.",
+    components: [
+      "Direct sunlight exposure (dawn or noon preferred)",
+      "Arms open, palms up, facing the sun",
+      "Deep breathing synchronized with light visualization",
+      "Objects or crystals placed in direct sun",
+      "Spoken declaration of charge",
+    ],
+    symbolicMeaning:
+      "Solar rituals appear in Egyptian, Aztec, Vedic, and Germanic traditions. The sun represents active, outward, creative, and masculine-principle energy. Solar charging is filling yourself with the drive to create and act.",
+    affirmationConversion:
+      "Solar charging becomes vitality activation: 'I am filled with the power of the sun. My energy is limitless, radiant, and inexhaustible. I act with confidence, clarity, and solar certainty. My will is as relentless as the sun's light.'",
+  },
+  {
+    name: "Lunar Drawing Down",
+    tradition: "Wicca",
+    purpose:
+      "A Wiccan and neo-pagan ritual in which the practitioner consciously draws the energy and presence of the moon into themselves — particularly popular at the full moon. The practitioner becomes a vessel for lunar consciousness, receiving intuition, healing, and revelation.",
+    components: [
+      "Full moon or new moon (for different purposes)",
+      "Arms raised toward the moon",
+      "Spoken invocation of the lunar deity",
+      "Receptive, relaxed body and mind",
+      "Journaling or oracle work immediately after",
+    ],
+    symbolicMeaning:
+      "Drawing Down the Moon is a central Wiccan rite associated with the Great Goddess. The moon represents the unconscious, the cyclic, the emotional, and the intuitive dimensions of the self.",
+    affirmationConversion:
+      "Lunar drawing becomes intuition activation: 'I am aligned with the cycles of the moon and my own deeper nature. My intuition flows freely and accurately. I trust the wisdom that arises from within. My inner knowing is always right on time.'",
+  },
+  {
+    name: "Spirit House Construction",
+    tradition: "Ceremonial",
+    purpose:
+      "The intentional construction or designation of a physical object or space as a dwelling for a spirit, egregore, servitor, or deity. Common in Southeast Asian and African Traditional Religion contexts, this practice externalizes spiritual relationships into a tangible, maintained relationship.",
+    components: [
+      "A box, statue, or natural object",
+      "Consecration and naming ceremony",
+      "Offerings on a regular schedule",
+      "Clear purpose and agreement with the spirit",
+      "Respectful treatment and gratitude protocol",
+    ],
+    symbolicMeaning:
+      "Spirit houses appear globally: the Thai spirit house (San Phra Phum), Yoruba Orisha shrines, Shinto kamidana, and European house blessing traditions. They represent the formal acknowledgment of a reciprocal relationship between the practitioner and the spiritual intelligence.",
+    affirmationConversion:
+      "Spirit house work becomes intentional relationship: 'I cultivate powerful relationships with the forces that support my highest evolution. I give and receive in sacred reciprocity. My spiritual allies are active partners in my life and growth.'",
+  },
+  {
+    name: "Void Meditation",
+    tradition: "Sigil Work",
+    purpose:
+      "A practice of deliberately entering a state of emptiness — the absence of thought, image, and sensation — as both a magical act and a state from which new creation can emerge. The void is the canvas before creation, the silence before the word.",
+    components: [
+      "Dark, silent space",
+      "Extended breathwork to quiet the mind",
+      "Active release of all thoughts as they arise",
+      "Extended silent resting in emptiness",
+      "Gentle emergence with one seed intention",
+    ],
+    symbolicMeaning:
+      "The void appears in creation mythology worldwide: the Ain Soph of Kabbalah, the Tao that cannot be named, the Buddhist sunyata (emptiness), and the Chaos before cosmos. The void is not absence but infinite potential.",
+    affirmationConversion:
+      "Void meditation becomes creation space: 'I am empty and full simultaneously. From my stillness, new creation arises. The silence within me is charged with possibility. I create from a deep well of peace, not urgency.'",
+  },
+  {
+    name: "Red Thread Ritual",
+    tradition: "Ceremonial",
+    purpose:
+      "A practice drawing from Kabbalah, Chinese fate-thread mythology (the red thread of destiny), and protection magic traditions. The red thread represents connected fates, protective boundaries, and the visible marking of sacred relationships or warded spaces.",
+    components: [
+      "Red thread or cord",
+      "Intention declaration for each tying",
+      "Optional: seven knots (Kabbalah tradition)",
+      "Worn on left wrist (receiving side)",
+      "Regular renewal with fresh intention",
+    ],
+    symbolicMeaning:
+      "The red thread appears in Kabbalah as a protective talisman against the evil eye, in Chinese mythology as the invisible thread connecting destined soulmates, and across Eurasian traditions as a protective boundary marker.",
+    affirmationConversion:
+      "The red thread becomes connection and protection: 'I am connected to every destined soul and experience meant for me. I am protected from all forces that do not serve my highest good. My sacred bonds are strong, lasting, and meaningful.'",
+  },
 ];
 
 const TRADITION_COLORS: Record<SpellTradition, string> = {

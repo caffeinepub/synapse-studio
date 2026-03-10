@@ -460,6 +460,254 @@ const RELIGIONS: Religion[] = [
       "light of creation",
     ],
   },
+  {
+    name: "Rosicrucianism",
+    symbol: "✠",
+    category: "New Age & Esoteric",
+    overview:
+      "Rosicrucianism is a spiritual and philosophical tradition rooted in the early 17th century manifestos of the legendary Fraternity of the Rose Cross. It blends mystical Christianity, Hermeticism, Kabbalah, and alchemical philosophy into a unified system of inner transformation and secret wisdom.",
+    coreBeliefs: [
+      "The universe contains hidden laws accessible through esoteric study and inner development",
+      "Alchemy is both a literal and spiritual science — transforming base matter and base consciousness simultaneously",
+      "An invisible brotherhood of illumined masters preserves ancient wisdom across generations",
+      "The rose symbolizes the unfolding soul; the cross symbolizes the material world — together they represent spiritual evolution within physical life",
+      "Service to humanity is the highest expression of spiritual attainment",
+    ],
+    sacredTexts: [
+      "Fama Fraternitatis (1614)",
+      "Confessio Fraternitatis (1615)",
+      "The Chemical Wedding of Christian Rosenkreuz (1616)",
+      "The Secret Doctrine (Helena Blavatsky, related tradition)",
+    ],
+    keyFigures: [
+      "Christian Rosenkreuz (legendary founder)",
+      "Michael Maier",
+      "Robert Fludd",
+      "Max Heindel",
+      "H. Spencer Lewis (AMORC founder)",
+    ],
+    affirmationThemes: [
+      "hidden wisdom",
+      "alchemical transformation",
+      "inner illumination",
+      "service to humanity",
+    ],
+  },
+  {
+    name: "Anthroposophy",
+    symbol: "⬡",
+    category: "New Age & Esoteric",
+    overview:
+      "Anthroposophy, developed by Rudolf Steiner in the early 20th century, is a spiritual philosophy that extends scientific methodology into the spiritual realm. It holds that human consciousness can, through disciplined development, directly perceive spiritual realities. It gave rise to Waldorf education, biodynamic farming, and Steiner's unique approach to karma and reincarnation.",
+    coreBeliefs: [
+      "Spiritual realities are as objective as physical ones and can be investigated with disciplined inner development",
+      "The human being consists of physical body, life body (etheric), soul body (astral), and spiritual self",
+      "Karma and reincarnation operate as laws of spiritual development across multiple lifetimes",
+      "Christ event was a unique cosmic turning point in the evolution of human consciousness",
+      "Art, education, and farming are spiritual activities when practiced with full consciousness",
+    ],
+    sacredTexts: [
+      "Knowledge of Higher Worlds — Rudolf Steiner",
+      "Occult Science: An Outline — Rudolf Steiner",
+      "Theosophy — Rudolf Steiner",
+      "The Philosophy of Freedom — Rudolf Steiner",
+    ],
+    keyFigures: [
+      "Rudolf Steiner",
+      "Marie Steiner-von Sivers",
+      "Ita Wegman (medical anthroposophy)",
+    ],
+    affirmationThemes: [
+      "spiritual development",
+      "karmic wisdom",
+      "inner perception",
+      "evolving consciousness",
+    ],
+  },
+  {
+    name: "Druidry / Neo-Druidism",
+    symbol: "🌿",
+    category: "Indigenous & Shamanic",
+    overview:
+      "Druidry is a modern spiritual movement inspired by the ancient Celtic priestly class known as druids. Contemporary Druidry emphasizes reverence for nature, the cycles of the seasons, oral tradition, poetic expression, and the sacred relationship between humanity and the living earth.",
+    coreBeliefs: [
+      "The natural world is sacred — trees, rivers, animals, and stones are all alive with spirit",
+      "The oak tree is the axis of the world; mistletoe is the sacred medicine of life",
+      "Three realms exist: Land, Sea, and Sky — each corresponding to body, soul, and spirit",
+      "Awen (divine inspiration) is the animating force available to all who open themselves to it",
+      "The seasonal cycles — solstices, equinoxes, and cross-quarter days — mark the sacred calendar",
+    ],
+    sacredTexts: [
+      "Barddas (Iolo Morganwg)",
+      "The Book of Druidry (Ross Nichols)",
+      "Druid Magic (Philip Carr-Gomm)",
+      "Celtic oral traditions and mythology",
+    ],
+    keyFigures: [
+      "John Toland (1726, revival)",
+      "Iolo Morganwg (Edward Williams)",
+      "Ross Nichols (OBOD founder)",
+      "Philip Carr-Gomm",
+    ],
+    affirmationThemes: [
+      "nature reverence",
+      "divine inspiration",
+      "seasonal wisdom",
+      "sacred connection to the earth",
+    ],
+  },
+  {
+    name: "Bon",
+    symbol: "卍",
+    category: "Eastern",
+    overview:
+      "Bon is the indigenous spiritual tradition of Tibet, predating the arrival of Buddhism by centuries. Often called Yungdrung Bon (the eternal Bon), it preserves unique teachings on dzogchen (the great perfection), cosmology, spirit world navigation, and ritual practices distinct from Tibetan Buddhism yet deeply interwoven with it.",
+    coreBeliefs: [
+      "The primordial state of awareness (rigpa) is the nature of mind — luminous, empty, and beyond all constructs",
+      "The universe is populated with spirits, deities, and forces that can be navigated through shamanic practice",
+      "Dzogchen practice offers direct recognition of the nature of mind without conceptual elaboration",
+      "Nine vehicles (thegpas) of practice lead progressively to liberation",
+      "Oral transmission from teacher to student preserves the living power of the teachings",
+    ],
+    sacredTexts: [
+      "Zhang Zhung Nyengyu (oral transmission from Zhang Zhung)",
+      "Terma (treasure texts revealed by tertöns)",
+      "Kanjur and Tanjur (Bon canon)",
+    ],
+    keyFigures: [
+      "Tonpa Shenrab Miwoche (legendary founder)",
+      "Tenzin Wangyal Rinpoche",
+      "Lopon Tenzin Namdak",
+    ],
+    affirmationThemes: [
+      "primordial awareness",
+      "spirit world wisdom",
+      "the nature of mind",
+      "eternal presence",
+    ],
+  },
+  {
+    name: "Yazidism",
+    symbol: "☀",
+    category: "Abrahamic",
+    overview:
+      "Yazidism is one of the world's oldest living religions, practiced primarily by the Yazidi people of northern Iraq. It is a syncretic tradition incorporating elements of ancient Mesopotamian religion, Zoroastrianism, Islam, Christianity, and Judaism. Central to Yazidism is the Peacock Angel (Melek Taus) — a divine being who refused to bow to Adam and was redeemed through his own tears.",
+    coreBeliefs: [
+      "Melek Taus (the Peacock Angel) is the chief of seven holy beings who govern creation",
+      "The world was created from a pearl and shaped by divine intervention across seven days",
+      "Reincarnation purifies the soul across many lives toward ultimate union with the divine",
+      "Yazidis are a distinct spiritual community whose identity cannot be adopted — it is inherited",
+      "Oral transmission through the Qewwals (sacred singers) preserves the religion's deepest wisdom",
+    ],
+    sacredTexts: [
+      "Kitab al-Jilwa (Book of Illumination)",
+      "Mishefa Res (Black Book)",
+      "Oral hymns and prayers transmitted by Qewwals",
+    ],
+    keyFigures: [
+      "Sheikh Adi ibn Musafir (12th c. saint, central figure)",
+      "Melek Taus (divine being)",
+      "Seven Holy Beings (Heft Sirr)",
+    ],
+    affirmationThemes: [
+      "divine emanation",
+      "purification across lifetimes",
+      "oral wisdom transmission",
+      "sacred community",
+    ],
+  },
+  {
+    name: "Church of All Worlds",
+    symbol: "🌐",
+    category: "New Age & Esoteric",
+    overview:
+      "The Church of All Worlds (CAW) is a neo-pagan religious organization founded in 1962 by Oberon Zell-Ravenheart (then Tim Zell) and others, inspired in part by Robert A. Heinlein's novel Stranger in a Strange Land. It centers on the Gaia hypothesis — the understanding of the Earth as a living being — and the practice of grokking: deep, total, intuitive understanding.",
+    coreBeliefs: [
+      "The Earth (Gaia) is a living, conscious being deserving of reverence and reciprocity",
+      "Grokking — the complete understanding of something by becoming fully one with it — is a spiritual practice",
+      "Divinity is immanent in nature and in each person: 'Thou art God/dess'",
+      "Water-sharing ritual creates bonds of deep connection between community members",
+      "Evolution of consciousness is both a personal and planetary project",
+    ],
+    sacredTexts: [
+      "Stranger in a Strange Land — Robert A. Heinlein (inspirational source)",
+      "Green Egg magazine (CAW publication)",
+      "Grimoire for the Apprentice Wizard — Oberon Zell-Ravenheart",
+    ],
+    keyFigures: [
+      "Oberon Zell-Ravenheart (founder)",
+      "Morning Glory Zell-Ravenheart (co-founder)",
+      "Robert A. Heinlein (literary inspiration)",
+    ],
+    affirmationThemes: [
+      "earth consciousness",
+      "deep understanding",
+      "divine immanence",
+      "community and belonging",
+    ],
+  },
+  {
+    name: "Tenrikyo",
+    symbol: "✿",
+    category: "Eastern",
+    overview:
+      "Tenrikyo is a Japanese new religion founded in 1838 by Miki Nakayama (Oyasama), who claimed to have received divine revelation from a deity called Tenri-O-no-Mikoto (God the Parent). It emphasizes joyous living (yoki-gurashi), the purification of the mind from dusts (negative mental tendencies), and the vision of humanity as a single family under one parent God.",
+    coreBeliefs: [
+      "Joyous living (yoki-gurashi) is the ultimate purpose of human existence",
+      "The mind accumulates eight dusts — greed, miserliness, self-love, hatred, enmity, anger, covetousness, and arrogance — that cause suffering",
+      "Sweeping the mind clean of dusts through hinokishin (daily service) brings divine blessing",
+      "All humanity is children of a single Parent God who desires only our happiness",
+      "The original homeland of humanity is Jiba (the church headquarters in Tenri, Japan)",
+    ],
+    sacredTexts: [
+      "Ofudesaki (The Tip of the Divine Writing Brush) — Oyasama",
+      "Mikagura-uta (Songs for the Service)",
+      "Osashizu (Divine Directions)",
+    ],
+    keyFigures: [
+      "Miki Nakayama (Oyasama, founder)",
+      "Izo Iburi (Honseki)",
+      "Tenri-O-no-Mikoto (God the Parent)",
+    ],
+    affirmationThemes: [
+      "joyous living",
+      "mind purification",
+      "divine parenthood",
+      "service and gratitude",
+    ],
+  },
+  {
+    name: "Spiritualism",
+    symbol: "∞",
+    category: "New Age & Esoteric",
+    overview:
+      "Spiritualism is a religious movement that emerged in the mid-19th century, centered on the belief that the spirits of the dead can communicate with the living through mediums. It arose dramatically with the Fox Sisters' alleged spirit communications in 1848 and spread rapidly across the United States and Europe, attracting millions of adherents including prominent intellectuals.",
+    coreBeliefs: [
+      "The soul survives physical death and continues to exist and develop in the spirit world",
+      "Communication between the living and the deceased is possible through gifted mediums",
+      "The spirit world is not a fixed destination but an evolving realm of continued growth",
+      "There is no eternal damnation — all souls progress toward the divine at their own pace",
+      "Spiritual gifts (mediumship, healing, clairvoyance) are natural human faculties that can be developed",
+    ],
+    sacredTexts: [
+      "The Spirits' Book — Allan Kardec (Spiritism variant)",
+      "The Book on Mediums — Allan Kardec",
+      "Seth Speaks — Jane Roberts",
+      "Writings from the Fox Sisters and early mediums",
+    ],
+    keyFigures: [
+      "Kate and Margaret Fox (1848, founding event)",
+      "Allan Kardec (Spiritism founder)",
+      "Arthur Conan Doyle (prominent advocate)",
+      "Helena Blavatsky (influenced by Spiritualism)",
+    ],
+    affirmationThemes: [
+      "eternal soul",
+      "spirit communication",
+      "life beyond death",
+      "natural spiritual gifts",
+    ],
+  },
 ];
 
 const CATEGORY_COLORS: Record<Religion["category"], string> = {

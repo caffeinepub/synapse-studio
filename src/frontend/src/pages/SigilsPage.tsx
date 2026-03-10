@@ -570,6 +570,161 @@ const SIGILS: Sigil[] = [
     subliminalUse:
       "Use for subliminals about angelic communication, divine language, Enochian activation, and direct access to the angelic hierarchy.",
   },
+  {
+    name: "Bind Rune of Awakening",
+    symbol: "ᚨ",
+    category: "Wisdom",
+    meaning:
+      "A composite rune combining Ansuz (divine communication), Raidho (sacred journey), and Dagaz (breakthrough/dawn) — traditionally formed by overlapping the three runes into a single unified glyph. It represents the activation of spiritual awareness, the opening of channels to higher guidance, and the dawning of a new phase of consciousness.",
+    origin: "Norse runic tradition, Elder Futhark",
+    connectedEntities: ["Odin", "Freya", "The Sage"],
+    connectedSpells: ["Sigil Charging", "Invocation", "Talisman Creation"],
+    subliminalUse:
+      "Use for subliminals about spiritual awakening, divine communication, and accessing higher states of consciousness and intuition.",
+  },
+  {
+    name: "Sigil of Venus",
+    symbol: "♀",
+    category: "Love/Venus",
+    meaning:
+      "The planetary seal of Venus — circle atop a cross — is one of the most ancient and universally recognized symbols, appearing in biology (female sex symbol), planetary notation, and ceremonial magic as the seal of the sphere of love, beauty, and attraction. In Hermetic magic it governs all matters of the heart, art, and magnetic attraction.",
+    origin: "Hermetic planetary tradition, Greco-Roman astrology",
+    connectedEntities: ["Aphrodite / Venus", "Oshun", "Freya", "Lakshmi"],
+    connectedSpells: ["Glamour Spell", "Candle Magic", "Desire Sigil"],
+    subliminalUse:
+      "Use for subliminals about love, attraction, beauty, artistic ability, and magnetic social presence.",
+  },
+  {
+    name: "Sigil of Mars",
+    symbol: "♂",
+    category: "Power",
+    meaning:
+      "The planetary seal of Mars — circle with an arrow — governs will, action, courage, conflict, and physical vitality. In ceremonial magic it is the seal of the war sphere, but at a higher octave it represents disciplined will directed toward worthy goals. It empowers those who feel their action is blocked or their courage diminished.",
+    origin: "Hermetic planetary tradition, Greco-Roman astrology",
+    connectedEntities: ["Ares / Mars", "Thor", "Shango", "The Hero"],
+    connectedSpells: ["Fire Spell", "Candle Magic", "Cord Binding Oath"],
+    subliminalUse:
+      "Use for subliminals about courage, willpower, physical strength, assertiveness, and the drive to take bold decisive action.",
+  },
+  {
+    name: "Sigil of Saturn",
+    symbol: "♄",
+    category: "Chaos/Left-Hand",
+    meaning:
+      "Saturn's sigil governs time, limits, karma, discipline, and the hard-won wisdom of endurance. In ceremonial magic Saturn rules over binding, structure, and the long game — it rewards patience and punishes shortcuts. Used to establish lasting foundations, break karmic cycles, and build with permanence.",
+    origin: "Hermetic planetary tradition, Greco-Roman astrology",
+    connectedEntities: ["Chronos", "Odin", "Veles", "The Wise Old Man"],
+    connectedSpells: ["Cord Binding Oath", "Talisman Creation", "Knot Magic"],
+    subliminalUse:
+      "Use for subliminals about discipline, patience, karmic resolution, building lasting foundations, and overcoming long-standing obstacles through persistent effort.",
+  },
+  {
+    name: "Sigil of Jupiter",
+    symbol: "♃",
+    category: "Manifestation",
+    meaning:
+      "Jupiter's seal governs expansion, abundance, good fortune, and the sphere of higher ideals. It is the most traditionally benevolent of the planetary seals, associated with luck, wealth, and the ability to access opportunity. In Hermetic magic, Jupiter workings are done for growth, prosperity, and the expansion of potential in any area.",
+    origin: "Hermetic planetary tradition, Greco-Roman astrology",
+    connectedEntities: [
+      "Zeus / Jupiter",
+      "Thor",
+      "Lakshmi",
+      "The Ruler / Sovereign",
+    ],
+    connectedSpells: [
+      "Abundance Ritual",
+      "Candle Magic",
+      "Solar Charging Ritual",
+    ],
+    subliminalUse:
+      "Use for subliminals about financial abundance, luck, expansion, growth, and accessing opportunities that feel larger than your current circumstances.",
+  },
+  {
+    name: "Trident of Poseidon",
+    symbol: "⋔",
+    category: "Egyptian",
+    meaning:
+      "The three-pronged trident represents the three aspects of water: surface (conscious), middle depths (subconscious), and the abyss (the unconscious). It is the symbol of dominion over the sea — the vast, boundless unconscious realm — and of authority over the emotional and intuitive dimensions of existence.",
+    origin: "Greek mythology, Greco-Roman religion",
+    connectedEntities: ["Poseidon / Neptune", "Shiva", "The Dragon"],
+    connectedSpells: ["Water Ritual", "Lunar Drawing Down", "Void Meditation"],
+    subliminalUse:
+      "Use for subliminals about emotional mastery, depth of feeling, navigating the unconscious, and the authority that comes from having processed the full depth of your inner world.",
+  },
+  {
+    name: "Kintsugi Symbol",
+    symbol: "金",
+    category: "Chaos/Left-Hand",
+    meaning:
+      "Derived from the Japanese art of repairing broken pottery with gold, the Kintsugi symbol represents the philosophy that breakage and repair are part of an object's history — not something to hide but to celebrate. As a sigil it represents the transformation of wounds into sources of beauty and strength.",
+    origin: "Japanese wabi-sabi philosophy, Zen aesthetics",
+    connectedEntities: [
+      "The Phoenix",
+      "The Shadow",
+      "The Caregiver / Wounded Healer",
+    ],
+    connectedSpells: [
+      "Cord Cutting",
+      "Shadow Work Integration",
+      "Healing Transmission",
+    ],
+    subliminalUse:
+      "Use for subliminals about turning trauma into power, finding beauty in imperfection, and the transformation of wounds into the most luminous aspects of your identity.",
+  },
+  {
+    name: "Sigil of the Abyss",
+    symbol: "𝔄",
+    category: "Wisdom",
+    meaning:
+      "The Abyss sigil draws from Kabbalistic and Thelemic traditions where the Abyss represents the gap between human consciousness and divine consciousness — a void that must be crossed for full spiritual adulthood. It is not a sign of darkness but of initiation — the willingness to release all familiar constructs of self.",
+    origin: "Thelemic tradition, Aleister Crowley, Kabbalah (Daath)",
+    connectedEntities: [
+      "Azazel",
+      "Lucifer",
+      "The Shadow",
+      "Choronzon (Thelema)",
+    ],
+    connectedSpells: [
+      "Void Meditation",
+      "Shadow Work Integration",
+      "Cross-Roads Ritual",
+    ],
+    subliminalUse:
+      "Use for subliminals about profound identity transformation, spiritual initiation, crossing major life thresholds, and the dissolution of limiting self-concepts.",
+  },
+  {
+    name: "Sigil of Horus",
+    symbol: "𓂀",
+    category: "Power",
+    meaning:
+      "The Eye of Horus distinguished from the Eye of Ra in that Horus represents the active, living divine king — the principle of restored sovereignty after usurpation. The Horus sigil governs rightful power reclaimed, justice enacted, and the victory of the true will over those who would suppress it.",
+    origin: "Ancient Egyptian mythology, Kemetic tradition",
+    connectedEntities: ["Ra", "Isis", "The Ruler / Sovereign", "The Hero"],
+    connectedSpells: ["Invocation", "Candle Magic", "Cord Binding Oath"],
+    subliminalUse:
+      "Use for subliminals about reclaiming your power, overcoming oppression, stepping into rightful leadership, and the restoration of justice in your personal circumstances.",
+  },
+  {
+    name: "Black Sun (Sonnenrad)",
+    symbol: "☀",
+    category: "Power",
+    meaning:
+      "The Black Sun is a complex esoteric symbol representing the hidden or occult (literally hidden) sun — the spiritual sun behind the physical one, associated with the inner light of consciousness, shadow integration, and the alchemical nigredo (blackening) stage of transformation. In its highest interpretation it symbolizes enlightenment through darkness.",
+    origin: "Alchemical tradition, European esoteric tradition",
+    connectedEntities: [
+      "Odin",
+      "Tezcatlipoca",
+      "The Shadow",
+      "Lucifer (light-bearer aspect)",
+    ],
+    connectedSpells: [
+      "Shadow Work Integration",
+      "Void Meditation",
+      "Sigil Charging",
+    ],
+    subliminalUse:
+      "Use for subliminals about accessing your shadow, inner transformation through darkness, finding power in what was previously hidden or suppressed, and radical self-honesty.",
+  },
 ];
 
 const CATEGORY_COLORS: Record<SigilCategory, string> = {

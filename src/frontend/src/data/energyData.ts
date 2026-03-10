@@ -1080,4 +1080,274 @@ export const KINESIS_DATA: KinesisEntry[] = [
     psychologicalMetaphor:
       "Razor-sharp discernment, the ability to cut through confusion and noise to the essential truth, and the discipline of refining your mind until it is an instrument of absolute clarity.",
   },
+  {
+    name: "Litokinesis",
+    suffix: "kinesis",
+    element: "Stone",
+    fictionalOrigins:
+      "Stone manipulation draws from the legends of stonecutters blessed by earth deities, titans who could crumble mountains, and the ancient mythological image of a hero pulling a sword from stone as an act of sovereign will.",
+    mediaReferences: [
+      "Stoneman — various comics",
+      "Rock Lee (earth affinity metaphor) — Naruto",
+      "Tremor — Mortal Kombat",
+      "Stone Golems across fantasy traditions",
+      "Medusa's petrification — Greek mythology",
+    ],
+    symbolicMeaning:
+      "Stone is permanence, endurance, and memory encoded in matter. Litokinesis symbolizes the ability to make things permanent — to lock intentions into the fabric of the physical world.",
+    psychologicalMetaphor:
+      "Unshakeable resolve and the power of follow-through. The ability to make a decision and hold it without wavering — carving your intentions in stone.",
+  },
+  {
+    name: "Photosynthetikinesis",
+    suffix: "kinesis",
+    element: "Growth",
+    fictionalOrigins:
+      "The ability to accelerate and control biological growth through light and energy appears in science fiction as a hybridization of biokinesis and photokinesis, associated with nature spirits, druids, and cosmic gardeners.",
+    mediaReferences: [
+      "Poison Ivy — DC Comics",
+      "Sage — various fantasy",
+      "Nature spirits across mythology",
+      "Green Lantern (life constructs)",
+      "Chloromancer — game fiction",
+    ],
+    symbolicMeaning:
+      "Growth represents potential moving toward its fullest expression. Photosynthetikinesis embodies the capacity to nourish, accelerate, and consciously direct the conditions for flourishing.",
+    psychologicalMetaphor:
+      "The power to cultivate growth in yourself and others — providing the right conditions, light, and nourishment for any dream or ability to develop rapidly.",
+  },
+  {
+    name: "Kinetomimicry",
+    suffix: "kinesis",
+    element: "Mimicry",
+    fictionalOrigins:
+      "The ability to observe, absorb, and replicate any physical or energetic ability appears across superhero fiction, anime, and video game systems as one of the most coveted and narrative-rich powers — the ultimate adaptive ability.",
+    mediaReferences: [
+      "Kirby — Nintendo",
+      "Rogue — X-Men",
+      "Orochimaru — Naruto",
+      "Absorbing Man — Marvel",
+      "Sylar — Heroes (TV series)",
+    ],
+    symbolicMeaning:
+      "Mimicry represents infinite adaptability and the dissolution of limits. Kinetomimicry embodies the principle that exposure to greatness contains within it the seed of becoming great.",
+    psychologicalMetaphor:
+      "Accelerated learning through deep observation — the ability to watch a master perform and internalize the underlying pattern instantly, transcending years of practice.",
+  },
+  {
+    name: "Astrakinesis",
+    suffix: "kinesis",
+    element: "Astral",
+    fictionalOrigins:
+      "Control over the astral plane — the non-physical realm of consciousness, dreams, and disembodied travel — appears in occult tradition, shamanic journeying, and modern fiction as the most intimate intersection of mind and cosmos.",
+    mediaReferences: [
+      "Doctor Strange — Marvel",
+      "Akira — anime",
+      "The Matrix (Neo's awareness)",
+      "Astral projection traditions",
+      "Remote viewing programs (factual/fictional)",
+    ],
+    symbolicMeaning:
+      "The astral plane represents all that exists beyond the physical — thought-forms, possibility fields, the realm where intention exists before manifestation. Astrakinesis symbolizes conscious navigation of the space between thought and reality.",
+    psychologicalMetaphor:
+      "Mastery of imagination as a creative force — the ability to build vivid internal worlds so compelling they inevitably shape external reality.",
+  },
+  {
+    name: "Pyschometrokinesis",
+    suffix: "kinesis",
+    element: "Probability",
+    fictionalOrigins:
+      "Manipulation of probability and luck itself — bending fate, stacking chance, and controlling statistical outcomes — appears as one of the most philosophically interesting powers in superhero fiction, described as the ultimate meta-power that affects all others.",
+    mediaReferences: [
+      "Scarlet Witch — Marvel",
+      "Domino — Marvel",
+      "Jinx — DC",
+      "Black Cat — Marvel",
+      "Lucky characters across genre fiction",
+    ],
+    symbolicMeaning:
+      "Probability represents the fabric of what is possible. Controlling it means reshaping the boundary between the likely and the unlikely — making the improbable inevitable.",
+    psychologicalMetaphor:
+      "Radical confidence and expectation management — the deeply held belief that circumstances arrange themselves in your favor, transforming how you perceive and respond to events.",
+  },
+  {
+    name: "Chronoportation",
+    suffix: "kinesis",
+    element: "Temporal",
+    fictionalOrigins:
+      "Beyond merely slowing or speeding time, temporal transport — moving oneself or objects to different moments in time — represents the most narrative-rich application of time manipulation across science fiction, myth, and fantasy.",
+    mediaReferences: [
+      "TARDIS — Doctor Who",
+      "Back to the Future",
+      "Flash (time runs) — DC",
+      "Hiro Nakamura — Heroes",
+      "Homura Akemi — Madoka Magica",
+    ],
+    symbolicMeaning:
+      "Temporal transport represents sovereignty over linear experience — the dissolution of the idea that you are permanently fixed to a single point in the unfolding of events.",
+    psychologicalMetaphor:
+      "The ability to mentally revisit and reframe past experiences with new understanding, or to project forward into future states with such clarity they become guiding blueprints.",
+  },
+  {
+    name: "Lexikinesis",
+    suffix: "kinesis",
+    element: "Language",
+    fictionalOrigins:
+      "The manipulation of language, words, and written text as a form of reality alteration is one of the oldest magical frameworks — from Egyptian heka (spoken creation), to Kabbalistic letter mysticism, to modern chaos magic's obsession with glyphs and sigils.",
+    mediaReferences: [
+      "Grimmoire magic — various RPGs",
+      "Wordmaster — various manga",
+      "Rune magic across Norse tradition",
+      "Kabbalistic letter magic (Sefer Yetzirah)",
+      "Logos concept in Gnosticism",
+    ],
+    symbolicMeaning:
+      "Language is the technology through which reality is structured and shared. Lexikinesis symbolizes the power of naming — the act of defining something creates the conditions for it to exist.",
+    psychologicalMetaphor:
+      "The mastery of affirmation, storytelling, and self-narration — understanding that the stories you tell yourself and others sculpt the reality both parties inhabit.",
+  },
+  {
+    name: "Morphokinesis",
+    suffix: "kinesis",
+    element: "Form",
+    fictionalOrigins:
+      "Shape-shifting and form alteration beyond biology — the ability to reshape physical structure, appearance, and even substance — draws from mythological shapeshifters (Loki, Proteus, Anansi) and modern superhero shapeshifting traditions.",
+    mediaReferences: [
+      "Mystique — X-Men",
+      "Metamorpho — DC",
+      "Envy — Fullmetal Alchemist",
+      "All For One (quirk alteration) — MHA",
+      "Proteus — Greek mythology",
+    ],
+    symbolicMeaning:
+      "Form is identity made visible. The ability to alter form represents mastery of identity itself — the refusal to be permanently defined by any single presentation.",
+    psychologicalMetaphor:
+      "Radical adaptability and identity fluidity — the capacity to occupy different social, professional, and internal roles with complete authenticity, never limited by a fixed self-concept.",
+  },
+  {
+    name: "Hyalokinesis",
+    suffix: "kinesis",
+    element: "Glass",
+    fictionalOrigins:
+      "Control of glass and crystallized silica appears in comic book fiction, particularly associated with fragile-appearing yet devastatingly powerful characters. The juxtaposition of beauty and danger is central to glass manipulation mythology.",
+    mediaReferences: [
+      "Mister Glass — Unbreakable (M. Night Shyamalan)",
+      "Crystal characters across comics",
+      "Mirror magic in folklore",
+      "Ice Queen archetypes (glass-adjacent)",
+      "Glass sword — The Glass Sword series",
+    ],
+    symbolicMeaning:
+      "Glass represents clarity, reflection, and hidden danger. Hyalokinesis embodies the paradox of something both beautiful and capable of cutting — extreme precision with a lethal edge.",
+    psychologicalMetaphor:
+      "Crystal clear mental clarity combined with the power to cut through illusion — the precision of thought that sees through deception and communicates truth with sharp, undeniable clarity.",
+  },
+  {
+    name: "Audiognosia",
+    suffix: "kinesis",
+    element: "Resonance",
+    fictionalOrigins:
+      "The ability to hear, feel, and manipulate the resonant frequency of all things — organic and inorganic — draws from ancient cymatics traditions, musical mysticism, the Hindu concept of Nada Brahma (the universe as sound), and science fiction's use of sonic weaponry.",
+    mediaReferences: [
+      "Daredevil's echolocation — Marvel",
+      "Banshee — X-Men",
+      "Black Canary — DC",
+      "Echo — Marvel",
+      "Nada Brahma traditions",
+    ],
+    symbolicMeaning:
+      "Everything vibrates at a fundamental resonant frequency. Audiognosia represents the ability to hear the true nature of things below surface appearance and to alter reality by shifting the frequency at which something resonates.",
+    psychologicalMetaphor:
+      "Deep listening and empathic resonance — the ability to sense the underlying emotional frequency of any person or situation and respond in a way that transforms it.",
+  },
+  {
+    name: "Omnikinesis",
+    suffix: "kinesis",
+    element: "All",
+    fictionalOrigins:
+      "The theoretical apex of all kinetic abilities — control over all forms of matter, energy, and force simultaneously — appears as the pinnacle power state in superhero fiction, typically reserved for cosmic-level beings or characters at their absolute maximum.",
+    mediaReferences: [
+      "Cosmic-level Superman — DC",
+      "One Above All — Marvel",
+      "Kami Tenchi — Tenchi Muyo",
+      "Presence — DC Vertigo",
+      "Chuck (God) — Supernatural",
+    ],
+    symbolicMeaning:
+      "Omnikinesis represents the ultimate integration — the dissolution of all separation between self and the forces of existence. It symbolizes complete unity with the creative principle of the universe.",
+    psychologicalMetaphor:
+      "Radical wholeness and integration — accessing all of your capacities simultaneously, with no internal resistance or compartmentalization. The state of full self-actualization.",
+  },
+  {
+    name: "Heliokinesis (Solar Flare Variant)",
+    suffix: "kinesis",
+    element: "Solar Plasma",
+    fictionalOrigins:
+      "Beyond simple light or heat control, the direct manipulation of solar plasma, flares, and star-matter represents a power associated with god-tier beings — wielders who draw from the star itself rather than merely its light.",
+    mediaReferences: [
+      "Solar — DC",
+      "Captain Atom (solar absorption) — DC",
+      "Photon / Monica Rambeau — Marvel",
+      "Sun Wukong's solar endurance",
+      "Ra's solar chariot — Egyptian mythology",
+    ],
+    symbolicMeaning:
+      "Solar plasma is the most primary expression of energy in our system — the source from which all light, warmth, and life flow. Its control represents access to the original creative force.",
+    psychologicalMetaphor:
+      "Radiant leadership and the power to energize others simply through presence — the rare quality of individuals who light up rooms and catalyze growth in everyone around them.",
+  },
+  {
+    name: "Caelestikinesis",
+    suffix: "kinesis",
+    element: "Celestial",
+    fictionalOrigins:
+      "The manipulation of celestial bodies — stars, planets, moons, and their movements — is the ultimate astronomical superpower, appearing in cosmic comic fiction and the divine powers of sky gods across mythology.",
+    mediaReferences: [
+      "Luna — various mythologies",
+      "Sailor Moon characters",
+      "Star-Lord (Celestial lineage) — Marvel",
+      "Cosmic entity characters across DC/Marvel",
+      "Astral deities across polytheism",
+    ],
+    symbolicMeaning:
+      "Celestial manipulation represents the alignment of personal will with cosmic cycles — the ability to move in harmony with forces incomprehensibly larger than any individual.",
+    psychologicalMetaphor:
+      "Long-range vision and patience that operates on cosmic timescales — the ability to plan and act with such scope that immediate setbacks become irrelevant to the eventual trajectory.",
+  },
+  {
+    name: "Venokinesis",
+    suffix: "kinesis",
+    element: "Venom",
+    fictionalOrigins:
+      "Control over toxins, venoms, poisons, and chemical compounds appears in villain and anti-hero archetypes, drawing from the mythology of serpent deities, poison gods, and the alchemical tradition's dark side of transmutation.",
+    mediaReferences: [
+      "Venom — Marvel",
+      "Poison Ivy (toxin variant) — DC",
+      "Medusa (petrifying venom) — mythology",
+      "Scorpion — Mortal Kombat",
+      "Sasori (poison master) — Naruto",
+    ],
+    symbolicMeaning:
+      "Venom represents the transformative power of dangerous substances — the same compound that poisons can also heal in different concentrations. It symbolizes the alchemical truth that shadow contains medicine.",
+    psychologicalMetaphor:
+      "The ability to metabolize difficulty — to take in challenging experiences, shadow material, or toxic environments and process them into fuel, wisdom, and protection.",
+  },
+  {
+    name: "Tempestokinesis",
+    suffix: "kinesis",
+    element: "Storm",
+    fictionalOrigins:
+      "The specific control of storm systems — thunder, lightning, wind, rain, and pressure all unified — is distinct from Atmokinesis in that it focuses on the combined fury of the tempest rather than individual atmospheric elements. It appears in the mythology of storm deities worldwide.",
+    mediaReferences: [
+      "Storm — X-Men",
+      "Thor — Marvel",
+      "Zeus — Greek mythology",
+      "Raijin — Japanese mythology",
+      "Indra — Hindu mythology",
+    ],
+    symbolicMeaning:
+      "The storm is transformation at its most dramatic — the clearing of old atmospheric conditions to make way for renewed air. Tempestokinesis represents the power to bring necessary, powerful change.",
+    psychologicalMetaphor:
+      "The capacity to hold space for intense emotional or situational storms — to be the eye of chaos, fully present and unshaken while transformation happens all around you.",
+  },
 ];
