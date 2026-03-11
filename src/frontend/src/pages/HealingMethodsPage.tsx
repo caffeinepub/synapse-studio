@@ -427,6 +427,171 @@ const HEALING_METHODS: HealingMethod[] = [
       "I am complete — past, present, and future aligned as one",
     ],
   },
+  {
+    name: "Pranic Healing",
+    symbol: "🌬",
+    category: "Energy & Chakra",
+    description:
+      "A system of energy healing developed by Master Choa Kok Sui that works by cleansing and energizing the bioplasmic body (the energy field or aura) using prana — the life force energy that sustains all living things.",
+    overview:
+      "Pranic Healing operates on the principle that the body has an innate ability to heal itself when its energy field is cleansed of depleted or diseased energy and recharged with fresh prana. Practitioners work on the aura and chakras without physical touch, using sweeping motions to remove dirty energy and projecting fresh prana to vitalize the field. The system includes protocols for physical, emotional, and psychological conditions.",
+    themes: [
+      "Life Force",
+      "Energy Cleansing",
+      "Bioplasmic Body",
+      "Chakra Vitalization",
+      "No-Touch Healing",
+      "Prana Flow",
+    ],
+    keyPractices: [
+      "Scanning the aura for energy imbalances",
+      "Sweeping — removing congested or depleted energy",
+      "Energizing — projecting fresh prana to deficient areas",
+      "Stabilizing healed energy",
+      "Cutting etheric cords and sealing the aura",
+      "Meditation on Twin Hearts for world healing",
+    ],
+    affirmations: [
+      "My bioplasmic body is cleansed, energized, and radiant with prana",
+      "Life force flows freely through every chakra and meridian",
+      "I release all depleted energy and receive fresh, healing prana",
+      "My aura is vibrant, strong, and filled with vitality",
+      "Prana heals every system of my body at a cellular level",
+      "I am a vessel of pure life force — healing radiates from within me",
+    ],
+  },
+  {
+    name: "Ho'oponopono",
+    symbol: "🤝",
+    category: "Spiritual Lineage",
+    description:
+      "An ancient Hawaiian forgiveness and reconciliation practice that dissolves painful memories and toxic beliefs through four simple phrases: I'm sorry, Please forgive me, Thank you, I love you.",
+    overview:
+      "Ho'oponopono (meaning 'to make right') is a Hawaiian reconciliation practice rooted in the belief that we are 100% responsible for everything in our experience — not through blame, but because everything we perceive is a projection of our own memories and data. The modern version, popularized by Dr. Ihaleakala Hew Len, works by taking responsibility for unconscious programming and offering it to the Divine for cleansing. The four phrases dissolve what the Hawaiians call 'data' — the memories and beliefs stored in the subconscious that create painful experiences.",
+    themes: [
+      "Forgiveness",
+      "Responsibility",
+      "Cleansing",
+      "Love",
+      "Reconciliation",
+      "Zero State",
+    ],
+    keyPractices: [
+      "Repeating the four phrases: I'm Sorry / Please Forgive Me / Thank You / I Love You",
+      "Working with memories, people, and situations that trigger pain",
+      "Returning to the 'Zero State' — the blank canvas of pure potential",
+      "Cleaning on people, places, relationships, and physical conditions",
+      "Gratitude practice as a form of Ho'oponopono",
+      "Extended practice in meditation for deep clearing",
+    ],
+    affirmations: [
+      "I am sorry for anything in me that created this — I take full responsibility",
+      "Please forgive me — I release all memories that have caused pain",
+      "Thank you — I am grateful for every experience that has brought me here",
+      "I love you — I fill every cell and memory with pure love and compassion",
+      "My subconscious is clean, clear, and returning to zero",
+      "I am free — my memories are cleansed and I am restored to wholeness",
+    ],
+  },
+  {
+    name: "Quantum Healing",
+    symbol: "⚛",
+    category: "Sound & Frequency",
+    description:
+      "A paradigm that applies principles from quantum physics to healing — working with the quantum field to shift consciousness, cellular patterns, and energetic reality at sub-atomic levels.",
+    overview:
+      "Quantum Healing bridges science and spirituality, drawing on concepts like observer effect, quantum entanglement, and non-locality to explain how consciousness affects physical reality. Pioneered by figures like Deepak Chopra and Gregg Braden, this approach suggests that the body's default state is regeneration and wholeness, and that shifting consciousness — particularly beliefs and emotional patterns held in the quantum field — can catalyze profound physical and psychological transformation.",
+    themes: [
+      "Observer Effect",
+      "Consciousness as Medicine",
+      "Cellular Reprogramming",
+      "Quantum Field",
+      "Non-Locality",
+      "Reality Shifting",
+    ],
+    keyPractices: [
+      "Heart-focused meditation to enter the quantum field",
+      "Visualization of desired cellular and physiological changes",
+      "Emotional coherence training (HeartMath protocols)",
+      "Theta brainwave states for subconscious reprogramming",
+      "Frequency medicine — sound, light, and bioresonance",
+      "Quantum journaling — writing from the future healed self",
+    ],
+    affirmations: [
+      "My consciousness directly influences my cellular reality — I choose healing",
+      "At the quantum level, my body's default is wholeness and regeneration",
+      "I exist in the quantum field where all possibilities are available to me",
+      "My observer effect is calibrated toward thriving — I see and create health",
+      "My cells respond to the frequency of love and shift toward perfect function",
+      "I collapse the quantum wave function toward my highest possible reality",
+    ],
+  },
+  {
+    name: "Plant Spirit Medicine",
+    symbol: "🌿",
+    category: "Spiritual Lineage",
+    description:
+      "A form of healing that works with the living intelligence of plants — particularly sacred master plants like tobacco, cacao, ayahuasca, and peyote — honoring the plant as a conscious teacher and healer.",
+    overview:
+      "Plant Spirit Medicine is rooted in indigenous shamanic traditions worldwide, particularly from the Amazon, Mesoamerica, and North America. It operates on the understanding that plants are conscious beings with spirits that can communicate with human consciousness for healing, guidance, and initiation. This modality involves ceremony, intentional use, and deep respect for the plant's intelligence. Beyond ceremonial use, it includes working with common plants through dreaming, journeying, and sitting in nature.",
+    themes: [
+      "Plant Consciousness",
+      "Sacred Ceremony",
+      "Indigenous Wisdom",
+      "Initiation",
+      "Healing",
+      "Teacher Plants",
+    ],
+    keyPractices: [
+      "Cacao ceremony (heart opening, emotional healing)",
+      "Tobacco (sacred mapacho) for energetic protection and clarity",
+      "Working with medicinal herbs through dream journeys",
+      "Plant dietas — entering into relationship with a specific plant teacher",
+      "Creating plant medicine altars and offerings",
+      "Nature sitting — receiving wisdom from plants in their natural habitat",
+    ],
+    affirmations: [
+      "I am in sacred relationship with the intelligence of the plant kingdom",
+      "The green world speaks to me and I receive its healing wisdom",
+      "I honor and am honored by the spirits of the plants that support my healing",
+      "Plant medicine activates my body's innate healing intelligence",
+      "I am initiated into the wisdom of the earth through sacred plant relationship",
+      "The spirit of [plant] walks with me, cleansing and guiding my path",
+    ],
+  },
+  {
+    name: "Mirror Work",
+    symbol: "🪞",
+    category: "Emotional & Psychological",
+    description:
+      "A powerful self-love practice developed by Louise L. Hay that uses direct eye contact with your reflection in a mirror to deliver affirmations, dissolve self-criticism, and build unconditional self-love.",
+    overview:
+      "Mirror Work is based on the insight that our relationship with ourselves is the foundation of every other relationship in our lives. Louise Hay taught that the mirror shows us not just our face, but our deepest beliefs about ourselves. By looking directly into your own eyes and speaking loving affirmations, you bypass mental resistance and communicate directly to the subconscious. Initial discomfort reveals the depth of stored self-criticism; continued practice transforms the inner critic into an inner ally.",
+    themes: [
+      "Self-Love",
+      "Inner Critic Transformation",
+      "Eye Contact with Self",
+      "Affirmation Practice",
+      "Unconditional Acceptance",
+      "Identity Reconstruction",
+    ],
+    keyPractices: [
+      "Morning mirror affirmations — starting the day with self-love declarations",
+      "Evening review — forgiving the day's experiences looking in the mirror",
+      "Working through resistance — staying with discomfort without looking away",
+      "Completing the sentence: 'I love you because...'' while looking in the mirror",
+      "Reparenting the inner child through the mirror",
+      "Gratitude mirror practice — thanking your body for specific functions",
+    ],
+    affirmations: [
+      "I love you — I truly, deeply, completely love and accept you",
+      "I am willing to release all resistance to loving myself fully",
+      "I am worthy of love — exactly as I am, right now, in this moment",
+      "I forgive myself completely for all the ways I was not enough",
+      "I see myself clearly and what I see is worthy, whole, and beautiful",
+      "Every time I look in the mirror, I fall more deeply in love with myself",
+    ],
+  },
 ];
 
 const CATEGORY_COLORS: Record<HealingCategory, string> = {

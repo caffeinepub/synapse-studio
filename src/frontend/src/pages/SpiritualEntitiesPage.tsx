@@ -1412,6 +1412,152 @@ const ENTITIES: SpiritualEntity[] = [
     relatedSpells: ["Glamour Weaving", "Candle Magic", "Solar Charging Ritual"],
     relatedSigils: ["Flower of Life", "Bind Rune of Awakening"],
   },
+  {
+    name: "Lilith (First Woman)",
+    type: "Demon",
+    subCategory: "Sumerian-Hebrew Dark Feminine",
+    origin: "Ancient Sumerian and Hebrew mythology",
+    domain:
+      "Radical independence, feminine sovereignty, sexual liberation, refusal of submission",
+    context:
+      "In Jewish midrash and earlier Mesopotamian tradition, Lilith was the first woman created as Adam's equal — not from his rib but from the same earth. When she refused to be subservient, she departed Eden on her own terms. As a demon-goddess, she represents the shadow of the feminine suppressed by patriarchal order, and the power reclaimed when one refuses to diminish themselves.",
+    psychologicalMeaning:
+      "Lilith represents the part of the self that refuses to be made small. She is the uncontrolled, undomesticated feminine — wild power, erotic intelligence, and the sovereign 'no' spoken to any system that demands subordination.",
+    relatedSpells: ["Cord Cutting", "Binding Spell", "Mirror Magic"],
+    relatedSigils: ["Sigil of Baphomet", "Triquetra", "Sigil of Azazel"],
+  },
+  {
+    name: "Astaroth",
+    type: "Demon",
+    subCategory: "Goetic — Duke of Hell",
+    origin: "Goetic tradition, derived from Ashtoreth (Phoenician goddess)",
+    domain: "Introspection, hidden truth, the arts, past knowledge, neutrality",
+    context:
+      "Astaroth is listed in the Ars Goetia as a mighty Duke who teaches all arts and sciences, reveals hidden things, and is skilled in past and future. Unlike many demons, Astaroth is often described as relatively neutral and answers questions about creation, sin, and the fall. He/she carries an echo of the ancient goddess Astarte, stripped of divinity by patriarchal reframing.",
+    psychologicalMeaning:
+      "Astaroth represents the archetype of the neutral witness — the being who sees what is, without moral filtering. It is the shadow that holds knowledge we are too afraid to look at directly.",
+    relatedSpells: ["Sigil Charging", "Mirror Magic", "Desire Sigil"],
+    relatedSigils: ["Sigil of Azazel", "Sigil of the Abyss"],
+  },
+  {
+    name: "Belial",
+    type: "Demon",
+    subCategory: "Goetic — King of Hell",
+    origin: "Hebrew Bible, Goetic tradition",
+    domain:
+      "Self-mastery, lawlessness, independence from authority, personal sovereignty",
+    context:
+      "Belial (meaning 'without master' or 'worthless') appears throughout the Hebrew Bible as the personification of wickedness and worthlessness. In Goetic tradition, he is a powerful King who distributes senatorships, grants favor, and provides brilliant senators. In LHP traditions, Belial represents total self-mastery — the divine principle of ruling oneself absolutely.",
+    psychologicalMeaning:
+      "Belial is the archetype of radical autonomy — the refusal to accept any external authority over one's inner world. It is the principle that the only legitimate laws are those you choose for yourself.",
+    relatedSpells: ["Sigil Charging", "Chaos Magick Sigil", "Binding Spell"],
+    relatedSigils: ["Sigil of Lucifer", "Chaos Star"],
+  },
+  {
+    name: "Haniel",
+    type: "Angel",
+    subCategory: "Archangel of Joy and Venus",
+    origin: "Jewish mysticism, Kabbalah (Netzach sphere)",
+    domain: "Joy, love, beauty, intuition, harmony, the planet Venus",
+    context:
+      "Haniel (whose name means 'Grace of God') is the archangel associated with the sphere of Netzach in Kabbalistic tradition — the realm of emotions, nature, and desire. Haniel governs the energy of Venus and brings joy, harmony, and intuitive wisdom. She is called upon for matters of love, emotional healing, beauty rituals, and connecting to one's innate grace.",
+    psychologicalMeaning:
+      "Haniel represents the soul's capacity for pure joy — not as a reward, but as a natural state. She is the archetype of grace: the ability to move through life with elegance, open-heartedness, and emotional intelligence.",
+    relatedSpells: ["Glamour Spell", "Moon Spell", "Candle Magic"],
+    relatedSigils: ["Sigil of Venus", "Triquetra"],
+  },
+  {
+    name: "Zadkiel",
+    type: "Angel",
+    subCategory: "Archangel of Forgiveness",
+    origin: "Jewish mysticism, Kabbalah (Chesed sphere)",
+    domain:
+      "Forgiveness, mercy, freedom from the past, compassion, transmutation",
+    context:
+      "Zadkiel (whose name means 'Righteousness of God') is the archangel of forgiveness and mercy. In Kabbalah, he governs the sphere of Chesed — divine love and benevolence. Zadkiel is associated with the violet flame of transmutation, used in healing rituals to release karmic debt, dissolve grudges, and free the soul from the prison of unresolved past.",
+    psychologicalMeaning:
+      "Zadkiel represents the liberating power of forgiveness — not as condoning, but as releasing the grip the past has on your present energy. The violet flame is the psychological process of transforming pain into wisdom.",
+    relatedSpells: ["Cord Cutting", "Water Ritual", "Moon Spell"],
+    relatedSigils: ["Seal of Solomon", "Flower of Life"],
+  },
+  {
+    name: "The Green Man",
+    type: "Spirit",
+    subCategory: "Celtic-Pagan Nature Spirit",
+    origin:
+      "European folklore, Celtic pagan tradition, medieval church carvings",
+    domain:
+      "Wildness, growth, cycles of nature, the living world, masculine vitality",
+    context:
+      "The Green Man is one of the most ancient and universal nature archetypes — a face wreathed in leaves, sometimes with foliage growing from the mouth. He appears in medieval churches, ancient temples, and folklore worldwide. He represents the undying spirit of nature — the force that grows, regenerates, and ultimately reclaims all things.",
+    psychologicalMeaning:
+      "The Green Man represents the wild self that civilization tries to tame — the part of us that is organic, cyclical, and ultimately beyond the control of the rational mind. He is the archetype of primal aliveness.",
+    relatedSpells: [
+      "Herb Pouch (Mojo Bag)",
+      "Earth Grounding",
+      "Ancestor Altar Ritual",
+    ],
+    relatedSigils: ["Triquetra", "Ouroboros"],
+  },
+  {
+    name: "Pachamama",
+    type: "Deity",
+    subCategory: "Andean Earth Goddess",
+    origin: "Andean cosmology (Quechua, Aymara, Inca civilizations)",
+    domain: "Earth, fertility, time, cycles, abundance, ecological reciprocity",
+    context:
+      "Pachamama ('World Mother' or 'Earth Mother') is the supreme goddess in Andean cosmology — the living, breathing earth itself. She is honored through offerings, ceremonies, and the principle of Ayni (sacred reciprocity). She governs not just the earth but time and the sacred cycles of existence. In contemporary global spirituality, she represents the healing of our relationship with the natural world.",
+    psychologicalMeaning:
+      "Pachamama represents the archetype of sacred belonging — the knowledge that we are not separate from the earth but expressions of it. She calls us to practice reciprocity: to take only what is needed and give back with gratitude.",
+    relatedSpells: [
+      "Earth Grounding",
+      "Herb Pouch (Mojo Bag)",
+      "Ancestor Altar Ritual",
+    ],
+    relatedSigils: ["Flower of Life", "Ouroboros"],
+  },
+  {
+    name: "Izanami",
+    type: "Deity",
+    subCategory: "Japanese Goddess of Death and Creation",
+    origin: "Shinto cosmology, Kojiki and Nihon Shoki",
+    domain:
+      "Death, creation, the underworld, duality of life/death, primal feminine",
+    context:
+      "Izanami-no-Mikoto is one of the two primordial deities in Shinto cosmology who created the Japanese islands. After dying in childbirth, she descended to Yomi (the underworld) and became its ruler. Her separation from Izanagi established the eternal boundary between the living and the dead, making her the ultimate goddess of duality — the one who contains both the creative and the destructive.",
+    psychologicalMeaning:
+      "Izanami represents the shadow of creation — the reality that all things that are born will also die. She is the archetype of the great duality: that creation and destruction are not opposites but one continuous movement.",
+    relatedSpells: ["Cord Cutting", "Void Meditation", "Ancestor Altar Ritual"],
+    relatedSigils: ["Ouroboros", "Sigil of the Abyss"],
+  },
+  {
+    name: "Nyx",
+    type: "Deity",
+    subCategory: "Greek Primordial Goddess",
+    origin: "Ancient Greek mythology, Theogony (Hesiod)",
+    domain:
+      "Night, primordial darkness, sleep, dreams, the void before creation",
+    context:
+      "Nyx (Night) is one of the most ancient primordial deities in Greek cosmology — born directly from Chaos at the dawn of creation. She is so powerful that even Zeus feared her. She is the mother of Sleep (Hypnos), Death (Thanatos), Dreams (Morpheus), and many other fundamental forces. In esoteric traditions, she represents the fertile void — the darkness from which all creation springs.",
+    psychologicalMeaning:
+      "Nyx represents the generative darkness — the fertile void of the unconscious from which all insights, dreams, and creative visions emerge. She is the archetype of the night mind: intuitive, deep, and uncontrolled by daylight rationality.",
+    relatedSpells: ["Moon Spell", "Void Meditation", "Dream Working"],
+    relatedSigils: ["Black Sun (Sonnenrad)", "Sigil of the Abyss"],
+  },
+  {
+    name: "The Crone",
+    type: "Archetype",
+    subCategory: "Triple Goddess — Third Aspect",
+    origin: "Jungian archetypes, Wiccan tradition, Celtic and Greek mythology",
+    domain:
+      "Wisdom, endings, death as transition, the dark half of the year, deep truth",
+    context:
+      "The Crone is the third aspect of the Triple Goddess (Maiden-Mother-Crone), representing the elder wisdom that comes only through having lived fully. She governs the dark half of the year, the waning moon, and the threshold between life and death. In the figures of Hecate, the Morrigan's Crone aspect, Baba Yaga, and the Wise Old Woman, she offers the gift that can only come from age: the ability to see clearly without illusion.",
+    psychologicalMeaning:
+      "The Crone represents the wisdom archetype that has transcended fear of death and dissolution. She knows that endings are transformations, and she carries the hard-earned knowledge that can only come from experience.",
+    relatedSpells: ["Witch's Ladder", "Void Meditation", "Cord Cutting"],
+    relatedSigils: ["Triquetra", "Hecate's Wheel"],
+  },
 ];
 
 const TYPE_COLORS: Record<EntityType, string> = {

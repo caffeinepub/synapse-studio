@@ -245,6 +245,10 @@ export interface AdvancedFunctions {
   // Sigil Activation
   sigilActivationEnabled?: boolean;
   sigilName?: string;
+
+  // Kinesis Integration
+  kinesisEnabled?: boolean;
+  selectedKinesis?: string;
 }
 
 const FREQUENCY_MEANINGS: Record<string, string> = {
@@ -790,6 +794,20 @@ export function generateAffirmations(
       `The ${SIG} sigil has been charged with my full intention for ${T} — it works continuously on my behalf.`,
       `I activate the ${SIG} sigil — it bridges the energetic and physical, bringing my ${T} into form.`,
       `The ${SIG} sigil is a permanent anchor for my ${T} — sealed, active, and delivering results now.`,
+    );
+  }
+
+  // 8. Kinesis Integration
+  if (advanced.kinesisEnabled && advanced.selectedKinesis?.trim()) {
+    const KIN = advanced.selectedKinesis.trim();
+    result.push(
+      `I am awakening my ${KIN} ability at a cellular level — it is real and active within me.`,
+      `My ${KIN} power flows naturally and effortlessly through me in every moment.`,
+      `I have complete mastery of ${KIN} — deep within me — at every level of my being.`,
+      `Every day my ${KIN} grows stronger, more precise, and more fully operational.`,
+      `My ${KIN} is real, present, and expressing itself through my existence now.`,
+      `I embody the power of ${KIN} — it is woven into my identity and my energy field.`,
+      `My subconscious mind recognizes ${KIN} as natural and innate — it allows it completely.`,
     );
   }
 

@@ -1,41 +1,37 @@
 # Synapse Studio
 
 ## Current State
-The Subliminal Generator (GeneratorPage.tsx) has Step 1 with modes (Fantasy, Protection, Chakra Alignment, Booster), advanced functions, wealth presets, adult themes, and fantasy sub-panels (Character, Item, Symbiotic manifestation). Affirmation generation passes all these parameters into the affirmation engine (rule-based + AI).
+Version 44 production app with: Generator (advanced functions: deity, spell, soul contract, shadow work, reality scripting, frequency attunement, sigil activation), Kinesis Archive (51 entries), Sigil Codex, Spiritual Entities (94 entries), Spells, Healing Methods, Religions, Wiki Search, Video Editor, YouTube Page, Journal, Vault.
 
-There is currently NO way to dedicate a subliminal to another person or multiple persons. The generator is always self-focused ("I am", "my"). There is also no multi-subliminal stack — you can only work on one topic at a time.
+Kinesis types are NOT yet selectable in the Generator — they only exist as a reference page.
+Connection links between kinesis ↔ sigils/spells/entities are pending.
 
 ## Requested Changes (Diff)
 
 ### Add
-- **Personal Subliminal Function** — a new collapsible panel in Step 1 (below the mode toggles, above Advanced Functions). When enabled:
-  - A list of "person entries", each with:
-    - Name field (text input)
-    - Relationship field (text input, e.g. "best friend", "sister", "partner", "client")
-  - An "Add Another Person" button to add more entries (up to ~10)
-  - A remove button per entry
-  - When active, affirmation language shifts from self ("I am") to the dedicated person ("Sarah is", "My sister is", "[Name] has", etc.) or uses a "for [Name]" wrapper
-  - Works with all existing modes: Fantasy-to-Reality (character/item/symbiotic), Financial/Wealth presets, Protection, Booster, etc.
-  - Multiple people: affirmations are generated for/about all listed persons (either interleaved or grouped)
-- **Multi-Subliminal Stack** — a new collapsible panel in Step 1 that lets the creator select more than one subliminal topic/preset at once. Each selected topic is added to a stack list. When generating, all stacked topics are combined into one affirmation batch. Includes:
-  - A search/add field to add any custom topic to the stack
-  - Quick-add buttons for common presets (wealth, confidence, healing, etc.)
-  - A list showing all stacked topics with a remove button per item
-  - Total affirmation count distributed across topics
+- **Kinesis Power Integration** in Generator Advanced Functions: a new toggleable panel that lets users pick a kinesis type from the full archive to weave into affirmations (e.g. "Pyrokinesis" -> "I am a conduit of fire... my pyrokinetic power flows naturally")
+- **Cross-connection links** on KinesisArchivePage: show related entities and sigils as clickable chips inside each expanded entry
+- **More content** across all reference pages:
+  - 10 more kinesis types (e.g. Vitakinesis, Metallokinesis, Photokinesis, Sonokinesis, Nanokinesis, Biokinesis, Plasmakinesis, Magnetokinesis, Chronokinesis, Spatiokinesis)
+  - 8 more sigils with connected entities/spells
+  - 10 more spiritual entities (gods, demons, angels, nature spirits)
+  - 5 more healing methods
+  - More wealth/manifestation affirmation presets in Generator
 
 ### Modify
-- `affirmationUtils.ts` — add support for `personalTargets` (array of {name, relationship}) and `stackedTopics` (array of strings) parameters. When personalTargets exist, affirmation starters include the person's name/relationship. When stackedTopics exist, generate across all topics.
-- `aiGenerate.ts` — pass personalTargets and stackedTopics into the AI prompt so AI-powered generation also respects these settings.
-- `handleGenerate` in GeneratorPage — pass new params to both rule-based and AI generators.
-- `handleBuild` — include `personal_targets` and `stacked_topics` in the JSON payload.
+- KinesisArchivePage: add entity/sigil connection chips inside each entry card
+- GeneratorPage: add Kinesis Integration panel inside Advanced Functions section, with a kinesis type selector (searchable dropdown or pill grid) and toggle
+- Affirmation engine: when kinesis is selected, weave kinesis-specific vocabulary into affirmation lines
 
 ### Remove
-- Nothing removed.
+- Nothing removed
 
 ## Implementation Plan
-1. Add state for `personalTargets` (array of {id, name, relationship}) and `stackedTopics` (array of strings) in GeneratorPage
-2. Build the Personal Subliminal Panel UI component inline in GeneratorPage — collapsible with add/remove person rows
-3. Build the Multi-Subliminal Stack UI panel — collapsible with search/add field and quick presets
-4. Update `affirmationUtils.ts` to accept and use `personalTargets` and `stackedTopics`
-5. Update `aiGenerate.ts` AI prompt to incorporate personalTargets and stackedTopics
-6. Wire new state into `handleGenerate` and `handleBuild`
+1. Add 10 new kinesis entries to KinesisArchivePage with connection metadata
+2. Add 8 new sigils to SigilsPage with connected entity/spell arrays
+3. Add 10 new spiritual entities to SpiritualEntitiesPage
+4. Add 5 new healing methods to HealingMethodsPage
+5. Add kinesis connection chips (entities/sigils) to KinesisArchivePage expanded view
+6. Add Kinesis Integration panel to GeneratorPage Advanced Functions section (state: kinesisEnabled, selectedKinesis)
+7. Update affirmation generation logic to weave selected kinesis type into output lines
+8. Add 6 more wealth/manifestation preset buttons in the GeneratorPage wealth presets area

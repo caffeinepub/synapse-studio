@@ -211,6 +211,13 @@ export async function generateAffirmationsWithAI(
     );
   }
 
+  if (advanced.kinesisEnabled && advanced.selectedKinesis?.trim()) {
+    const KIN = advanced.selectedKinesis.trim();
+    modeLines.push(
+      `KINESIS INTEGRATION is active: The listener is awakening their ${KIN} ability. Generate 5–7 affirmations that treat ${KIN} as a real, awakening power within the listener, woven together with their core topic of ${topic}. Use language like "I am awakening my ${KIN} ability at a cellular level", "My ${KIN} power flows naturally and effortlessly", "I have complete mastery of ${KIN}". These should feel powerful, embodied, and identity-level.`,
+    );
+  }
+
   // ── Personal Subliminal ──────────────────────────────────────────────────
   const validTargets = personalTargets?.filter((p) => p.name.trim()) ?? [];
   if (validTargets.length > 0) {

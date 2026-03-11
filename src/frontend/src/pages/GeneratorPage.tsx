@@ -1379,6 +1379,11 @@ export default function GeneratorPage({
   const [sigilActivationEnabled, setSigilActivationEnabled] = useState(false);
   const [sigilName, setSigilName] = useState("");
 
+  // 8. Kinesis Integration
+  const [kinesisEnabled, setKinesisEnabled] = useState(false);
+  const [selectedKinesis, setSelectedKinesis] = useState("");
+  const [kinesisSearch, setKinesisSearch] = useState("");
+
   // Step 2 state
   const [affirmationCount, setAffirmationCount] = useState(50);
   const [affirmations, setAffirmations] = useState<string[]>([]);
@@ -1686,6 +1691,8 @@ export default function GeneratorPage({
       frequencyAttunementHz,
       sigilActivationEnabled,
       sigilName,
+      kinesisEnabled,
+      selectedKinesis,
     };
 
     // Effective topic for AI: join all stacked topics
@@ -1963,6 +1970,10 @@ export default function GeneratorPage({
           sigil_activation: sigilActivationEnabled
             ? { enabled: true, sigil: sigilName }
             : { enabled: false },
+          kinesis_integration:
+            kinesisEnabled && selectedKinesis
+              ? { enabled: true, power: selectedKinesis }
+              : { enabled: false },
         },
         personal_subliminal: {
           enabled: personalEnabled,
@@ -2125,6 +2136,12 @@ export default function GeneratorPage({
                         "Unexpected money flowing to me",
                         "Abundance in all areas of life",
                         "Money comes to me easily and frequently",
+                        "Crypto wealth flowing to me now",
+                        "Real estate empire building effortlessly",
+                        "My business grows exponentially",
+                        "I am completely debt free and financially free",
+                        "I live a luxurious abundant lifestyle",
+                        "Abundance overflows in every area of my life",
                       ].map((preset) => (
                         <button
                           key={preset}
@@ -3228,6 +3245,7 @@ export default function GeneratorPage({
                   realityScriptEnabled,
                   frequencyAttunementEnabled,
                   sigilActivationEnabled,
+                  kinesisEnabled,
                 ].filter(Boolean).length
               }{" "}
               active
@@ -3664,6 +3682,127 @@ export default function GeneratorPage({
                             className="bg-input/50 border-orange-500/30 focus:border-orange-500/60 text-sm"
                             data-ocid="generator.sigil_name.input"
                           />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* 8. Kinesis Power Integration */}
+                  <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-indigo-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Zap className="w-3.5 h-3.5 text-indigo-400" />
+                        <Label
+                          className="text-sm font-semibold text-indigo-300 cursor-pointer"
+                          htmlFor="kinesis-toggle"
+                        >
+                          Kinesis Power Integration
+                        </Label>
+                      </div>
+                      <Switch
+                        id="kinesis-toggle"
+                        checked={kinesisEnabled}
+                        onCheckedChange={setKinesisEnabled}
+                        data-ocid="generator.kinesis_integration.toggle"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      Channel a kinesis ability into your subliminal —
+                      affirmations will be tuned to your chosen power
+                    </p>
+                    <AnimatePresence>
+                      {kinesisEnabled && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-2 overflow-hidden"
+                        >
+                          <Input
+                            value={kinesisSearch}
+                            onChange={(e) => setKinesisSearch(e.target.value)}
+                            placeholder="Search kinesis types..."
+                            className="bg-input/50 border-indigo-500/30 focus:border-indigo-500/60 text-sm"
+                            data-ocid="generator.kinesis_search.input"
+                          />
+                          {selectedKinesis && (
+                            <div
+                              className="text-xs text-indigo-300 px-2 py-1 rounded-full inline-flex items-center gap-1"
+                              style={{
+                                background: "oklch(0.5 0.22 265 / 0.2)",
+                                border: "1px solid oklch(0.5 0.22 265 / 0.4)",
+                              }}
+                            >
+                              <Zap className="w-3 h-3" /> {selectedKinesis}{" "}
+                              active
+                            </div>
+                          )}
+                          <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto pr-1">
+                            {[
+                              "Telekinesis",
+                              "Pyrokinesis",
+                              "Electrokinesis",
+                              "Hydrokinesis",
+                              "Aerokinesis",
+                              "Geokinesis",
+                              "Cryokinesis",
+                              "Chronokinesis",
+                              "Photokinesis",
+                              "Umbrakinesis",
+                              "Gravitokinesis",
+                              "Lunakinesis",
+                              "Heliokinesis",
+                              "Atmokinesis",
+                              "Ergokinesis",
+                              "Quantumkinesis",
+                              "Cosmokinesis",
+                              "Psionics",
+                              "Onirokinesis",
+                              "Psammokinesis",
+                              "Nucleokinesis",
+                              "Vitakinesis",
+                              "Metallokinesis",
+                              "Sonokinesis",
+                              "Nanokinesis",
+                              "Biokinesis",
+                              "Plasmakinesis",
+                              "Magnetokinesis",
+                              "Spatiokinesis",
+                              "Cytokinesis",
+                              "Haemokinesis",
+                              "Galekinesis",
+                              "Litokinesis",
+                              "Kinetomimicry",
+                              "Astrakinesis",
+                              "Chronoportation",
+                              "Lexikinesis",
+                              "Morphokinesis",
+                              "Hyalokinesis",
+                              "Audiognosia",
+                              "Omnikinesis",
+                              "Venokinesis",
+                              "Tempestokinesis",
+                            ]
+                              .filter((k) =>
+                                k
+                                  .toLowerCase()
+                                  .includes(kinesisSearch.toLowerCase()),
+                              )
+                              .map((k) => (
+                                <button
+                                  key={k}
+                                  type="button"
+                                  onClick={() =>
+                                    setSelectedKinesis(
+                                      k === selectedKinesis ? "" : k,
+                                    )
+                                  }
+                                  className={`px-2 py-0.5 rounded-full text-xs font-medium border transition-all ${selectedKinesis === k ? "bg-indigo-500/30 text-indigo-200 border-indigo-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-indigo-400/40 hover:text-indigo-300"}`}
+                                >
+                                  {k}
+                                </button>
+                              ))}
+                          </div>
                         </motion.div>
                       )}
                     </AnimatePresence>

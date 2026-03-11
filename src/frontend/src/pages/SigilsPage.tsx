@@ -725,6 +725,116 @@ const SIGILS: Sigil[] = [
     subliminalUse:
       "Use for subliminals about accessing your shadow, inner transformation through darkness, finding power in what was previously hidden or suppressed, and radical self-honesty.",
   },
+  {
+    name: "Eye of Ra",
+    symbol: "☀",
+    category: "Egyptian",
+    meaning:
+      "The Eye of Ra is a solar symbol representing the destructive power of the sun god Ra. It embodies divine protection, cosmic authority, and the fierce light that destroys obstacles. It is both a shield and a weapon of divine will.",
+    origin: "Ancient Egyptian mythology",
+    connectedEntities: ["Ra", "Horus", "Sekhmet"],
+    connectedSpells: [
+      "Solar Charging Ritual",
+      "Candle Magic",
+      "Protection Circle",
+    ],
+    subliminalUse:
+      "Use for subliminals about solar empowerment, divine protection, obliterating obstacles, and channeling fierce life force.",
+  },
+  {
+    name: "Helm of Awe (Aegishjalmur)",
+    symbol: "ᚨ",
+    category: "Norse",
+    meaning:
+      "The Helm of Awe is an ancient Norse symbol of protection and invincibility. Warriors would draw it on their foreheads before battle to invoke an aura of dread in their enemies. It represents the fearless warrior spirit and psychic armor.",
+    origin: "Norse mythology, Elder Futhark runic tradition",
+    connectedEntities: ["Odin", "Thor"],
+    connectedSpells: ["Protection Circle", "Runic Bind Rune", "Energy Shield"],
+    subliminalUse:
+      "Use for subliminals about unshakeable confidence, psychic protection, overcoming fear, and projecting commanding presence.",
+  },
+  {
+    name: "Vegvisir (Norse Compass)",
+    symbol: "⊕",
+    category: "Norse",
+    meaning:
+      "The Vegvisir is an Icelandic magical stave whose name means 'that which shows the way.' It is a symbol of finding one's path through storms and confusion, associated with Odin's wisdom and the power of divine navigation.",
+    origin: "Icelandic grimoires, Norse tradition",
+    connectedEntities: ["Odin"],
+    connectedSpells: [
+      "Cross-Roads Ritual",
+      "Talisman Creation",
+      "Runic Bind Rune",
+    ],
+    subliminalUse:
+      "Use for subliminals about clarity of purpose, finding direction, navigating life's storms, and trusting your inner compass.",
+  },
+  {
+    name: "Ouroboros",
+    symbol: "🔄",
+    category: "Sacred Geometry",
+    meaning:
+      "The Ouroboros depicts a serpent eating its own tail, symbolizing eternal cycles, infinite renewal, and the unity of beginning and end. It represents the self-contained infinite — the universe that feeds itself, the cycle of death and rebirth, and the eternal present.",
+    origin:
+      "Ancient Egyptian, Greek Hermetic, and Norse (Jormungandr) traditions",
+    connectedEntities: ["Hermes Trismegistus", "Jormungandr", "The Serpent"],
+    connectedSpells: ["Reality Scripting", "Sigil Charging", "Moon Spell"],
+    subliminalUse:
+      "Use for subliminals about breaking cycles, embracing transformation, eternal renewal, and completing karmic loops.",
+  },
+  {
+    name: "Hamsa Hand",
+    symbol: "🖐",
+    category: "Protection",
+    meaning:
+      "The Hamsa Hand is a palm-shaped amulet found across the Middle East and North Africa. It represents the hand of God offering protection against the evil eye, luck, and divine blessing. The open hand symbolizes blessings flowing outward and shields flowing inward.",
+    origin:
+      "Middle Eastern, Jewish (Miriam's Hand), Islamic, and Hindu traditions",
+    connectedEntities: ["Fatima", "Miriam", "Shiva"],
+    connectedSpells: [
+      "Protection Circle",
+      "Energy Shield",
+      "Talisman Creation",
+    ],
+    subliminalUse:
+      "Use for subliminals about protection from negative energy, attracting divine blessing, and shielding your energy field.",
+  },
+  {
+    name: "Flower of Life",
+    symbol: "✿",
+    category: "Sacred Geometry",
+    meaning:
+      "The Flower of Life is a sacred geometric pattern of 19 overlapping circles that contains the mathematical basis of all existence. Found across ancient temples worldwide, it represents the unity of all creation, the blueprint of the universe, and the template from which all life emerges.",
+    origin: "Ancient Egypt, Assyria, India, China, worldwide — truly universal",
+    connectedEntities: ["Metatron", "Thoth"],
+    connectedSpells: ["Talisman Creation", "Sigil Charging", "Planetary Seal"],
+    subliminalUse:
+      "Use for subliminals about unity consciousness, creation, divine alignment, and connecting to the source blueprint of existence.",
+  },
+  {
+    name: "Alchemy Fire Triangle",
+    symbol: "△",
+    category: "Power",
+    meaning:
+      "The upward-pointing triangle is the alchemical symbol for Fire — the masculine principle, will, transformation, and ascending energy. It represents the drive to evolve, to transmute base matter into gold, and the active force of spiritual will imposing itself on the world.",
+    origin: "Hermetic alchemy, Western esoteric tradition",
+    connectedEntities: ["Prometheus", "Hephaestus", "Ra"],
+    connectedSpells: ["Solar Charging Ritual", "Fire Spell", "Candle Magic"],
+    subliminalUse:
+      "Use for subliminals about willpower, transformation, masculine energy, ambition, and alchemizing your circumstances.",
+  },
+  {
+    name: "Triquetra",
+    symbol: "☘",
+    category: "Celtic",
+    meaning:
+      "The Triquetra (Celtic triple knot) is a symbol of the triple goddess — Maiden, Mother, and Crone — and the trinity of mind, body, and spirit. Its three interlocking arcs represent wholeness through three unified aspects, the endless cycle of life, and the power of sacred three.",
+    origin: "Celtic tradition, Norse paganism, Wicca and modern neopaganism",
+    connectedEntities: ["The Morrigan", "Hecate", "Brigid"],
+    connectedSpells: ["Witch's Ladder", "Moon Spell", "Knot Magic"],
+    subliminalUse:
+      "Use for subliminals about the triple goddess, integration of mind/body/spirit, Wiccan practice, and sacred feminine power.",
+  },
 ];
 
 const CATEGORY_COLORS: Record<SigilCategory, string> = {

@@ -151,21 +151,9 @@ const KINESIS_CONNECTIONS: Record<
     entities: ["Cernunnos", "Ganesha", "Veles"],
     spells: ["Earth Grounding", "Herb Pouch (Mojo Bag)", "Talisman Creation"],
   },
-  Biokinesis: {
-    entities: ["Raphael", "Isis", "Kali"],
-    spells: ["Healing Transmission", "Chakra Clearing", "Aura Cleansing"],
-  },
   Cryokinesis: {
     entities: ["Odin", "Freya"],
     spells: ["Moon Spell", "Runic Bind Rune"],
-  },
-  Chronokinesis: {
-    entities: ["Odin", "Metatron"],
-    spells: ["Planetary Seal", "Sigil Charging", "Talisman Creation"],
-  },
-  Photokinesis: {
-    entities: ["Ra", "Apollo", "Uriel"],
-    spells: ["Candle Magic", "Fire Spell", "Planetary Seal"],
   },
   Umbrakinesis: {
     entities: ["Lilith", "The Shadow", "Tezcatlipoca"],
@@ -190,6 +178,46 @@ const KINESIS_CONNECTIONS: Record<
   Onirokinesis: {
     entities: ["Hecate", "Odin"],
     spells: ["Moon Spell", "Mirror Magic", "Sigil Charging"],
+  },
+  Vitakinesis: {
+    entities: ["Osiris", "Raphael"],
+    spells: ["Healing Transmission", "Chakra Clearing"],
+  },
+  Metallokinesis: {
+    entities: ["Hephaestus", "Ares"],
+    spells: ["Fire Spell", "Talisman Creation"],
+  },
+  Photokinesis: {
+    entities: ["Apollo", "Ra", "Amaterasu"],
+    spells: ["Candle Magic", "Planetary Seal"],
+  },
+  Sonokinesis: {
+    entities: ["Saraswati", "Orpheus"],
+    spells: ["Sound Healing", "Invocation"],
+  },
+  Nanokinesis: {
+    entities: ["Prometheus"],
+    spells: ["Bind Rune", "Talisman Creation"],
+  },
+  Biokinesis: {
+    entities: ["Asclepius", "Osiris"],
+    spells: ["Healing Transmission", "Chakra Clearing"],
+  },
+  Plasmakinesis: {
+    entities: ["Ra", "Thor"],
+    spells: ["Fire Spell", "Planetary Seal"],
+  },
+  Magnetokinesis: {
+    entities: ["Thor", "Zeus"],
+    spells: ["Planetary Seal", "Talisman Creation"],
+  },
+  Chronokinesis: {
+    entities: ["Chronos", "Kali"],
+    spells: ["Planetary Seal", "Talisman Creation"],
+  },
+  Spatiokinesis: {
+    entities: ["Metatron", "The Hermit"],
+    spells: ["Sigil Charging", "Invocation"],
   },
 };
 
