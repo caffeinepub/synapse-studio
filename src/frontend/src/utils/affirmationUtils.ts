@@ -270,6 +270,10 @@ export interface PersonalTarget {
   id: string;
   name: string;
   relationship: string;
+  intent: string; // 'Healing' | 'Love & Attraction' | 'Protection' | 'Success & Abundance' | 'Reconciliation' | 'Forgiveness' | 'Spiritual Growth' | 'Custom'
+  customIntent: string; // only used when intent === 'Custom'
+  wish: string; // optional wish/desire for the person
+  energyColor: string; // optional energetic color assignment
 }
 
 /** Build affirmations FOR a specific person using third-person or "for [Name]" framing */
@@ -278,12 +282,82 @@ function buildAffirmationForPerson(
   name: string,
   relationship: string,
   slot: number,
+  intent = "Healing",
+  affStyle: "about" | "to" | "hybrid" = "about",
+  _wish = "",
 ): string {
   const rel = relationship.trim() || "this person";
   const relLabel = relationship.trim() ? `my ${relationship.trim()} ` : "";
   const enhancer = pick(ENHANCERS, slot + 4);
 
-  const patterns = [
+  // Intent-specific patterns
+  const intentPatterns: Record<string, string[]> = {
+    Healing: [
+      `${name} is healing at every level — mind, body, and spirit — right now.`,
+      `Every cell in ${name}'s body is regenerating, renewing, and healing completely.`,
+      `${relLabel}${name} radiates vibrant health — their body knows how to heal itself.`,
+      `${name}'s healing is accelerating — deep within them — it is real and done.`,
+      `I send ${name} waves of healing light — they receive it fully and are restored.`,
+      `${name} is whole, healthy, and perfectly healed in every dimension of their being.`,
+      `My love for ${name} is a healing force — it reaches them and transforms their reality.`,
+    ],
+    "Love & Attraction": [
+      `${name} feels deeply loved and cherished — from every direction — it is done.`,
+      `Love flows to and from ${name} effortlessly — they are magnetic and adored.`,
+      `${relLabel}${name} is surrounded by love — it finds them wherever they are.`,
+      `${name}'s heart is open — they give and receive love freely and completely.`,
+      `I send ${name} the frequency of pure unconditional love — they feel it now.`,
+      `${name} is becoming more magnetic and loveable every single day.`,
+      `The love ${name} desires is manifesting for them — real, deep, and lasting.`,
+    ],
+    Protection: [
+      `An impenetrable shield of light surrounds ${name} — they are safe at all times.`,
+      `${name} is divinely protected — no harm can reach them — it is absolute.`,
+      `${relLabel}${name} moves through the world shielded by pure cosmic energy.`,
+      `Every path ${name} walks is guarded — angels and light beings watch over them.`,
+      `I surround ${name} with protective light — they are safe, secure, and untouchable.`,
+      `${name}'s energy field is sealed — only love and light may enter their space.`,
+      `The universe stands guard over ${name} — now and in every moment.`,
+    ],
+    "Success & Abundance": [
+      `${name} is stepping into unprecedented success — it is inevitable and unfolding now.`,
+      `Abundance flows to ${name} from every direction — they cannot stop it.`,
+      `${relLabel}${name} is a magnet for prosperity, opportunity, and greatness.`,
+      `${name}'s success is written — it is real, growing, and already done.`,
+      `Every door opens for ${name} — the universe conspires in their favor.`,
+      `${name} is becoming the wealthiest, most successful version of themselves now.`,
+      `I send ${name} the energy of limitless abundance — they receive it completely.`,
+    ],
+    Reconciliation: [
+      `${name} and I are moving toward peace, understanding, and harmony — it is happening.`,
+      `The bridge between ${name} and I is being rebuilt — stronger than before.`,
+      `${name}'s heart is softening — old wounds are dissolving — reconciliation is near.`,
+      `I release all resentment toward ${name} and they release all resentment toward me.`,
+      `${name} and I are finding our way back to love and mutual respect — it is done.`,
+      `The universe is orchestrating a beautiful reunion between ${name} and I.`,
+      `${name} feels the pull toward healing our connection — they respond with openness.`,
+    ],
+    Forgiveness: [
+      `${name} forgives deeply and freely — their heart is light and unburdened.`,
+      `I forgive ${name} completely — I release them and myself from all pain.`,
+      `${relLabel}${name} is moving through forgiveness with grace and ease.`,
+      `${name}'s ability to forgive is expanding — they are free, healed, and at peace.`,
+      `I send ${name} the energy of pure forgiveness — it washes over them now.`,
+      `All karmic ties between ${name} and past hurts are lovingly dissolved.`,
+      `${name} is healed from within — forgiveness is their superpower.`,
+    ],
+    "Spiritual Growth": [
+      `${name} is awakening rapidly — their spiritual gifts are blooming and real.`,
+      `The universe is guiding ${name} toward their highest spiritual potential.`,
+      `${relLabel}${name} is aligned with divine wisdom — they hear and follow it.`,
+      `${name}'s intuition is sharpening — they trust themselves and the universe.`,
+      `I send ${name} the light of spiritual expansion — they receive it and grow.`,
+      `${name}'s soul is evolving — every experience is moving them toward enlightenment.`,
+      `${name} is connected to Source — deeply, completely, and permanently.`,
+    ],
+  };
+
+  const basePatterns = [
     `${name} is ${T} — ${enhancer}.`,
     `${name} has everything they need to embody ${T} — ${enhancer}.`,
     `${name} attracts ${T} — every moment, without effort.`,
@@ -298,7 +372,37 @@ function buildAffirmationForPerson(
     `${name}'s subconscious is now programmed with ${T} — at a cellular level.`,
   ];
 
-  return patterns[slot % patterns.length];
+  // "to" style (second-person direct address)
+  const toPatterns = [
+    `${name}, you are ${T} — right now — it is absolute and done.`,
+    `${name}, you deserve ${T} in every area of your beautiful life.`,
+    `${name}, your reality is saturated with ${T} — you feel it now.`,
+    `${name}, I believe in your ${T} — it is real and it is yours.`,
+    `${name}, you are worthy of all the ${T} the universe has for you.`,
+    `${name}, your subconscious accepts ${T} — completely and permanently.`,
+  ];
+
+  const resolvedIntentPatterns = intentPatterns[intent] ?? basePatterns;
+
+  if (affStyle === "to") {
+    const pool = [...toPatterns, ...resolvedIntentPatterns.slice(0, 3)];
+    return pool[slot % pool.length];
+  }
+  if (affStyle === "hybrid") {
+    const pool = slot % 2 === 0 ? resolvedIntentPatterns : toPatterns;
+    return pool[slot % pool.length];
+  }
+  // default "about"
+  return resolvedIntentPatterns[slot % resolvedIntentPatterns.length];
+}
+
+export interface ProtectionConfig {
+  types: string[];
+  strength: string;
+  entity: string;
+  geometry: string[];
+  duration: string;
+  boost: boolean;
 }
 
 export function generateAffirmations(
@@ -325,6 +429,21 @@ export function generateAffirmations(
   advanced: AdvancedFunctions = {},
   personalTargets?: PersonalTarget[],
   stackedTopics?: string[],
+  personalAffStyle: "about" | "to" | "hybrid" = "about",
+  personalBlessingIntensity = 3,
+  personalProtectionSeal = false,
+  personalManifestSpeed: "gradual" | "accelerated" | "instant" = "gradual",
+  personalMirrorMode = false,
+  personalLoveFreq = false,
+  personalCordCutting = false,
+  personalCordDesc = "",
+  personalAncestralHealing = false,
+  personalTimeline = "Present",
+  personalEmotionalLayers: string[] = [],
+  personalSoulRetrieval = false,
+  personalDNAReprog = false,
+  personalInnerChildProtect = false,
+  protectionConfig?: ProtectionConfig,
 ): string[] {
   const intent = extractIntent(topic);
   const T = intent;
@@ -591,17 +710,144 @@ export function generateAffirmations(
 
   // ── Protection mode ───────────────────────────────────────────────────────
   if (protectionEnabled) {
-    const protectionLines: string[] = [
-      `My ${T} is protected, stable, and cannot be taken from me — deep within me.`,
-      `I am grounded in my ${T} — my energy remains steady and untouchable — at my core.`,
-      `My inner clarity keeps my ${T} safe and continuously growing — every moment.`,
-      `It is safe for me to fully own my ${T} — I am ready and I am protected.`,
-      `My aura around ${T} remains unshakeable — no outside force can diminish what I have built.`,
-      `I trust myself completely to sustain and protect my ${T} — naturally and effortlessly.`,
-      `My presence is grounded in ${T} — it is safe for me to exist fully in this power.`,
-      `My energy holds ${T} with calm authority — it is inevitable and it is done.`,
-    ];
-    result.push(...protectionLines);
+    if (!protectionConfig || protectionConfig.types.length === 0) {
+      // Generic fallback
+      result.push(
+        `My ${T} is protected, stable, and cannot be taken from me — deep within me.`,
+        `I am grounded in my ${T} — my energy remains steady and untouchable — at my core.`,
+        `My inner clarity keeps my ${T} safe and continuously growing — every moment.`,
+        `It is safe for me to fully own my ${T} — I am ready and I am protected.`,
+        `My aura around ${T} remains unshakeable — no outside force can diminish what I have built.`,
+        `I trust myself completely to sustain and protect my ${T} — naturally and effortlessly.`,
+        `My presence is grounded in ${T} — it is safe for me to exist fully in this power.`,
+        `My energy holds ${T} with calm authority — it is inevitable and it is done.`,
+      );
+    } else {
+      const pc = protectionConfig;
+      const typeLines: Record<string, string[]> = {
+        "Energetic Shield": [
+          `My energetic field forms an impenetrable shield around my ${T} — nothing can pass through it.`,
+          `I am surrounded by a living shield of pure energy — my ${T} is sealed and untouchable.`,
+          `At my core, a brilliant shield of light protects my ${T} — it is active right now.`,
+        ],
+        "Auric Seal": [
+          `My aura is sealed completely — no foreign energy can enter or affect my ${T}.`,
+          `My auric field locks in every gain I make in ${T} — it is sealed and permanent.`,
+          `The outer layer of my aura acts as an impenetrable seal for my ${T}.`,
+        ],
+        "Psychic Protection": [
+          `My mind is shielded from all psychic interference — my ${T} is mine alone.`,
+          `No negative thought-form can reach my ${T} — my psychic field deflects all intrusion.`,
+          `I am psychically fortified — my ${T} remains pure and untouched.`,
+        ],
+        "Cord Cutting": [
+          `All cords that drain my ${T} are severed now — I am free and my energy is reclaimed.`,
+          `Every unhealthy energetic cord connected to my ${T} is cut and dissolved permanently.`,
+          `I release all ties that diminish my ${T} — only supportive connections remain.`,
+        ],
+        "Divine Armor": [
+          `I wear the armor of the divine — my ${T} is shielded by the highest light.`,
+          `Divine protection surrounds my ${T} — it is untouchable by any lower vibration.`,
+          `The universe itself stands guard over my ${T} — I am divinely armored.`,
+        ],
+        "Mirror Shield": [
+          `Any negativity directed at my ${T} reflects back as healing light — I am untouchable.`,
+          `I carry a mirror shield — what is sent against my ${T} is returned transformed.`,
+          `My mirror shield ensures my ${T} is always safe — negativity cannot find a foothold.`,
+        ],
+        "Ancestral Protection": [
+          `My ancestors stand guard over my ${T} — their protection spans generations.`,
+          `The protective wisdom of my lineage flows through my ${T} — I am never alone.`,
+          `I am protected by the strength of all who came before me — my ${T} is secured.`,
+        ],
+        "Shadow Banishment": [
+          `I banish all shadow energies from my ${T} — only light and truth remain.`,
+          `Shadow has no power over my ${T} — it is permanently cleared and cleansed.`,
+          `Every dark influence on my ${T} is banished and dissolved — it is done.`,
+        ],
+        "Entity Warding": [
+          `My ${T} is warded against all unwanted entities — my space is sovereign.`,
+          `No entity can interfere with my ${T} — my ward is strong and permanent.`,
+          `I have placed an entity ward on my ${T} — it is sealed and protected.`,
+        ],
+        "Frequency Lock": [
+          `My ${T} is frequency-locked at the highest vibration — lower energies cannot reach it.`,
+          `I have set a frequency lock on my ${T} — only resonant energies may enter.`,
+          `My ${T} holds its frequency absolutely — it is locked and unchangeable.`,
+        ],
+        "Karmic Clearing": [
+          `All karmic interference with my ${T} is cleared and released — I begin fresh.`,
+          `My ${T} is free from all karmic debt — the slate is clean, the path is open.`,
+          `Karmic clearing is complete — my ${T} moves forward unburdened.`,
+        ],
+        "Soul Protection": [
+          `My soul is fully protected — my ${T} originates from a place of divine wholeness.`,
+          `I protect my soul's expression in ${T} — nothing can diminish my core essence.`,
+          `My soul carries my ${T} safely — it is guarded at the deepest possible level.`,
+        ],
+        "Reality Seal": [
+          `I have sealed my ${T} into this reality permanently — it cannot be undone.`,
+          `My ${T} is reality-sealed — it exists fully and completely in this timeline.`,
+          `The seal is placed — my ${T} is locked into physical reality, now and forever.`,
+        ],
+        "Manifestation Guard": [
+          `My manifestation of ${T} is guarded every step of the way — nothing can block it.`,
+          `I protect the manifestation process of ${T} — it arrives safely and completely.`,
+          `My ${T} is guarded from all interference on its journey into physical reality.`,
+        ],
+      };
+
+      for (const type of pc.types) {
+        const lines = typeLines[type];
+        if (lines) result.push(...lines);
+      }
+
+      // Entity invocation
+      if (pc.entity?.trim()) {
+        result.push(
+          `My ${T} is protected by the power of ${pc.entity} — their energy stands as my guardian.`,
+        );
+      }
+
+      // Sacred geometry
+      for (const geo of pc.geometry ?? []) {
+        result.push(
+          `The ${geo} surrounds my ${T} — its sacred form seals and amplifies my protection.`,
+        );
+      }
+
+      // Strength modifier
+      const strengthLines: Record<string, string> = {
+        Divine: `The protection over my ${T} is absolute and divine — it transcends all dimensions.`,
+        Absolute: `My ${T} is absolutely protected — nothing can shake or diminish this.`,
+        Strong: `My ${T} is strongly shielded — I feel the power of this protection daily.`,
+        Moderate: `My ${T} is shielded with steady, reliable protection.`,
+        Minimal: `A light protective field surrounds my ${T} — it is enough.`,
+      };
+      if (pc.strength && strengthLines[pc.strength]) {
+        result.push(strengthLines[pc.strength]);
+      }
+
+      // Duration line
+      const durationLines: Record<string, string> = {
+        Permanent: "This protection is permanent — it will never expire.",
+        "Until Released":
+          "This protection holds until I consciously release it.",
+        Renewable:
+          "This protection renews itself at every sunrise — it is always fresh.",
+      };
+      if (pc.duration && durationLines[pc.duration]) {
+        result.push(durationLines[pc.duration]);
+      }
+
+      // Boost
+      if (pc.boost) {
+        result.push(
+          `I am untouchable — my ${T} is sealed in the highest light and nothing can diminish it.`,
+          "My protection is absolute and active — every layer of my being is shielded and secure.",
+        );
+      }
+    }
   }
 
   // ── Chakra alignment ──────────────────────────────────────────────────────
@@ -814,12 +1060,30 @@ export function generateAffirmations(
   // ── Personal Subliminal ───────────────────────────────────────────────────
   const validTargets = personalTargets?.filter((p) => p.name.trim()) ?? [];
   if (validTargets.length > 0) {
+    // Blessing intensity maps 1-5 → 3-8 affirmations per person
+    const linesPerPerson =
+      2 + Math.max(1, Math.min(6, personalBlessingIntensity));
     for (const target of validTargets) {
       const name = target.name.trim();
       const rel = target.relationship.trim();
-      // 5-6 affirmations per person
-      for (let i = 0; i < 6; i++) {
-        result.push(buildAffirmationForPerson(T, name, rel, i));
+      const personIntent = personalProtectionSeal
+        ? "Protection"
+        : target.intent || "Healing";
+      const effectiveIntent =
+        personIntent === "Custom"
+          ? target.customIntent || "Healing"
+          : personIntent;
+      for (let i = 0; i < linesPerPerson; i++) {
+        result.push(
+          buildAffirmationForPerson(
+            T,
+            name,
+            rel,
+            i,
+            effectiveIntent,
+            personalAffStyle,
+          ),
+        );
       }
       // Also weave active modes for the person
       if (boosterEnabled && boosterLevel === "extremely_powerful") {
@@ -834,10 +1098,95 @@ export function generateAffirmations(
           `The fabric of reality has opened for ${name} — ${T} is now a tangible part of their world.`,
         );
       }
-      if (protectionEnabled) {
+      if (protectionEnabled || personalProtectionSeal) {
         result.push(
           `${name}'s ${T} is protected, stable, and growing stronger — every moment — it is done.`,
           `My ${rel || "person"} ${name} is grounded and shielded in their ${T} — naturally and effortlessly.`,
+        );
+      }
+      // Wish lines
+      if (target.wish?.trim()) {
+        const w = target.wish.trim();
+        result.push(
+          `${name} is experiencing ${w} — now, fully and completely.`,
+          `${name}'s reality includes ${w} — it is real, present, and growing stronger every day.`,
+        );
+      }
+      // Mirror Mode
+      if (personalMirrorMode) {
+        result.push(
+          `All energy sent toward ${name} returns as pure healing light — transmuted and amplified.`,
+          `${name} is shielded — any negativity they hold dissolves into love before it reaches anyone.`,
+        );
+      }
+      // Love Frequency
+      if (personalLoveFreq) {
+        result.push(
+          `Every affirmation for ${name} vibrates at 528Hz — the frequency of love and miraculous repair.`,
+          `${name}'s cells resonate with the heart frequency — healing flows through them now.`,
+        );
+      }
+      // Cord Cutting
+      if (personalCordCutting) {
+        const cordDesc = personalCordDesc.trim() || "unhealthy attachments";
+        result.push(
+          `All ${cordDesc} cords connecting ${name} to the past are lovingly severed and transmuted now.`,
+          `${name} is free — released from all ${cordDesc} — only love and light remain.`,
+        );
+      }
+      // Ancestral Healing
+      if (personalAncestralHealing) {
+        result.push(
+          `${name}'s ancestral line is cleansed — seven generations back and forward — right now.`,
+          `The healing flowing to ${name} extends through their entire lineage — it is done.`,
+        );
+      }
+      // Timeline
+      if (personalTimeline && personalTimeline !== "Present") {
+        const tl =
+          personalTimeline === "All Timelines"
+            ? "across all timelines"
+            : `in the ${personalTimeline.toLowerCase()}`;
+        result.push(
+          `${tl === "across all timelines" ? "Across all timelines" : `In the ${personalTimeline.toLowerCase()}`}, ${name} is healed, whole, and thriving — it is absolute.`,
+          `${name}'s ${T} is anchored ${tl} — permanently and completely.`,
+        );
+      }
+      // Emotional Layers
+      for (const layer of personalEmotionalLayers) {
+        result.push(
+          `${name}'s ${layer.toLowerCase()} body is healed, whole, and vibrating at its highest frequency.`,
+        );
+      }
+      // Manifest Speed flavoring
+      if (personalManifestSpeed === "instant") {
+        result.push(
+          `${name}'s transformation is instantaneous — the shift is happening RIGHT NOW — it is done.`,
+        );
+      } else if (personalManifestSpeed === "accelerated") {
+        result.push(
+          `${name}'s healing and growth are accelerating rapidly — every hour brings new expansion.`,
+        );
+      }
+      // Soul Retrieval
+      if (personalSoulRetrieval) {
+        result.push(
+          `I call back all soul fragments of ${name} now — they return whole, healed, and complete.`,
+          `${name}'s soul is reunited and whole — every lost piece returns with love and grace.`,
+        );
+      }
+      // DNA Reprogramming
+      if (personalDNAReprog) {
+        result.push(
+          `Every strand of ${name}'s DNA awakens to the highest expression of ${T}.`,
+          `${name}'s genetic blueprint activates its full divine potential — right now, at the cellular level.`,
+        );
+      }
+      // Inner Child Protection
+      if (personalInnerChildProtect) {
+        result.push(
+          `The inner child of ${name} is safe, loved, and protected — they know they are enough.`,
+          `${name}'s inner child is held in unconditional love — healed, whole, and free.`,
         );
       }
     }

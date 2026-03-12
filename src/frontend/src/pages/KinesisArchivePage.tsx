@@ -219,6 +219,34 @@ const KINESIS_CONNECTIONS: Record<
     entities: ["Metatron", "The Hermit"],
     spells: ["Sigil Charging", "Invocation"],
   },
+  Neokinesis: {
+    entities: ["Source", "Cosmic Creator"],
+    spells: ["Silver Thread Manifestation", "Reality Scripting"],
+  },
+  Myokinesis: {
+    entities: ["Hercules", "Thor"],
+    spells: ["Storm Calling", "Phoenix Rising Ritual"],
+  },
+  Seismokinesis: {
+    entities: ["Geb", "Poseidon"],
+    spells: ["Storm Calling", "Ancestor Altar Ritual"],
+  },
+  Psyllokinesis: {
+    entities: ["Hermes", "Thoth"],
+    spells: ["Astral Gate Opening", "Eye of Truth Ritual"],
+  },
+  Spectrokinesis: {
+    entities: ["Ra", "Apollo"],
+    spells: ["Solar Charging Ritual", "Candle Magic"],
+  },
+  Keratinokinesis: {
+    entities: ["Cernunnos", "The Green Man"],
+    spells: ["Glamour Weaving"],
+  },
+  Chromokinesis: {
+    entities: ["Iris", "Oshun"],
+    spells: ["Glamour Weaving", "Candle Magic"],
+  },
 };
 
 function getKinesisConnections(name: string) {

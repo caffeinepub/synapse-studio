@@ -3,6 +3,7 @@ import {
   BookMarked,
   BookOpen,
   Brain,
+  Eye,
   Film,
   Ghost,
   Globe,
@@ -36,7 +37,8 @@ type Page =
   | "youtube"
   | "videoeditor"
   | "journal"
-  | "vault";
+  | "vault"
+  | "signs";
 
 interface NavBarProps {
   currentPage: Page;
@@ -72,6 +74,13 @@ const navItems: NavItem[] = [
     label: "Vault",
     icon: Library,
     description: "Saved Affirmations",
+    group: "core",
+  },
+  {
+    id: "signs",
+    label: "Signs",
+    icon: Eye,
+    description: "Manifestation Signs Library",
     group: "core",
   },
   // Discover

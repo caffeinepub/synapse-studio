@@ -26,6 +26,12 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Atom,
   Check,
   ChevronDown,
@@ -67,6 +73,7 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import SignsPanel, { type SignsContext } from "../components/SignsPanel";
 import {
   useDeleteProject,
   useGenerateAffirmations,
@@ -91,6 +98,9 @@ const CHAKRAS = [
   "Throat",
   "Third Eye",
   "Crown",
+  "High Heart",
+  "Soul Star",
+  "Earth Star",
 ];
 
 const CHAKRA_COLORS: Record<string, string> = {
@@ -101,6 +111,35 @@ const CHAKRA_COLORS: Record<string, string> = {
   Throat: "oklch(0.58 0.2 220)",
   "Third Eye": "oklch(0.5 0.22 270)",
   Crown: "oklch(0.55 0.22 310)",
+  "High Heart": "oklch(0.60 0.20 160)",
+  "Soul Star": "oklch(0.82 0.15 55)",
+  "Earth Star": "oklch(0.45 0.15 35)",
+};
+
+const CHAKRA_HZ: Record<string, string> = {
+  Root: "396Hz",
+  Sacral: "417Hz",
+  "Solar Plexus": "528Hz",
+  Heart: "639Hz",
+  Throat: "741Hz",
+  "Third Eye": "852Hz",
+  Crown: "963Hz",
+  "High Heart": "594Hz",
+  "Soul Star": "1074Hz",
+  "Earth Star": "285Hz",
+};
+
+const CHAKRA_EMOJI: Record<string, string> = {
+  Root: "🔴",
+  Sacral: "🟠",
+  "Solar Plexus": "🟡",
+  Heart: "💚",
+  Throat: "🔵",
+  "Third Eye": "🟣",
+  Crown: "⚪",
+  "High Heart": "💚",
+  "Soul Star": "⭐",
+  "Earth Star": "🌍",
 };
 
 const ADULT_THEME_PRESETS = [
@@ -144,6 +183,12 @@ const ADULT_THEME_PRESETS = [
       "Sensual Presence",
       "Physical Magnetism",
       "Sacred Sexuality",
+      "Tantric Awakening",
+      "Orgasmic Energy",
+      "Kundalini Rise",
+      "Erotic Magnetism",
+      "Sacred Union",
+      "Sexual Healing",
     ],
   },
   {
@@ -158,6 +203,20 @@ const ADULT_THEME_PRESETS = [
       "The Underworld Path",
       "Trickster Energy",
       "Liminal Power",
+    ],
+  },
+  {
+    category: "Power & Domination",
+    color: "oklch(0.55 0.22 15)",
+    presets: [
+      "Commanding Presence",
+      "Natural Authority",
+      "Submissive Surrender",
+      "Power Exchange Mastery",
+      "Dominant Energy",
+      "Magnetic Control",
+      "Irresistible Command",
+      "Sacred Kink Integration",
     ],
   },
 ] as const;
@@ -282,6 +341,7 @@ interface GeneratorPageProps {
   injectedTopic?: string;
   onInjectedTopicConsumed?: () => void;
   onSubliminalUpdate?: (ctx: SubliminalContext) => void;
+  onNavigate?: (page: string) => void;
 }
 
 // ── Canvas subliminal video preview ──────────────────────────────────────────
@@ -1294,6 +1354,7 @@ export default function GeneratorPage({
   injectedTopic,
   onInjectedTopicConsumed,
   onSubliminalUpdate,
+  onNavigate,
 }: GeneratorPageProps = {}) {
   // Step 1 state
   const [topic, setTopic] = useState("");
@@ -1333,8 +1394,117 @@ export default function GeneratorPage({
   // ── Personal Subliminal ───────────────────────────────────────────────────
   const [personalEnabled, setPersonalEnabled] = useState(false);
   const [personalTargets, setPersonalTargets] = useState<PersonalTarget[]>([
-    { id: crypto.randomUUID(), name: "", relationship: "" },
+    {
+      id: crypto.randomUUID(),
+      name: "",
+      relationship: "",
+      intent: "Healing",
+      customIntent: "",
+      wish: "",
+      energyColor: "",
+    },
   ]);
+
+  // ── Personal Subliminal Advanced Options ─────────────────────────────────
+  const [personalAffStyle, setPersonalAffStyle] = useState<
+    "about" | "to" | "hybrid"
+  >("about");
+  const [personalRelHealingMode, setPersonalRelHealingMode] = useState(false);
+  const [personalCoreIssue, setPersonalCoreIssue] = useState("");
+  const [personalGroupMode, setPersonalGroupMode] = useState(false);
+  const [personalGroupDesc, setPersonalGroupDesc] = useState("");
+  const [personalBlessingIntensity, setPersonalBlessingIntensity] = useState(3);
+  const [personalProtectionSeal, setPersonalProtectionSeal] = useState(false);
+  const [personalManifestSpeed, setPersonalManifestSpeed] = useState<
+    "gradual" | "accelerated" | "instant"
+  >("gradual");
+  const [personalMirrorMode, setPersonalMirrorMode] = useState(false);
+  const [personalLoveFreq, setPersonalLoveFreq] = useState(false);
+  const [personalCordCutting, setPersonalCordCutting] = useState(false);
+  const [personalCordDesc, setPersonalCordDesc] = useState("");
+  const [personalAncestralHealing, setPersonalAncestralHealing] =
+    useState(false);
+  const [personalTimeline, setPersonalTimeline] = useState("Present");
+  const [personalEmotionalLayers, setPersonalEmotionalLayers] = useState<
+    string[]
+  >([]);
+  const [personalNote, setPersonalNote] = useState("");
+  const [personalNoteOpen, setPersonalNoteOpen] = useState(false);
+
+  // ── Personal Subliminal — Extra Advanced Options ──────────────────────────
+  const [personalSoulDepth, setPersonalSoulDepth] = useState("Heart");
+  const [personalDivineTiming, setPersonalDivineTiming] = useState(false);
+  const [personalKarmaClearing, setPersonalKarmaClearing] = useState(false);
+  const [personalTwinFlame, setPersonalTwinFlame] = useState(false);
+  const [personalEthericCord, setPersonalEthericCord] = useState(false);
+  const [personalVowClearing, setPersonalVowClearing] = useState(false);
+  const [personalDNACode, setPersonalDNACode] = useState(false);
+  const [personalAkashicUpdate, setPersonalAkashicUpdate] = useState(false);
+  const [personalFreqMatch, setPersonalFreqMatch] = useState(false);
+  const [personalFreqHz, setPersonalFreqHz] = useState("528Hz");
+  const [personalSharedDream, setPersonalSharedDream] = useState(false);
+  const [personalHeartWall, setPersonalHeartWall] = useState(false);
+  const [personalUnconditionalLove, setPersonalUnconditionalLove] =
+    useState(false);
+  const [personalSoulRetrieval, setPersonalSoulRetrieval] = useState(false);
+  const [personalDNAReprog, setPersonalDNAReprog] = useState(false);
+  const [personalInnerChildProtect, setPersonalInnerChildProtect] =
+    useState(false);
+
+  // ── Protection Sub-Panel ──────────────────────────────────────────────────
+  const [protectionTypes, setProtectionTypes] = useState<string[]>([]);
+  const [protectionStrength, setProtectionStrength] = useState("Absolute");
+  const [protectFrom, setProtectFrom] = useState<string[]>([]);
+  const [protectionEntity, setProtectionEntity] = useState("");
+  const [auricLayer, setAuricLayer] = useState("All Layers");
+  const [protectionGeometry, setProtectionGeometry] = useState<string[]>([]);
+  const [protectionDuration, setProtectionDuration] = useState("Permanent");
+  const [protectionBoost, setProtectionBoost] = useState(false);
+
+  // ── Advanced Functions — Extra ────────────────────────────────────────────
+  const [astralEnabled, setAstralEnabled] = useState(false);
+  const [astralIntent, setAstralIntent] = useState("");
+  const [lucidDreamEnabled, setLucidDreamEnabled] = useState(false);
+  const [lucidDreamScenario, setLucidDreamScenario] = useState("");
+  const [parallelSelfEnabled, setParallelSelfEnabled] = useState(false);
+  const [parallelSelfType, setParallelSelfType] = useState("Wealthiest Self");
+  const [voidMeditationEnabled, setVoidMeditationEnabled] = useState(false);
+  const [sacredFlameEnabled, setSacredFlameEnabled] = useState(false);
+  const [sacredFlameColor, setSacredFlameColor] = useState("Violet");
+  const [quantumObserverEnabled, setQuantumObserverEnabled] = useState(false);
+  const [divineBlueprintEnabled, setDivineBlueprintEnabled] = useState(false);
+  const [morphicFieldEnabled, setMorphicFieldEnabled] = useState(false);
+  const [morphicFieldName, setMorphicFieldName] = useState("");
+
+  // ── Booster Extras ────────────────────────────────────────────────────────
+  const [boosterTargets, setBoosterTargets] = useState<string[]>(["Self"]);
+  const [quantumAmp, setQuantumAmp] = useState(false);
+  const [parallelUniversePull, setParallelUniversePull] = useState(false);
+  const [godMode, setGodMode] = useState(false);
+
+  // ── Fantasy Extra Sub-Types ───────────────────────────────────────────────
+  const [mythicalCreatureEnabled, setMythicalCreatureEnabled] = useState(false);
+  const [mythicalCreatureName, setMythicalCreatureName] = useState("");
+  const [mythicalCreatureSpecies, setMythicalCreatureSpecies] = useState("");
+  const [mythicalCreatureBondType, setMythicalCreatureBondType] = useState("");
+  const [mythicalCreatureLocation, setMythicalCreatureLocation] = useState("");
+  const [mythicalCreatureTimeFrame, setMythicalCreatureTimeFrame] =
+    useState("");
+  const [soulFragmentEnabled, setSoulFragmentEnabled] = useState(false);
+  const [soulFragmentDesc, setSoulFragmentDesc] = useState("");
+  const [soulFragmentRealm, setSoulFragmentRealm] = useState("");
+  const [soulFragmentMethod, setSoulFragmentMethod] = useState("Dream");
+  const [soulFragmentTimeFrame, setSoulFragmentTimeFrame] = useState("");
+  const [powerInheritanceEnabled, setPowerInheritanceEnabled] = useState(false);
+  const [powerInheritanceSource, setPowerInheritanceSource] = useState("");
+  const [powerInheritancePower, setPowerInheritancePower] = useState("");
+  const [powerInheritanceTrigger, setPowerInheritanceTrigger] = useState("");
+  const [powerInheritanceLocation, setPowerInheritanceLocation] = useState("");
+  const [powerInheritanceTimeFrame, setPowerInheritanceTimeFrame] =
+    useState("");
+
+  // ── Chakra Extras ─────────────────────────────────────────────────────────
+  const [chakraToneViz, setChakraToneViz] = useState(false);
 
   // ── Multi-Subliminal Stack ────────────────────────────────────────────────
   const [stackEnabled, setStackEnabled] = useState(false);
@@ -1701,11 +1871,24 @@ export default function GeneratorPage({
         ? [topic, ...stackedTopics].join(", ")
         : topic;
 
-    // Active personal targets (non-empty names only)
-    const activePersonalTargets =
+    // Active personal targets (non-empty names only), with group mode injection
+    let activePersonalTargets =
       personalEnabled && personalTargets.filter((p) => p.name.trim()).length > 0
         ? personalTargets.filter((p) => p.name.trim())
         : undefined;
+    if (personalEnabled && personalGroupMode && personalGroupDesc.trim()) {
+      activePersonalTargets = [
+        {
+          id: "group-target",
+          name: personalGroupDesc.trim(),
+          relationship: "group",
+          intent: "Healing",
+          customIntent: "",
+          wish: "",
+          energyColor: "",
+        },
+      ];
+    }
 
     // Active stacked topics
     const activeStackedTopics =
@@ -1736,6 +1919,30 @@ export default function GeneratorPage({
         advancedConfig,
         activePersonalTargets,
         activeStackedTopics,
+        personalAffStyle,
+        personalBlessingIntensity,
+        personalProtectionSeal,
+        personalManifestSpeed,
+        personalMirrorMode,
+        personalLoveFreq,
+        personalCordCutting,
+        personalCordDesc,
+        personalAncestralHealing,
+        personalTimeline,
+        personalEmotionalLayers,
+        personalSoulRetrieval,
+        personalDNAReprog,
+        personalInnerChildProtect,
+        modes.protection
+          ? {
+              types: protectionTypes,
+              strength: protectionStrength,
+              entity: protectionEntity,
+              geometry: protectionGeometry,
+              duration: protectionDuration,
+              boost: protectionBoost,
+            }
+          : undefined,
       );
 
       if (aiResult && aiResult.length > 0) {
@@ -1787,6 +1994,30 @@ export default function GeneratorPage({
         advancedConfig,
         activePersonalTargets,
         activeStackedTopics,
+        personalAffStyle,
+        personalBlessingIntensity,
+        personalProtectionSeal,
+        personalManifestSpeed,
+        personalMirrorMode,
+        personalLoveFreq,
+        personalCordCutting,
+        personalCordDesc,
+        personalAncestralHealing,
+        personalTimeline,
+        personalEmotionalLayers,
+        personalSoulRetrieval,
+        personalDNAReprog,
+        personalInnerChildProtect,
+        modes.protection
+          ? {
+              types: protectionTypes,
+              strength: protectionStrength,
+              entity: protectionEntity,
+              geometry: protectionGeometry,
+              duration: protectionDuration,
+              boost: protectionBoost,
+            }
+          : undefined,
       );
       const expanded = expandToCount(localResult, affirmationCount);
       setAffirmations(expanded);
@@ -2142,6 +2373,18 @@ export default function GeneratorPage({
                         "I am completely debt free and financially free",
                         "I live a luxurious abundant lifestyle",
                         "Abundance overflows in every area of my life",
+                        "Web3 Wealth",
+                        "Side Hustle Empire",
+                        "Multiple Income Streams",
+                        "Overnight Success",
+                        "Lottery & Windfall",
+                        "Manifestation Millionaire",
+                        "Billionaire Blueprint",
+                        "Financial Miracles",
+                        "CEO Mindset",
+                        "Sales Mastery",
+                        "Client Attraction",
+                        "Abundance Portal",
                       ].map((preset) => (
                         <button
                           key={preset}
@@ -2168,6 +2411,34 @@ export default function GeneratorPage({
           </div>
         </div>
 
+        {/* General Manifestation Signs */}
+        <SignsPanel
+          context={
+            modes.fantasy && characterEnabled
+              ? "character"
+              : modes.fantasy && itemEnabled
+                ? "item"
+                : modes.fantasy && symbioticEnabled
+                  ? "symbiotic"
+                  : topic
+                        .toLowerCase()
+                        .match(
+                          /wealth|money|financ|abundan|rich|income|prosper/,
+                        )
+                    ? "wealth"
+                    : topic
+                          .toLowerCase()
+                          .match(/love|relationship|romance|partner|attract/)
+                      ? "love"
+                      : topic
+                            .toLowerCase()
+                            .match(/heal|health|pain|sick|recover|wellness/)
+                        ? "health"
+                        : "general"
+          }
+          compact={true}
+          onNavigateToSigns={onNavigate ? () => onNavigate("signs") : undefined}
+        />
         {/* Mode toggles */}
         <div className="space-y-3">
           <Label className="text-sm text-muted-foreground">
@@ -2318,65 +2589,230 @@ export default function GeneratorPage({
                     compatible with all active modes.
                   </p>
 
-                  {/* Person rows */}
-                  <div className="space-y-2">
-                    {personalTargets.map((target, idx) => (
-                      <div
-                        key={target.id}
-                        className="flex items-center gap-2"
-                        data-ocid={`generator.personal_target.item.${idx + 1}`}
-                      >
-                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                          <Input
-                            value={target.name}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setPersonalTargets((prev) =>
-                                prev.map((p) =>
-                                  p.id === target.id ? { ...p, name: val } : p,
-                                ),
-                              );
-                            }}
-                            placeholder="Name — e.g. Sarah, Mom, Alex..."
-                            className="bg-input/50 border-[oklch(0.62_0.22_180)/30] focus:border-[oklch(0.62_0.22_180)/60] text-sm h-9"
-                            data-ocid={`generator.personal_target_name.input.${idx + 1}`}
-                          />
-                          <Input
-                            value={target.relationship}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setPersonalTargets((prev) =>
-                                prev.map((p) =>
-                                  p.id === target.id
-                                    ? { ...p, relationship: val }
-                                    : p,
-                                ),
-                              );
-                            }}
-                            placeholder="Relationship — e.g. best friend, sister, partner..."
-                            className="bg-input/50 border-[oklch(0.62_0.22_180)/30] focus:border-[oklch(0.62_0.22_180)/60] text-sm h-9"
-                            data-ocid={`generator.personal_target_relationship.input.${idx + 1}`}
-                          />
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setPersonalTargets((prev) =>
-                              prev.filter((p) => p.id !== target.id),
-                            )
-                          }
-                          disabled={personalTargets.length <= 1}
-                          className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/40"
-                          data-ocid={`generator.personal_remove_person.button.${idx + 1}`}
+                  {/* Person rows — hidden in group mode */}
+                  {!personalGroupMode && (
+                    <div className="space-y-2">
+                      {personalTargets.map((target, idx) => (
+                        <div
+                          key={target.id}
+                          className="space-y-1.5 pb-2 border-b last:border-b-0"
+                          style={{ borderColor: "oklch(0.62 0.22 180 / 0.1)" }}
+                          data-ocid={`generator.personal_target.item.${idx + 1}`}
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                              <Input
+                                value={target.name}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setPersonalTargets((prev) =>
+                                    prev.map((p) =>
+                                      p.id === target.id
+                                        ? { ...p, name: val }
+                                        : p,
+                                    ),
+                                  );
+                                }}
+                                placeholder="Name — e.g. Sarah, Mom, Alex..."
+                                className="bg-input/50 border-[oklch(0.62_0.22_180)/30] focus:border-[oklch(0.62_0.22_180)/60] text-sm h-9"
+                                data-ocid={`generator.personal_target_name.input.${idx + 1}`}
+                              />
+                              <Input
+                                value={target.relationship}
+                                onChange={(e) => {
+                                  const val = e.target.value;
+                                  setPersonalTargets((prev) =>
+                                    prev.map((p) =>
+                                      p.id === target.id
+                                        ? { ...p, relationship: val }
+                                        : p,
+                                    ),
+                                  );
+                                }}
+                                placeholder="Relationship — e.g. best friend, sister, partner..."
+                                className="bg-input/50 border-[oklch(0.62_0.22_180)/30] focus:border-[oklch(0.62_0.22_180)/60] text-sm h-9"
+                                data-ocid={`generator.personal_target_relationship.input.${idx + 1}`}
+                              />
+                              <div className="flex flex-col gap-1">
+                                <select
+                                  value={target.intent}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    setPersonalTargets((prev) =>
+                                      prev.map((p) =>
+                                        p.id === target.id
+                                          ? { ...p, intent: val }
+                                          : p,
+                                      ),
+                                    );
+                                  }}
+                                  className="h-9 rounded-md border bg-input/50 px-2 text-sm focus:outline-none focus:ring-2 w-full"
+                                  style={{
+                                    borderColor: "oklch(0.62 0.22 180 / 0.3)",
+                                    color: "inherit",
+                                  }}
+                                  data-ocid={`generator.personal_target_intent.select.${idx + 1}`}
+                                >
+                                  <option value="Healing">🌿 Healing</option>
+                                  <option value="Love & Attraction">
+                                    💗 Love & Attraction
+                                  </option>
+                                  <option value="Protection">
+                                    🛡️ Protection
+                                  </option>
+                                  <option value="Success & Abundance">
+                                    ✨ Success & Abundance
+                                  </option>
+                                  <option value="Reconciliation">
+                                    🤝 Reconciliation
+                                  </option>
+                                  <option value="Forgiveness">
+                                    🕊️ Forgiveness
+                                  </option>
+                                  <option value="Spiritual Growth">
+                                    🔮 Spiritual Growth
+                                  </option>
+                                  <option value="Custom">✏️ Custom</option>
+                                </select>
+                                {target.intent === "Custom" && (
+                                  <Input
+                                    value={target.customIntent}
+                                    onChange={(e) => {
+                                      const val = e.target.value;
+                                      setPersonalTargets((prev) =>
+                                        prev.map((p) =>
+                                          p.id === target.id
+                                            ? { ...p, customIntent: val }
+                                            : p,
+                                        ),
+                                      );
+                                    }}
+                                    placeholder="Describe intent..."
+                                    className="bg-input/50 border-[oklch(0.62_0.22_180)/30] text-sm h-8"
+                                    data-ocid={`generator.personal_target_custom_intent.input.${idx + 1}`}
+                                  />
+                                )}
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setPersonalTargets((prev) =>
+                                  prev.filter((p) => p.id !== target.id),
+                                )
+                              }
+                              disabled={personalTargets.length <= 1}
+                              className="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/40"
+                              data-ocid={`generator.personal_remove_person.button.${idx + 1}`}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                          {/* Wish + Energy Color row */}
+                          <div className="flex flex-col sm:flex-row gap-2 mt-1.5">
+                            <Input
+                              value={target.wish}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setPersonalTargets((prev) =>
+                                  prev.map((p) =>
+                                    p.id === target.id
+                                      ? { ...p, wish: val }
+                                      : p,
+                                  ),
+                                );
+                              }}
+                              placeholder="What do you wish for them? e.g. deep inner peace and clarity"
+                              className="flex-1 bg-input/50 border-[oklch(0.62_0.22_180)/20] focus:border-[oklch(0.62_0.22_180)/50] text-sm h-8"
+                              data-ocid={`generator.personal_target_wish.input.${idx + 1}`}
+                            />
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <span className="text-xs text-muted-foreground whitespace-nowrap">
+                                Energy:
+                              </span>
+                              {[
+                                {
+                                  color: "bg-pink-400",
+                                  value: "pink",
+                                  label: "Pink",
+                                },
+                                {
+                                  color: "bg-red-400",
+                                  value: "red",
+                                  label: "Red",
+                                },
+                                {
+                                  color: "bg-yellow-400",
+                                  value: "gold",
+                                  label: "Gold",
+                                },
+                                {
+                                  color: "bg-green-400",
+                                  value: "green",
+                                  label: "Green",
+                                },
+                                {
+                                  color: "bg-blue-400",
+                                  value: "blue",
+                                  label: "Blue",
+                                },
+                                {
+                                  color: "bg-purple-400",
+                                  value: "purple",
+                                  label: "Purple",
+                                },
+                                {
+                                  color: "bg-white border border-gray-300",
+                                  value: "white",
+                                  label: "White",
+                                },
+                                {
+                                  color: "bg-gray-300",
+                                  value: "silver",
+                                  label: "Silver",
+                                },
+                              ].map(({ color, value, label }) => (
+                                <button
+                                  key={value}
+                                  type="button"
+                                  title={label}
+                                  onClick={() =>
+                                    setPersonalTargets((prev) =>
+                                      prev.map((p) =>
+                                        p.id === target.id
+                                          ? {
+                                              ...p,
+                                              energyColor:
+                                                p.energyColor === value
+                                                  ? ""
+                                                  : value,
+                                            }
+                                          : p,
+                                      ),
+                                    )
+                                  }
+                                  className={`w-5 h-5 rounded-full ${color} transition-all`}
+                                  style={
+                                    target.energyColor === value
+                                      ? {
+                                          outline:
+                                            "2px solid oklch(0.62 0.22 180)",
+                                          outlineOffset: "2px",
+                                        }
+                                      : {}
+                                  }
+                                  data-ocid={`generator.personal_energy_color.toggle.${idx + 1}`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Add button */}
-                  {personalTargets.length < 10 && (
+                  {!personalGroupMode && personalTargets.length < 10 && (
                     <button
                       type="button"
                       onClick={() =>
@@ -2386,6 +2822,10 @@ export default function GeneratorPage({
                             id: crypto.randomUUID(),
                             name: "",
                             relationship: "",
+                            intent: "Healing",
+                            customIntent: "",
+                            wish: "",
+                            energyColor: "",
                           },
                         ])
                       }
@@ -2397,13 +2837,694 @@ export default function GeneratorPage({
                       Add Another Person
                     </button>
                   )}
+
+                  {/* ── Advanced Options ─────────────────────────────── */}
+                  <div
+                    className="mt-3 pt-3 border-t"
+                    style={{ borderColor: "oklch(0.62 0.22 180 / 0.2)" }}
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <span
+                        className="text-xs font-semibold uppercase tracking-widest"
+                        style={{ color: "oklch(0.62 0.22 180 / 0.7)" }}
+                      >
+                        Advanced Options
+                      </span>
+                    </div>
+
+                    {/* Affirmation Style toggle */}
+                    <div className="mb-3">
+                      <p className="text-xs text-muted-foreground mb-1.5">
+                        Affirmation Style
+                      </p>
+                      <div
+                        className="flex gap-1"
+                        data-ocid="generator.personal_aff_style.toggle"
+                      >
+                        {(["about", "to", "hybrid"] as const).map((style) => (
+                          <button
+                            key={style}
+                            type="button"
+                            onClick={() => setPersonalAffStyle(style)}
+                            className="px-3 py-1.5 rounded-md text-xs font-medium transition-all"
+                            style={{
+                              background:
+                                personalAffStyle === style
+                                  ? "oklch(0.62 0.22 180 / 0.2)"
+                                  : "transparent",
+                              color:
+                                personalAffStyle === style
+                                  ? "oklch(0.62 0.22 180)"
+                                  : "oklch(0.62 0.22 180 / 0.5)",
+                              border: `1px solid ${personalAffStyle === style ? "oklch(0.62 0.22 180 / 0.5)" : "oklch(0.62 0.22 180 / 0.2)"}`,
+                            }}
+                          >
+                            {style === "about"
+                              ? "About Them"
+                              : style === "to"
+                                ? "To Them"
+                                : "Hybrid"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Relationship Healing Mode */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs font-medium text-foreground/80">
+                            Relationship Healing Mode
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Focuses affirmations on healing relational wounds
+                          </p>
+                        </div>
+                        <Switch
+                          checked={personalRelHealingMode}
+                          onCheckedChange={setPersonalRelHealingMode}
+                          data-ocid="generator.personal_rel_healing.switch"
+                        />
+                      </div>
+                      <AnimatePresence>
+                        {personalRelHealingMode && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden mt-2"
+                          >
+                            <textarea
+                              value={personalCoreIssue}
+                              onChange={(e) =>
+                                setPersonalCoreIssue(e.target.value)
+                              }
+                              placeholder="e.g. past conflict, emotional distance, trust issues..."
+                              rows={2}
+                              className="w-full rounded-md border bg-input/50 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2"
+                              style={{
+                                borderColor: "oklch(0.62 0.22 180 / 0.3)",
+                              }}
+                              data-ocid="generator.personal_core_issue.textarea"
+                            />
+
+                            {/* Personal Subliminal Signs */}
+                            <SignsPanel
+                              context="personal"
+                              title="Signs For Your Person"
+                              compact={true}
+                              onNavigateToSigns={
+                                onNavigate
+                                  ? () => onNavigate("signs")
+                                  : undefined
+                              }
+                            />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    {/* Group Subliminal Mode */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs font-medium text-foreground/80">
+                            Group Subliminal Mode
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Generate affirmations for a collective
+                          </p>
+                        </div>
+                        <Switch
+                          checked={personalGroupMode}
+                          onCheckedChange={setPersonalGroupMode}
+                          data-ocid="generator.personal_group_mode.switch"
+                        />
+                      </div>
+                      <AnimatePresence>
+                        {personalGroupMode && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden mt-2"
+                          >
+                            <textarea
+                              value={personalGroupDesc}
+                              onChange={(e) =>
+                                setPersonalGroupDesc(e.target.value)
+                              }
+                              placeholder="e.g. my family, my coworkers, everyone I encounter..."
+                              rows={2}
+                              className="w-full rounded-md border bg-input/50 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2"
+                              style={{
+                                borderColor: "oklch(0.62 0.22 180 / 0.3)",
+                              }}
+                              data-ocid="generator.personal_group_desc.textarea"
+                            />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    {/* Blessing Intensity */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <p className="text-xs font-medium text-foreground/80">
+                          Blessing Intensity
+                        </p>
+                        <span
+                          className="text-xs font-semibold"
+                          style={{ color: "oklch(0.62 0.22 180)" }}
+                        >
+                          {
+                            [
+                              "",
+                              "Gentle",
+                              "Soft",
+                              "Balanced",
+                              "Powerful",
+                              "Transcendent",
+                            ][personalBlessingIntensity]
+                          }
+                        </span>
+                      </div>
+                      <Slider
+                        min={1}
+                        max={5}
+                        step={1}
+                        value={[personalBlessingIntensity]}
+                        onValueChange={([v]) => setPersonalBlessingIntensity(v)}
+                        data-ocid="generator.personal_blessing_intensity.input"
+                        className="w-full"
+                      />
+                      <div className="flex justify-between mt-1">
+                        <span className="text-xs text-muted-foreground">
+                          Gentle
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          Transcendent
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Protection Seal */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs font-medium text-foreground/80">
+                          Protection Seal
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Surround all listed people with energetic protection
+                        </p>
+                      </div>
+                      <Switch
+                        checked={personalProtectionSeal}
+                        onCheckedChange={setPersonalProtectionSeal}
+                        data-ocid="generator.personal_protection_seal.switch"
+                      />
+                    </div>
+
+                    {/* Manifestation Speed */}
+                    <div
+                      className="mb-3 mt-3 pt-3 border-t"
+                      style={{ borderColor: "oklch(0.62 0.22 180 / 0.1)" }}
+                    >
+                      <p className="text-xs font-medium text-foreground/80 mb-1">
+                        Manifestation Speed
+                      </p>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        How quickly you intend these changes to anchor in their
+                        reality.
+                      </p>
+                      <div
+                        className="flex gap-1"
+                        data-ocid="generator.personal_manifest_speed.toggle"
+                      >
+                        {(["gradual", "accelerated", "instant"] as const).map(
+                          (spd) => (
+                            <button
+                              key={spd}
+                              type="button"
+                              onClick={() => setPersonalManifestSpeed(spd)}
+                              className="px-3 py-1.5 rounded-md text-xs font-medium capitalize transition-all"
+                              style={{
+                                background:
+                                  personalManifestSpeed === spd
+                                    ? "oklch(0.62 0.22 180 / 0.2)"
+                                    : "transparent",
+                                color:
+                                  personalManifestSpeed === spd
+                                    ? "oklch(0.62 0.22 180)"
+                                    : "oklch(0.62 0.22 180 / 0.5)",
+                                border: `1px solid ${personalManifestSpeed === spd ? "oklch(0.62 0.22 180 / 0.5)" : "oklch(0.62 0.22 180 / 0.2)"}`,
+                              }}
+                            >
+                              {spd === "gradual"
+                                ? "🌱 Gradual"
+                                : spd === "accelerated"
+                                  ? "⚡ Accelerated"
+                                  : "✨ Instantaneous"}
+                            </button>
+                          ),
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Mirror Reflection Mode */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs font-medium text-foreground/80">
+                            Mirror Reflection Mode
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Sends back any negativity as healing energy
+                          </p>
+                        </div>
+                        <Switch
+                          checked={personalMirrorMode}
+                          onCheckedChange={setPersonalMirrorMode}
+                          data-ocid="generator.personal_mirror_mode.switch"
+                        />
+                      </div>
+                      <AnimatePresence>
+                        {personalMirrorMode && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden mt-1"
+                          >
+                            <p className="text-xs text-muted-foreground italic">
+                              Affirmations will include energetic return and
+                              mirror shielding lines.
+                            </p>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    {/* Love Frequency */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs font-medium text-foreground/80">
+                            Love Frequency 💗
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Infuse all affirmations with 528Hz heart-opening
+                            resonance
+                          </p>
+                        </div>
+                        <Switch
+                          checked={personalLoveFreq}
+                          onCheckedChange={setPersonalLoveFreq}
+                          data-ocid="generator.personal_love_freq.switch"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Cord Cutting */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs font-medium text-foreground/80">
+                            Cord Cutting ✂️
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Sever unhealthy energetic attachments before sending
+                            healing
+                          </p>
+                        </div>
+                        <Switch
+                          checked={personalCordCutting}
+                          onCheckedChange={setPersonalCordCutting}
+                          data-ocid="generator.personal_cord_cutting.switch"
+                        />
+                      </div>
+                      <AnimatePresence>
+                        {personalCordCutting && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden mt-2"
+                          >
+                            <textarea
+                              value={personalCordDesc}
+                              onChange={(e) =>
+                                setPersonalCordDesc(e.target.value)
+                              }
+                              placeholder="e.g. resentment, dependency, old pain..."
+                              rows={2}
+                              className="w-full rounded-md border bg-input/50 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2"
+                              style={{
+                                borderColor: "oklch(0.62 0.22 180 / 0.3)",
+                              }}
+                              data-ocid="generator.personal_cord_desc.textarea"
+                            />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    {/* Ancestral Healing */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs font-medium text-foreground/80">
+                            Ancestral Healing 🌳
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Extend affirmations to heal ancestral trauma lines
+                          </p>
+                        </div>
+                        <Switch
+                          checked={personalAncestralHealing}
+                          onCheckedChange={setPersonalAncestralHealing}
+                          data-ocid="generator.personal_ancestral_healing.switch"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Timeline Anchoring */}
+                    <div className="mb-3">
+                      <p className="text-xs font-medium text-foreground/80 mb-1">
+                        Timeline Anchoring 🕰️
+                      </p>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        Which timeline dimension to anchor the healing in.
+                      </p>
+                      <select
+                        value={personalTimeline}
+                        onChange={(e) => setPersonalTimeline(e.target.value)}
+                        className="h-9 rounded-md border bg-input/50 px-2 text-sm focus:outline-none focus:ring-2 w-full"
+                        style={{
+                          borderColor: "oklch(0.62 0.22 180 / 0.3)",
+                          color: "inherit",
+                        }}
+                        data-ocid="generator.personal_timeline.select"
+                      >
+                        <option value="Past">⏪ Past</option>
+                        <option value="Present">⏺️ Present</option>
+                        <option value="Future">⏩ Future</option>
+                        <option value="All Timelines">∞ All Timelines</option>
+                      </select>
+                    </div>
+
+                    {/* Emotional Layer Focus */}
+                    <div className="mb-3">
+                      <p className="text-xs font-medium text-foreground/80 mb-1">
+                        Emotional Layer Focus
+                      </p>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        Select which layers to target in the affirmations.
+                      </p>
+                      <div
+                        className="flex flex-wrap gap-1.5"
+                        data-ocid="generator.personal_emotional_layers.toggle"
+                      >
+                        {[
+                          "Mental",
+                          "Emotional",
+                          "Physical",
+                          "Spiritual",
+                          "Financial",
+                          "Social",
+                          "Romantic",
+                        ].map((layer) => {
+                          const active =
+                            personalEmotionalLayers.includes(layer);
+                          return (
+                            <button
+                              key={layer}
+                              type="button"
+                              onClick={() =>
+                                setPersonalEmotionalLayers((prev) =>
+                                  prev.includes(layer)
+                                    ? prev.filter((l) => l !== layer)
+                                    : [...prev, layer],
+                                )
+                              }
+                              className="px-2.5 py-1 rounded-full text-xs font-medium transition-all"
+                              style={{
+                                background: active
+                                  ? "oklch(0.62 0.22 180 / 0.2)"
+                                  : "oklch(0.62 0.22 180 / 0.05)",
+                                color: active
+                                  ? "oklch(0.62 0.22 180)"
+                                  : "oklch(0.62 0.22 180 / 0.5)",
+                                border: `1px solid ${active ? "oklch(0.62 0.22 180 / 0.5)" : "oklch(0.62 0.22 180 / 0.2)"}`,
+                              }}
+                            >
+                              {layer}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Private Note */}
+                    <div className="mb-1">
+                      <button
+                        type="button"
+                        onClick={() => setPersonalNoteOpen((v) => !v)}
+                        className="flex items-center gap-1.5 text-xs font-medium mb-1 transition-colors"
+                        style={{ color: "oklch(0.62 0.22 180 / 0.7)" }}
+                      >
+                        <span>{personalNoteOpen ? "▼" : "▶"}</span>
+                        Private Intention Note
+                      </button>
+                      <AnimatePresence>
+                        {personalNoteOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden"
+                          >
+                            <textarea
+                              value={personalNote}
+                              onChange={(e) => setPersonalNote(e.target.value)}
+                              placeholder="Write a private note or intention for this subliminal set..."
+                              rows={3}
+                              className="w-full rounded-md border bg-input/50 px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2"
+                              style={{
+                                borderColor: "oklch(0.62 0.22 180 / 0.3)",
+                              }}
+                              data-ocid="generator.personal_note.textarea"
+                            />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+
+                    {/* Soul Connection Depth */}
+                    <div className="space-y-2">
+                      <p
+                        className="text-xs font-semibold"
+                        style={{ color: "oklch(0.62 0.22 180)" }}
+                      >
+                        Soul Connection Depth
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {["Surface", "Heart", "Soul", "Cosmic Bond"].map(
+                          (d) => (
+                            <button
+                              key={d}
+                              type="button"
+                              data-ocid="generator.soul_depth.toggle"
+                              onClick={() => setPersonalSoulDepth(d)}
+                              className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${personalSoulDepth === d ? "bg-teal-500/30 text-teal-200 border-teal-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-teal-400/40"}`}
+                              aria-pressed={personalSoulDepth === d}
+                            >
+                              {d}
+                            </button>
+                          ),
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Extra switches */}
+                    <div className="space-y-2.5">
+                      {[
+                        {
+                          label: "Divine Timing",
+                          desc: "Trust divine timing in all things",
+                          val: personalDivineTiming,
+                          set: setPersonalDivineTiming,
+                          ocid: "generator.personal_divine_timing.switch",
+                        },
+                        {
+                          label: "Karma Clearing",
+                          desc: "Clear karmic debt and residue between all parties",
+                          val: personalKarmaClearing,
+                          set: setPersonalKarmaClearing,
+                          ocid: "generator.personal_karma_clearing.switch",
+                        },
+                        {
+                          label: "Twin Flame Activation",
+                          desc: "Activate the twin flame reunion frequency",
+                          val: personalTwinFlame,
+                          set: setPersonalTwinFlame,
+                          ocid: "generator.personal_twin_flame.switch",
+                        },
+                        {
+                          label: "Etheric Cord Strengthening",
+                          desc: "Deepen and strengthen the energetic connection",
+                          val: personalEthericCord,
+                          set: setPersonalEthericCord,
+                          ocid: "generator.personal_etheric_cord.switch",
+                        },
+                        {
+                          label: "Vow & Oath Clearing",
+                          desc: "Clear past-life vows and soul oaths that block connection",
+                          val: personalVowClearing,
+                          set: setPersonalVowClearing,
+                          ocid: "generator.personal_vow_clearing.switch",
+                        },
+                        {
+                          label: "DNA Love Code Activation",
+                          desc: "Activate love codes encoded in your shared DNA field",
+                          val: personalDNACode,
+                          set: setPersonalDNACode,
+                          ocid: "generator.personal_dna_code.switch",
+                        },
+                        {
+                          label: "Akashic Record Update",
+                          desc: "Update your shared soul record in the Akashic field",
+                          val: personalAkashicUpdate,
+                          set: setPersonalAkashicUpdate,
+                          ocid: "generator.personal_akashic_update.switch",
+                        },
+                        {
+                          label: "Shared Dream Activation",
+                          desc: "Activate shared dreaming experiences during sleep",
+                          val: personalSharedDream,
+                          set: setPersonalSharedDream,
+                          ocid: "generator.personal_shared_dream.switch",
+                        },
+                        {
+                          label: "Heart Wall Removal",
+                          desc: "Remove energetic walls around the heart for open love",
+                          val: personalHeartWall,
+                          set: setPersonalHeartWall,
+                          ocid: "generator.personal_heart_wall.switch",
+                        },
+                        {
+                          label: "Unconditional Love Transmission",
+                          desc: "Transmit unconditional love across all dimensions",
+                          val: personalUnconditionalLove,
+                          set: setPersonalUnconditionalLove,
+                          ocid: "generator.personal_unconditional_love.switch",
+                        },
+                        {
+                          label: "🌟 Soul Retrieval",
+                          desc: "Retrieve and reintegrate fragmented soul pieces, restoring wholeness and vitality",
+                          val: personalSoulRetrieval,
+                          set: setPersonalSoulRetrieval,
+                          ocid: "generator.personal_soul_retrieval.switch",
+                        },
+                        {
+                          label: "🧬 DNA Reprogramming",
+                          desc: "Activate the highest potential DNA expression, unlocking the full genetic blueprint for this topic",
+                          val: personalDNAReprog,
+                          set: setPersonalDNAReprog,
+                          ocid: "generator.personal_dna_reprog.switch",
+                        },
+                        {
+                          label: "👶 Inner Child Protection",
+                          desc: "Surround the inner child with unconditional love, safety, and healing light",
+                          val: personalInnerChildProtect,
+                          set: setPersonalInnerChildProtect,
+                          ocid: "generator.personal_inner_child_protect.switch",
+                        },
+                      ].map(({ label, desc, val, set, ocid }) => (
+                        <div
+                          key={label}
+                          className="flex items-start justify-between gap-3 p-2 rounded-lg"
+                          style={{
+                            background: "oklch(0.62 0.22 180 / 0.05)",
+                            borderLeft: "2px solid oklch(0.62 0.22 180 / 0.3)",
+                          }}
+                        >
+                          <div>
+                            <p
+                              className="text-xs font-semibold"
+                              style={{ color: "oklch(0.72 0.22 180)" }}
+                            >
+                              {label}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground leading-snug">
+                              {desc}
+                            </p>
+                          </div>
+                          <Switch
+                            checked={val}
+                            onCheckedChange={set}
+                            data-ocid={ocid}
+                          />
+                        </div>
+                      ))}
+
+                      {/* Frequency Matching with hz select */}
+                      <div
+                        className="p-2 rounded-lg space-y-2"
+                        style={{
+                          background: "oklch(0.62 0.22 180 / 0.05)",
+                          borderLeft: "2px solid oklch(0.62 0.22 180 / 0.3)",
+                        }}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p
+                              className="text-xs font-semibold"
+                              style={{ color: "oklch(0.72 0.22 180)" }}
+                            >
+                              Frequency Matching
+                            </p>
+                            <p className="text-[10px] text-muted-foreground leading-snug">
+                              Tune both parties to the same Hz frequency
+                            </p>
+                          </div>
+                          <Switch
+                            checked={personalFreqMatch}
+                            onCheckedChange={setPersonalFreqMatch}
+                            data-ocid="generator.personal_freq_match.switch"
+                          />
+                        </div>
+                        {personalFreqMatch && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {["396Hz", "528Hz", "639Hz", "741Hz", "852Hz"].map(
+                              (hz) => (
+                                <button
+                                  key={hz}
+                                  type="button"
+                                  data-ocid="generator.personal_freq_hz.toggle"
+                                  onClick={() => setPersonalFreqHz(hz)}
+                                  className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${personalFreqHz === hz ? "bg-teal-500/30 text-teal-200 border-teal-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-teal-400/40"}`}
+                                  aria-pressed={personalFreqHz === hz}
+                                >
+                                  {hz}
+                                </button>
+                              ),
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
-
-        {/* ── Multi-Subliminal Stack Panel ─────────────────────── */}
         <div className="space-y-0">
           <button
             type="button"
@@ -2557,6 +3678,18 @@ export default function GeneratorPage({
                         "Protection",
                         "Manifestation power",
                         "Sleep & relaxation",
+                        "Alien DNA Activation",
+                        "Starseed Awakening",
+                        "Dragon Bond",
+                        "Mer/Atlantean Heritage",
+                        "Phoenix Rebirth",
+                        "Dark Goddess",
+                        "Sacred Masculine",
+                        "Void Walker",
+                        "Time Traveler",
+                        "Dimensional Shifter",
+                        "Celestial Being",
+                        "Fae Connection",
                       ].map((preset) => {
                         const isAdded = stackedTopics.includes(preset);
                         return (
@@ -2640,8 +3773,6 @@ export default function GeneratorPage({
             )}
           </AnimatePresence>
         </div>
-
-        {/* Booster Level sub-panel */}
         <AnimatePresence>
           {modes.booster && (
             <motion.div
@@ -2746,12 +3877,94 @@ export default function GeneratorPage({
                     </motion.div>
                   )}
                 </AnimatePresence>
+
+                {/* Booster Target */}
+                <div className="space-y-2">
+                  <p
+                    className="text-xs font-semibold"
+                    style={{ color: "oklch(0.78 0.18 90)" }}
+                  >
+                    Booster Target
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      "Self",
+                      "Topic",
+                      "Relationship",
+                      "Reality",
+                      "Timeline",
+                      "All",
+                    ].map((t) => {
+                      const isOn = boosterTargets.includes(t);
+                      return (
+                        <button
+                          key={t}
+                          type="button"
+                          data-ocid={"generator.booster_target.toggle"}
+                          onClick={() =>
+                            setBoosterTargets((prev) =>
+                              isOn ? prev.filter((x) => x !== t) : [...prev, t],
+                            )
+                          }
+                          className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${isOn ? "bg-amber-500/30 text-amber-200 border-amber-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-amber-400/40 hover:text-amber-300"}`}
+                          aria-pressed={isOn}
+                        >
+                          {t}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Booster switches */}
+                <div className="space-y-2.5">
+                  {[
+                    {
+                      label: "Quantum Amplification",
+                      desc: "Amplify across all quantum fields",
+                      val: quantumAmp,
+                      set: setQuantumAmp,
+                      ocid: "generator.quantum_amp.switch",
+                    },
+                    {
+                      label: "Parallel Universe Pull",
+                      desc: "Pull desired reality from parallel timelines",
+                      val: parallelUniversePull,
+                      set: setParallelUniversePull,
+                      ocid: "generator.parallel_universe_pull.switch",
+                    },
+                    {
+                      label: "God-Mode Activation",
+                      desc: "Activate omnipotent creative consciousness",
+                      val: godMode,
+                      set: setGodMode,
+                      ocid: "generator.god_mode.switch",
+                    },
+                  ].map(({ label, desc, val, set, ocid }) => (
+                    <div
+                      key={label}
+                      className="flex items-start justify-between gap-3 p-2 rounded-lg bg-amber-900/10 border border-amber-500/15"
+                    >
+                      <div>
+                        <p className="text-xs font-semibold text-amber-200">
+                          {label}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground leading-snug">
+                          {desc}
+                        </p>
+                      </div>
+                      <Switch
+                        checked={val}
+                        onCheckedChange={set}
+                        data-ocid={ocid}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Fantasy-to-Reality sub-functions */}
         <AnimatePresence>
           {modes.fantasy && (
             <motion.div
@@ -2898,6 +4111,15 @@ export default function GeneratorPage({
                   </AnimatePresence>
                 </div>
 
+                {/* Character Manifestation Signs */}
+                <SignsPanel
+                  context="character"
+                  title="Character Manifestation Signs"
+                  compact={true}
+                  onNavigateToSigns={
+                    onNavigate ? () => onNavigate("signs") : undefined
+                  }
+                />
                 {/* Item Manifestation */}
                 <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-border/30">
                   <div className="flex items-center justify-between">
@@ -3018,6 +4240,15 @@ export default function GeneratorPage({
                   </AnimatePresence>
                 </div>
 
+                {/* Item Manifestation Signs */}
+                <SignsPanel
+                  context="item"
+                  title="Item Manifestation Signs"
+                  compact={true}
+                  onNavigateToSigns={
+                    onNavigate ? () => onNavigate("signs") : undefined
+                  }
+                />
                 {/* Symbiotic / Bio-Engineered Manifestation */}
                 <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-border/30">
                   <div className="flex items-center justify-between">
@@ -3153,12 +4384,529 @@ export default function GeneratorPage({
                     )}
                   </AnimatePresence>
                 </div>
+
+                {/* Mythical Creature Bond */}
+                <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-emerald-500/20">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">🐉</span>
+                      <Label
+                        className="text-sm font-semibold text-emerald-300 cursor-pointer"
+                        htmlFor="mythical-toggle"
+                      >
+                        Mythical Creature Bond
+                      </Label>
+                    </div>
+                    <Switch
+                      id="mythical-toggle"
+                      checked={mythicalCreatureEnabled}
+                      onCheckedChange={setMythicalCreatureEnabled}
+                      data-ocid="generator.mythical_creature.switch"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-snug">
+                    Form a soul bond with a mythical creature — dragon, phoenix,
+                    unicorn, or any other being.
+                  </p>
+                  <AnimatePresence>
+                    {mythicalCreatureEnabled && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="space-y-2 overflow-hidden"
+                      >
+                        <Input
+                          value={mythicalCreatureName}
+                          onChange={(e) =>
+                            setMythicalCreatureName(e.target.value)
+                          }
+                          placeholder="Creature name (e.g. Saphira, Fawkes)..."
+                          className="bg-input/50 border-emerald-500/30 text-sm"
+                          data-ocid="generator.mythical_creature_name.input"
+                        />
+                        <Input
+                          value={mythicalCreatureSpecies}
+                          onChange={(e) =>
+                            setMythicalCreatureSpecies(e.target.value)
+                          }
+                          placeholder="Species/Type (e.g. Dragon, Phoenix, Kirin)..."
+                          className="bg-input/50 border-emerald-500/30 text-sm"
+                          data-ocid="generator.mythical_creature_species.input"
+                        />
+                        <Input
+                          value={mythicalCreatureBondType}
+                          onChange={(e) =>
+                            setMythicalCreatureBondType(e.target.value)
+                          }
+                          placeholder="Bond type (e.g. rider bond, soul tether, telepathic link)..."
+                          className="bg-input/50 border-emerald-500/30 text-sm"
+                          data-ocid="generator.mythical_creature_bond.input"
+                        />
+                        <Input
+                          value={mythicalCreatureLocation}
+                          onChange={(e) =>
+                            setMythicalCreatureLocation(e.target.value)
+                          }
+                          placeholder="Location of manifestation (optional)..."
+                          className="bg-input/50 border-emerald-500/30 text-xs h-8"
+                          data-ocid="generator.mythical_creature_location.input"
+                        />
+                        <div className="flex flex-wrap gap-1.5">
+                          {["Now", "Today", "This Week", "This Month"].map(
+                            (tf) => (
+                              <button
+                                key={tf}
+                                type="button"
+                                onClick={() =>
+                                  setMythicalCreatureTimeFrame(
+                                    mythicalCreatureTimeFrame === tf ? "" : tf,
+                                  )
+                                }
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-medium border transition-all ${mythicalCreatureTimeFrame === tf ? "bg-emerald-500/30 text-emerald-200 border-emerald-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-emerald-400/40"}`}
+                              >
+                                {tf}
+                              </button>
+                            ),
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Soul Fragment Retrieval */}
+                <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-sky-500/20">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">✨</span>
+                      <Label
+                        className="text-sm font-semibold text-sky-300 cursor-pointer"
+                        htmlFor="soulfrag-toggle"
+                      >
+                        Soul Fragment Retrieval
+                      </Label>
+                    </div>
+                    <Switch
+                      id="soulfrag-toggle"
+                      checked={soulFragmentEnabled}
+                      onCheckedChange={setSoulFragmentEnabled}
+                      data-ocid="generator.soul_fragment.switch"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-snug">
+                    Retrieve and reintegrate lost or scattered soul fragments
+                    from other timelines or realms.
+                  </p>
+                  <AnimatePresence>
+                    {soulFragmentEnabled && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="space-y-2 overflow-hidden"
+                      >
+                        <Input
+                          value={soulFragmentDesc}
+                          onChange={(e) => setSoulFragmentDesc(e.target.value)}
+                          placeholder="Fragment description (e.g. childhood innocence, warrior strength)..."
+                          className="bg-input/50 border-sky-500/30 text-sm"
+                          data-ocid="generator.soul_fragment_desc.input"
+                        />
+                        <Input
+                          value={soulFragmentRealm}
+                          onChange={(e) => setSoulFragmentRealm(e.target.value)}
+                          placeholder="Origin realm (e.g. Akashic plane, past life 1450 AD)..."
+                          className="bg-input/50 border-sky-500/30 text-sm"
+                          data-ocid="generator.soul_fragment_realm.input"
+                        />
+                        <div className="flex flex-wrap gap-1.5">
+                          {["Dream", "Ceremony", "Visualization", "Astral"].map(
+                            (m) => (
+                              <button
+                                key={m}
+                                type="button"
+                                onClick={() => setSoulFragmentMethod(m)}
+                                className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${soulFragmentMethod === m ? "bg-sky-500/30 text-sky-200 border-sky-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-sky-400/40"}`}
+                              >
+                                {m}
+                              </button>
+                            ),
+                          )}
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {["Now", "Today", "This Week", "This Month"].map(
+                            (tf) => (
+                              <button
+                                key={tf}
+                                type="button"
+                                onClick={() =>
+                                  setSoulFragmentTimeFrame(
+                                    soulFragmentTimeFrame === tf ? "" : tf,
+                                  )
+                                }
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-medium border transition-all ${soulFragmentTimeFrame === tf ? "bg-sky-500/30 text-sky-200 border-sky-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-sky-400/40"}`}
+                              >
+                                {tf}
+                              </button>
+                            ),
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Power Inheritance */}
+                <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-rose-500/20">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">⚡</span>
+                      <Label
+                        className="text-sm font-semibold text-rose-300 cursor-pointer"
+                        htmlFor="powerinherit-toggle"
+                      >
+                        Power Inheritance
+                      </Label>
+                    </div>
+                    <Switch
+                      id="powerinherit-toggle"
+                      checked={powerInheritanceEnabled}
+                      onCheckedChange={setPowerInheritanceEnabled}
+                      data-ocid="generator.power_inheritance.switch"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-snug">
+                    Inherit specific powers or abilities from a character,
+                    deity, or entity and anchor them into your physical body.
+                  </p>
+                  <AnimatePresence>
+                    {powerInheritanceEnabled && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="space-y-2 overflow-hidden"
+                      >
+                        <Input
+                          value={powerInheritanceSource}
+                          onChange={(e) =>
+                            setPowerInheritanceSource(e.target.value)
+                          }
+                          placeholder="Source character/entity (e.g. Zeus, Saitama, Merlin)..."
+                          className="bg-input/50 border-rose-500/30 text-sm"
+                          data-ocid="generator.power_source.input"
+                        />
+                        <Input
+                          value={powerInheritancePower}
+                          onChange={(e) =>
+                            setPowerInheritancePower(e.target.value)
+                          }
+                          placeholder="Specific power/ability (e.g. lightning control, one-punch strength)..."
+                          className="bg-input/50 border-rose-500/30 text-sm"
+                          data-ocid="generator.power_ability.input"
+                        />
+                        <Input
+                          value={powerInheritanceTrigger}
+                          onChange={(e) =>
+                            setPowerInheritanceTrigger(e.target.value)
+                          }
+                          placeholder="Activation trigger (e.g. breathing deeply, touching ground)..."
+                          className="bg-input/50 border-rose-500/30 text-sm"
+                          data-ocid="generator.power_trigger.input"
+                        />
+                        <Input
+                          value={powerInheritanceLocation}
+                          onChange={(e) =>
+                            setPowerInheritanceLocation(e.target.value)
+                          }
+                          placeholder="Location (optional)..."
+                          className="bg-input/50 border-rose-500/30 text-xs h-8"
+                          data-ocid="generator.power_location.input"
+                        />
+                        <div className="flex flex-wrap gap-1.5">
+                          {["Now", "Today", "This Week", "This Month"].map(
+                            (tf) => (
+                              <button
+                                key={tf}
+                                type="button"
+                                onClick={() =>
+                                  setPowerInheritanceTimeFrame(
+                                    powerInheritanceTimeFrame === tf ? "" : tf,
+                                  )
+                                }
+                                className={`px-2 py-0.5 rounded-full text-[10px] font-medium border transition-all ${powerInheritanceTimeFrame === tf ? "bg-rose-500/30 text-rose-200 border-rose-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-rose-400/40"}`}
+                              >
+                                {tf}
+                              </button>
+                            ),
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        {/* ── Protection Sub-Panel ──────────────────────────────────────────────── */}
+        <AnimatePresence>
+          {modes.protection && (
+            <motion.div
+              key="protection-subpanel"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25 }}
+              className="overflow-hidden"
+            >
+              <div className="space-y-4 p-4 rounded-xl border border-[oklch(0.62_0.22_220)/40] bg-[oklch(0.62_0.22_220)/5]">
+                <div className="flex items-center gap-2 mb-1">
+                  <Shield
+                    className="w-4 h-4"
+                    style={{ color: "oklch(0.62 0.22 220)" }}
+                  />
+                  <span
+                    className="text-sm font-heading font-semibold"
+                    style={{ color: "oklch(0.62 0.22 220)" }}
+                  >
+                    Protection Configuration
+                  </span>
+                </div>
+
+                {/* Protection Type chips */}
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-sky-300">
+                    Protection Type (multi-select)
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      "Energetic Shield",
+                      "Psychic Defense",
+                      "Aura Cleansing",
+                      "Grounding Cord",
+                      "Ward of Light",
+                      "Mirror Shield",
+                      "Ancestral Protection",
+                      "Divine Armor",
+                      "Karmic Shield",
+                      "Crystal Barrier",
+                      "Silver Cord Guard",
+                      "Etheric Seal",
+                      "Dimensional Lock",
+                      "Soul Fortress",
+                    ].map((t) => {
+                      const isOn = protectionTypes.includes(t);
+                      return (
+                        <button
+                          key={t}
+                          type="button"
+                          data-ocid="generator.protection_type.toggle"
+                          onClick={() =>
+                            setProtectionTypes((prev) =>
+                              isOn ? prev.filter((x) => x !== t) : [...prev, t],
+                            )
+                          }
+                          className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${isOn ? "bg-sky-500/30 text-sky-200 border-sky-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-sky-400/40 hover:text-sky-300"}`}
+                          aria-pressed={isOn}
+                        >
+                          {t}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Protection Strength */}
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-sky-300">
+                    Protection Strength
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {["Subtle", "Moderate", "Absolute", "Unbreakable"].map(
+                      (s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          data-ocid="generator.protection_strength.toggle"
+                          onClick={() => setProtectionStrength(s)}
+                          className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${protectionStrength === s ? "bg-sky-500/30 text-sky-200 border-sky-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-sky-400/40"}`}
+                          aria-pressed={protectionStrength === s}
+                        >
+                          {s}
+                        </button>
+                      ),
+                    )}
+                  </div>
+                </div>
+
+                {/* Protect From chips */}
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-sky-300">
+                    What to Protect From
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      "Negative Energy",
+                      "Psychic Attacks",
+                      "Emotional Vampires",
+                      "Evil Eye",
+                      "Curses & Hexes",
+                      "Low Vibrations",
+                      "Past Trauma",
+                      "External Manipulation",
+                      "Energy Drains",
+                      "Jealousy",
+                      "Black Magic",
+                      "Shadow Entities",
+                      "Parasitic Thought-Forms",
+                      "Dimensional Interference",
+                    ].map((t) => {
+                      const isOn = protectFrom.includes(t);
+                      return (
+                        <button
+                          key={t}
+                          type="button"
+                          data-ocid="generator.protect_from.toggle"
+                          onClick={() =>
+                            setProtectFrom((prev) =>
+                              isOn ? prev.filter((x) => x !== t) : [...prev, t],
+                            )
+                          }
+                          className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${isOn ? "bg-indigo-500/30 text-indigo-200 border-indigo-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-indigo-400/40 hover:text-indigo-300"}`}
+                          aria-pressed={isOn}
+                        >
+                          {t}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Protection Entity */}
+                <div className="space-y-1.5">
+                  <p className="text-xs font-semibold text-sky-300">
+                    Protection Entity
+                  </p>
+                  <Input
+                    value={protectionEntity}
+                    onChange={(e) => setProtectionEntity(e.target.value)}
+                    placeholder="Deity / Angel / Guardian to invoke (e.g. Archangel Michael, Hecate, Durga)..."
+                    className="bg-input/50 border-sky-500/30 focus:border-sky-500/60 text-sm"
+                    data-ocid="generator.protection_entity.input"
+                  />
+                </div>
+
+                {/* Auric Layer */}
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-sky-300">
+                    Auric Layer
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      "Physical",
+                      "Emotional",
+                      "Mental",
+                      "Spiritual",
+                      "Etheric",
+                      "Causal",
+                      "All Layers",
+                    ].map((l) => (
+                      <button
+                        key={l}
+                        type="button"
+                        data-ocid="generator.auric_layer.toggle"
+                        onClick={() => setAuricLayer(l)}
+                        className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${auricLayer === l ? "bg-sky-500/30 text-sky-200 border-sky-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-sky-400/40"}`}
+                        aria-pressed={auricLayer === l}
+                      >
+                        {l}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Sacred Geometry */}
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-sky-300">
+                    Sacred Geometry Amplifiers
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      "Merkaba",
+                      "Flower of Life",
+                      "Sri Yantra",
+                      "Metatron's Cube",
+                      "Vesica Piscis",
+                      "Seed of Life",
+                    ].map((g) => {
+                      const isOn = protectionGeometry.includes(g);
+                      return (
+                        <button
+                          key={g}
+                          type="button"
+                          data-ocid="generator.sacred_geometry.toggle"
+                          onClick={() =>
+                            setProtectionGeometry((prev) =>
+                              isOn ? prev.filter((x) => x !== g) : [...prev, g],
+                            )
+                          }
+                          className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${isOn ? "bg-violet-500/30 text-violet-200 border-violet-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-violet-400/40 hover:text-violet-300"}`}
+                          aria-pressed={isOn}
+                        >
+                          {g}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Duration */}
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold text-sky-300">Duration</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      "Daily Renewal",
+                      "Permanent",
+                      "Until Cleared",
+                      "Moon Cycle",
+                    ].map((d) => (
+                      <button
+                        key={d}
+                        type="button"
+                        data-ocid="generator.protection_duration.toggle"
+                        onClick={() => setProtectionDuration(d)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${protectionDuration === d ? "bg-sky-500/30 text-sky-200 border-sky-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-sky-400/40"}`}
+                        aria-pressed={protectionDuration === d}
+                      >
+                        {d}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Affirmation Boost switch */}
+                <div className="flex items-center justify-between p-2.5 rounded-lg bg-sky-900/10 border border-sky-500/15">
+                  <div>
+                    <p className="text-xs font-semibold text-sky-200">
+                      Protection Affirmation Boost
+                    </p>
+                    <p className="text-[10px] text-muted-foreground">
+                      Add extra protection lines to every affirmation set
+                    </p>
+                  </div>
+                  <Switch
+                    checked={protectionBoost}
+                    onCheckedChange={setProtectionBoost}
+                    data-ocid="generator.protection_boost.switch"
+                  />
+                </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Chakra selector */}
         <div className="space-y-3">
           <Label className="text-sm text-muted-foreground">
             Chakra Selection
@@ -3192,37 +4940,67 @@ export default function GeneratorPage({
               const isSelected = selectedChakras.includes(chakra);
               const color = CHAKRA_COLORS[chakra];
               return (
-                <button
-                  type="button"
-                  key={chakra}
-                  onClick={() => handleToggleChakra(chakra)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
-                    isSelected
-                      ? "text-white"
-                      : "text-muted-foreground bg-secondary/50 hover:bg-secondary border border-border/50 hover:border-border"
-                  }`}
-                  style={
-                    isSelected
-                      ? { background: color, borderColor: "transparent" }
-                      : undefined
-                  }
-                  aria-pressed={isSelected}
-                >
-                  {chakra}
-                </button>
+                <TooltipProvider key={chakra}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleChakra(chakra)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+                          isSelected
+                            ? "text-white"
+                            : "text-muted-foreground bg-secondary/50 hover:bg-secondary border border-border/50 hover:border-border"
+                        }`}
+                        style={
+                          isSelected
+                            ? { background: color, borderColor: "transparent" }
+                            : undefined
+                        }
+                        aria-pressed={isSelected}
+                        data-ocid="generator.chakra.toggle"
+                      >
+                        {CHAKRA_EMOJI[chakra] ? `${CHAKRA_EMOJI[chakra]} ` : ""}
+                        {chakra}
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="text-xs">
+                      {chakra} · {CHAKRA_HZ[chakra] ?? ""}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               );
             })}
           </div>
           {selectedChakras.length > 0 && (
             <p className="text-xs text-muted-foreground">
               {selectedChakras.length === CHAKRAS.length
-                ? "All 7 chakras selected — full alignment mode"
+                ? "All 10 chakras selected — full alignment mode"
                 : `${selectedChakras.length} chakra${selectedChakras.length > 1 ? "s" : ""} selected`}
             </p>
           )}
-        </div>
 
-        {/* ── Advanced Functions Section ────────────────────────── */}
+          {/* Chakra Tone Visualization */}
+          <div className="flex items-center justify-between p-2.5 rounded-lg border border-border/30 bg-secondary/10 mt-2">
+            <div>
+              <p className="text-xs font-semibold">Chakra Tone Visualization</p>
+              <p className="text-[10px] text-muted-foreground leading-snug">
+                Embed Hz tones for each selected chakra into the affirmation set
+              </p>
+            </div>
+            <Switch
+              checked={chakraToneViz}
+              onCheckedChange={setChakraToneViz}
+              data-ocid="generator.chakra_tone_viz.switch"
+            />
+          </div>
+        </div>
+        {/* Chakra Signs Panel */}
+        <SignsPanel
+          context="chakra"
+          title="Chakra Activation Signs"
+          compact={true}
+          onNavigateToSigns={onNavigate ? () => onNavigate("signs") : undefined}
+        />
         <div className="space-y-3">
           <button
             type="button"
@@ -3322,6 +5100,15 @@ export default function GeneratorPage({
                     </AnimatePresence>
                   </div>
 
+                  {/* Deity Signs Panel */}
+                  <SignsPanel
+                    context="deity"
+                    title="Deity Invocation Signs"
+                    compact={true}
+                    onNavigateToSigns={
+                      onNavigate ? () => onNavigate("signs") : undefined
+                    }
+                  />
                   {/* 2. Spell Weaving */}
                   <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-purple-500/20">
                     <div className="flex items-center justify-between">
@@ -3687,6 +5474,15 @@ export default function GeneratorPage({
                     </AnimatePresence>
                   </div>
 
+                  {/* Sigil Signs Panel */}
+                  <SignsPanel
+                    context="sigil"
+                    title="Sigil Activation Signs"
+                    compact={true}
+                    onNavigateToSigns={
+                      onNavigate ? () => onNavigate("signs") : undefined
+                    }
+                  />
                   {/* 8. Kinesis Power Integration */}
                   <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-indigo-500/20">
                     <div className="flex items-center justify-between">
@@ -3807,13 +5603,357 @@ export default function GeneratorPage({
                       )}
                     </AnimatePresence>
                   </div>
+
+                  {/* 9. Astral Projection Programming */}
+                  <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-indigo-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">🌌</span>
+                        <Label
+                          className="text-sm font-semibold text-indigo-300 cursor-pointer"
+                          htmlFor="astral-toggle"
+                        >
+                          Astral Projection Programming
+                        </Label>
+                      </div>
+                      <Switch
+                        id="astral-toggle"
+                        checked={astralEnabled}
+                        onCheckedChange={setAstralEnabled}
+                        data-ocid="generator.astral.switch"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      Program your subconscious for intentional out-of-body
+                      experiences.
+                    </p>
+                    <AnimatePresence>
+                      {astralEnabled && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <Textarea
+                            value={astralIntent}
+                            onChange={(e) => setAstralIntent(e.target.value)}
+                            placeholder="Intent or destination (e.g. visit the Akashic library, explore the astral realm)..."
+                            className="bg-input/50 border-indigo-500/30 text-sm resize-none"
+                            rows={2}
+                            data-ocid="generator.astral_intent.textarea"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* 10. Lucid Dream Seeding */}
+                  <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-violet-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">💫</span>
+                        <Label
+                          className="text-sm font-semibold text-violet-300 cursor-pointer"
+                          htmlFor="lucid-toggle"
+                        >
+                          Lucid Dream Seeding
+                        </Label>
+                      </div>
+                      <Switch
+                        id="lucid-toggle"
+                        checked={lucidDreamEnabled}
+                        onCheckedChange={setLucidDreamEnabled}
+                        data-ocid="generator.lucid_dream.switch"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      Plant a specific scenario or symbol to appear in your
+                      lucid dreams.
+                    </p>
+                    <AnimatePresence>
+                      {lucidDreamEnabled && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <Textarea
+                            value={lucidDreamScenario}
+                            onChange={(e) =>
+                              setLucidDreamScenario(e.target.value)
+                            }
+                            placeholder="Dream scenario or symbol (e.g. a golden door, flying over mountains, meeting your guide)..."
+                            className="bg-input/50 border-violet-500/30 text-sm resize-none"
+                            rows={2}
+                            data-ocid="generator.lucid_dream_scenario.textarea"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* 11. Parallel Self Integration */}
+                  <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-cyan-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">🪞</span>
+                        <Label
+                          className="text-sm font-semibold text-cyan-300 cursor-pointer"
+                          htmlFor="parallel-toggle"
+                        >
+                          Parallel Self Integration
+                        </Label>
+                      </div>
+                      <Switch
+                        id="parallel-toggle"
+                        checked={parallelSelfEnabled}
+                        onCheckedChange={setParallelSelfEnabled}
+                        data-ocid="generator.parallel_self.switch"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      Merge with the version of yourself living your desired
+                      reality.
+                    </p>
+                    <AnimatePresence>
+                      {parallelSelfEnabled && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-2 overflow-hidden"
+                        >
+                          <div className="flex flex-wrap gap-1.5">
+                            {[
+                              "Wealthiest Self",
+                              "Healthiest Self",
+                              "Loved Self",
+                              "Most Powerful Self",
+                              "Healed Self",
+                              "Enlightened Self",
+                            ].map((opt) => (
+                              <button
+                                key={opt}
+                                type="button"
+                                data-ocid="generator.parallel_self_type.toggle"
+                                onClick={() => setParallelSelfType(opt)}
+                                className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${parallelSelfType === opt ? "bg-cyan-500/30 text-cyan-200 border-cyan-400/60" : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-cyan-400/40"}`}
+                                aria-pressed={parallelSelfType === opt}
+                              >
+                                {opt}
+                              </button>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* 12. Void Meditation Anchor */}
+                  <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-slate-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">⬛</span>
+                        <Label
+                          className="text-sm font-semibold text-slate-300 cursor-pointer"
+                          htmlFor="void-toggle"
+                        >
+                          Void Meditation Anchor
+                        </Label>
+                      </div>
+                      <Switch
+                        id="void-toggle"
+                        checked={voidMeditationEnabled}
+                        onCheckedChange={setVoidMeditationEnabled}
+                        data-ocid="generator.void_meditation.switch"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      Use the void as a reset and creation point — the silence
+                      between thoughts where reality is formed.
+                    </p>
+                  </div>
+
+                  {/* 13. Sacred Flame Invocation */}
+                  <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-orange-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">🔥</span>
+                        <Label
+                          className="text-sm font-semibold text-orange-300 cursor-pointer"
+                          htmlFor="flame-toggle"
+                        >
+                          Sacred Flame Invocation
+                        </Label>
+                      </div>
+                      <Switch
+                        id="flame-toggle"
+                        checked={sacredFlameEnabled}
+                        onCheckedChange={setSacredFlameEnabled}
+                        data-ocid="generator.sacred_flame.switch"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      Invoke a sacred flame to purify, transform, and amplify
+                      your affirmations.
+                    </p>
+                    <AnimatePresence>
+                      {sacredFlameEnabled && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="space-y-2 overflow-hidden"
+                        >
+                          <div className="flex flex-wrap gap-1.5">
+                            {[
+                              {
+                                c: "Gold",
+                                col: "text-yellow-300 border-yellow-400/60 bg-yellow-500/20",
+                              },
+                              {
+                                c: "Violet",
+                                col: "text-violet-300 border-violet-400/60 bg-violet-500/20",
+                              },
+                              {
+                                c: "Blue",
+                                col: "text-blue-300 border-blue-400/60 bg-blue-500/20",
+                              },
+                              {
+                                c: "White",
+                                col: "text-slate-200 border-slate-400/60 bg-slate-500/20",
+                              },
+                              {
+                                c: "Emerald",
+                                col: "text-emerald-300 border-emerald-400/60 bg-emerald-500/20",
+                              },
+                              {
+                                c: "Ruby",
+                                col: "text-rose-300 border-rose-400/60 bg-rose-500/20",
+                              },
+                              {
+                                c: "Silver",
+                                col: "text-gray-300 border-gray-400/60 bg-gray-500/20",
+                              },
+                            ].map(({ c, col }) => (
+                              <button
+                                key={c}
+                                type="button"
+                                data-ocid="generator.sacred_flame_color.toggle"
+                                onClick={() => setSacredFlameColor(c)}
+                                className={`px-2.5 py-1 rounded-full text-[11px] font-medium border transition-all ${sacredFlameColor === c ? col : "bg-secondary/50 text-muted-foreground border-border/40 hover:border-orange-400/40"}`}
+                                aria-pressed={sacredFlameColor === c}
+                              >
+                                {c} Flame
+                              </button>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+
+                  {/* 14. Quantum Observer Collapse */}
+                  <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-lime-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">⚛️</span>
+                        <Label
+                          className="text-sm font-semibold text-lime-300 cursor-pointer"
+                          htmlFor="quantum-toggle"
+                        >
+                          Quantum Observer Collapse
+                        </Label>
+                      </div>
+                      <Switch
+                        id="quantum-toggle"
+                        checked={quantumObserverEnabled}
+                        onCheckedChange={setQuantumObserverEnabled}
+                        data-ocid="generator.quantum_observer.switch"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      Collapse quantum possibilities into your desired reality
+                      through conscious observation and certainty.
+                    </p>
+                  </div>
+
+                  {/* 15. Divine Blueprint Activation */}
+                  <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-amber-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">📐</span>
+                        <Label
+                          className="text-sm font-semibold text-amber-300 cursor-pointer"
+                          htmlFor="blueprint-toggle"
+                        >
+                          Divine Blueprint Activation
+                        </Label>
+                      </div>
+                      <Switch
+                        id="blueprint-toggle"
+                        checked={divineBlueprintEnabled}
+                        onCheckedChange={setDivineBlueprintEnabled}
+                        data-ocid="generator.divine_blueprint.switch"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      Activate your original soul blueprint — the perfect
+                      template of who you are meant to become.
+                    </p>
+                  </div>
+
+                  {/* 16. Morphic Field Resonance */}
+                  <div className="space-y-2.5 p-3 rounded-lg bg-background/40 border border-teal-500/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm">🌊</span>
+                        <Label
+                          className="text-sm font-semibold text-teal-300 cursor-pointer"
+                          htmlFor="morphic-toggle"
+                        >
+                          Morphic Field Resonance
+                        </Label>
+                      </div>
+                      <Switch
+                        id="morphic-toggle"
+                        checked={morphicFieldEnabled}
+                        onCheckedChange={setMorphicFieldEnabled}
+                        data-ocid="generator.morphic_field.switch"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-snug">
+                      Tune into a morphic field or collective consciousness to
+                      accelerate your manifestation.
+                    </p>
+                    <AnimatePresence>
+                      {morphicFieldEnabled && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <Input
+                            value={morphicFieldName}
+                            onChange={(e) =>
+                              setMorphicFieldName(e.target.value)
+                            }
+                            placeholder="Field name or collective (e.g. 'Olympic athletes', 'enlightened masters', 'billionaires')..."
+                            className="bg-input/50 border-teal-500/30 text-sm"
+                            data-ocid="generator.morphic_field_name.input"
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
-
-        {/* ── Adult Themes ──────────────────────────────────────── */}
         <div className="space-y-3">
           <button
             type="button"
@@ -3888,8 +6028,6 @@ export default function GeneratorPage({
           </AnimatePresence>
         </div>
       </motion.section>
-
-      {/* ── Step 2: Generate ──────────────────────────────────── */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -4075,8 +6213,6 @@ export default function GeneratorPage({
             )}
         </AnimatePresence>
       </motion.section>
-
-      {/* ── Step 3: Project Config ────────────────────────────── */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -4927,8 +7063,6 @@ export default function GeneratorPage({
           )}
         </div>
       </motion.section>
-
-      {/* ── Step 4: Build JSON + Video Preview ───────────────── */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -5059,8 +7193,6 @@ export default function GeneratorPage({
           )}
         </AnimatePresence>
       </motion.section>
-
-      {/* ── Saved Projects Panel ─────────────────────────────── */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

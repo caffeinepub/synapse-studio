@@ -46,6 +46,28 @@ export async function generateAffirmationsWithAI(
   advanced: AdvancedFunctions = {},
   personalTargets?: PersonalTarget[],
   stackedTopics?: string[],
+  _personalAffStyle?: string,
+  _personalBlessingIntensity?: number,
+  _personalProtectionSeal?: boolean,
+  _personalManifestSpeed?: string,
+  _personalMirrorMode?: boolean,
+  _personalLoveFreq?: boolean,
+  _personalCordCutting?: boolean,
+  _personalCordDesc?: string,
+  _personalAncestralHealing?: boolean,
+  _personalTimeline?: string,
+  _personalEmotionalLayers?: string[],
+  _personalSoulRetrieval?: boolean,
+  _personalDNAReprog?: boolean,
+  _personalInnerChildProtect?: boolean,
+  protectionConfig?: {
+    types: string[];
+    strength: string;
+    entity: string;
+    geometry: string[];
+    duration: string;
+    boost: boolean;
+  },
 ): Promise<string[] | null> {
   const settings = getAISettings();
   if (!settings) return null;
@@ -140,9 +162,12 @@ export async function generateAffirmationsWithAI(
   }
 
   if (protectionEnabled) {
-    modeLines.push(
-      "PROTECTION MODE is active: Include 4–6 affirmations that ground and protect the listener's relationship with this specific topic. Use themes of: stability, safety, inner clarity, unshakeable confidence, energy protection, self-trust. Tie these directly to the topic — do not write generic protection affirmations. No fear-based wording.",
-    );
+    let protectionInstruction =
+      "PROTECTION MODE is active: Include 4–6 affirmations that ground and protect the listener's relationship with this specific topic. Use themes of: stability, safety, inner clarity, unshakeable confidence, energy protection, self-trust. Tie these directly to the topic — do not write generic protection affirmations. No fear-based wording.";
+    if (protectionConfig && protectionConfig.types.length > 0) {
+      protectionInstruction += `\n\nPROTECTION CONFIG: Types selected: [${protectionConfig.types.join(", ")}]. Strength: ${protectionConfig.strength}. Entity: ${protectionConfig.entity || "none"}. Geometry: [${protectionConfig.geometry.join(", ")}]. Duration: ${protectionConfig.duration}. Boost: ${protectionConfig.boost}. Generate protection affirmations specifically for each selected type, referencing the entity and geometry where applicable.`;
+    }
+    modeLines.push(protectionInstruction);
   }
 
   if (chakraName) {

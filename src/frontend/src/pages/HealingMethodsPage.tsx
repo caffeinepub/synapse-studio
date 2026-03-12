@@ -592,6 +592,138 @@ const HEALING_METHODS: HealingMethod[] = [
       "Every time I look in the mirror, I fall more deeply in love with myself",
     ],
   },
+  // Womb Healing
+  {
+    name: "Womb Healing",
+    symbol: "🌙",
+    category: "Emotional & Psychological",
+    description:
+      "Healing the sacred womb space — physical or energetic — and releasing intergenerational trauma stored within it.",
+    overview:
+      "Womb healing is a practice that recognizes the womb (or sacral energy center for all genders) as a storehouse of ancestral memory, emotional imprints, and creative life force. Trauma, grief, and suppressed emotion often live in the womb space, passed through lineage and accumulated through personal experience. This practice combines somatic awareness, breathwork, visualization, sound, and intentional ceremony to gently release what has been held and restore the womb to its natural state of creative, receptive power.",
+    themes: [
+      "Intergenerational Healing",
+      "Creative Reclamation",
+      "Sacred Feminine",
+      "Ancestral Release",
+      "Emotional Liberation",
+    ],
+    keyPractices: [
+      "Womb meditation — placing hands on the lower belly and breathing warmth and light into the space",
+      "Womb letter writing — journaling directly to the womb as its own being",
+      "Cacao ceremonies — using plant medicine to open the heart-womb connection",
+      "Yoni steaming — traditional herbal practice for womb cleansing and nourishment",
+      "Womb prayers and forgiveness rituals for ancestral clearing",
+      "Dance and movement to release held energy through the hips and pelvis",
+    ],
+    affirmations: [
+      "My womb space is sacred and I honor it as a portal of creation and healing",
+      "I release all that my lineage has stored here — with love, with gratitude, with freedom",
+      "My creative center is restored to its natural state of radiant, abundant power",
+      "I am a descendant of strong women — and their healing flows through me now",
+      "I choose to fill this space with life, love, and limitless creative possibility",
+      "My womb space is healed, whole, and overflowing with sacred feminine wisdom",
+    ],
+  },
+  // Nervous System Regulation
+  {
+    name: "Nervous System Regulation",
+    symbol: "🌿",
+    category: "Emotional & Psychological",
+    description:
+      "Techniques to down-regulate the sympathetic nervous system and restore parasympathetic balance, healing at the biological root of stress and trauma.",
+    overview:
+      "Nervous system regulation recognizes that trauma, chronic stress, and unresolved emotional experiences are not just psychological — they are stored in the body's autonomic nervous system. When the sympathetic system (fight/flight) becomes chronically overactivated, the body loses its natural capacity for rest, repair, and connection. Regulation practices work directly with the body's physiology — breath, movement, touch, sound, and relational co-regulation — to restore the nervous system's innate capacity for safety and ease.",
+    themes: [
+      "Somatic Safety",
+      "Window of Tolerance",
+      "Polyvagal Theory",
+      "Trauma Resolution",
+      "Embodiment",
+    ],
+    keyPractices: [
+      "4-7-8 breathing for parasympathetic activation",
+      "Cold water face immersion (mammalian diving reflex reset)",
+      "Titration — moving through activation in small, manageable steps",
+      "Pendulation — consciously alternating between resource states and activation",
+      "EMDR-adjacent eye movement practices for memory processing",
+      "Safe and sound protocol — listening to filtered music for vagal toning",
+    ],
+    affirmations: [
+      "My nervous system is learning safety — day by day, it is regulated and at ease",
+      "I am safe right now — this moment is complete, and I am whole within it",
+      "My body is no longer living in the past — it is updating to the present moment",
+      "Every breath I take signals to my body that it is safe to rest and restore",
+      "I am building a new baseline — calm, clear, and connected to the present",
+      "My nervous system is my ally — and I support it with patience and love",
+    ],
+  },
+  // Past Life Regression
+  {
+    name: "Past Life Regression",
+    symbol: "⏳",
+    category: "Spiritual Lineage",
+    description:
+      "Accessing past life memories to heal recurring patterns, phobias, and soul contracts carried across incarnations into the present lifetime.",
+    overview:
+      "Past life regression is a therapeutic and spiritual practice that accesses the subconscious or superconscious mind to retrieve memories of previous incarnations. Pioneered by therapists like Brian Weiss and Michael Newton, PLR addresses recurring life patterns, unexplained phobias, intense soul connections, and karmic contracts by tracing them to their origin in earlier lifetimes. Whether understood as literal memory or as the deep mind's symbolic healing language, past life regression consistently produces profound and lasting shifts in present-life patterns.",
+    themes: [
+      "Karmic Resolution",
+      "Soul Contract Clearing",
+      "Pattern Liberation",
+      "Phobia Healing",
+      "Soul Memory",
+    ],
+    keyPractices: [
+      "Guided hypnotherapy induction with a trained regression therapist",
+      "Bridging technique — following a physical sensation back to its origin",
+      "Life-between-lives sessions (Michael Newton method)",
+      "Written integration journaling post-session",
+      "Self-regression using recorded scripts for light trance",
+      "Akashic record consultation for soul history clarity",
+    ],
+    affirmations: [
+      "I release all contracts and agreements that no longer serve my highest evolution",
+      "My soul carries wisdom from every lifetime — and I integrate it now with grace",
+      "The patterns that haunted me are healed at their root — I am free in this lifetime",
+      "I honor every past self — they survived what they faced, and now I can thrive",
+      "This lifetime is the culmination of my soul's entire journey — I am ready for my highest expression",
+      "All karmic loops complete through me — with love, with awareness, with finality",
+    ],
+  },
+  // Etheric Surgery
+  {
+    name: "Etheric Surgery",
+    symbol: "✨",
+    category: "Energy & Chakra",
+    description:
+      "Removing etheric implants, cords, and blockages from the subtle body through guided intention and spiritual tools.",
+    overview:
+      "Etheric surgery is the practice of identifying and removing non-beneficial structures in the subtle energy body — including psychic cords, energetic implants, thoughtform attachments, and accumulated residue from past traumas, relationships, and agreements. Practitioners work in a light meditative or trance state, using visualization, intention, and sometimes physical gestures to locate and remove these structures before filling the cleared space with healing light. It is used in shamanic traditions, quantum healing, and energy medicine as a deep-clearing complement to emotional and psychological work.",
+    themes: [
+      "Cord Removal",
+      "Etheric Clearing",
+      "Energetic Sovereignty",
+      "Implant Removal",
+      "Subtle Body Healing",
+    ],
+    keyPractices: [
+      "Scanning the energy field through guided visualization and intuitive sensing",
+      "Identifying cords at the chakra points — particularly solar plexus, heart, and sacral",
+      "Using light tools (etheric scissors, laser light, golden fire) to sever and remove structures",
+      "Filling cleared spaces with golden or violet healing light",
+      "Grounding practice after surgery to anchor the cleared field",
+      "Calling back your own energy from all locations and beings",
+    ],
+    affirmations: [
+      "My energy field is clear, sovereign, and fully my own",
+      "I release all cords that no longer serve — they dissolve with love",
+      "My subtle body is restored to its natural state of radiant wholeness",
+      "I reclaim all my energy from every person, place, and time — it returns to me now",
+      "My energetic boundaries are strong, clear, and respected by all",
+      "I am energetically sovereign — nothing can attach to me without my conscious consent",
+    ],
+  },
 ];
 
 const CATEGORY_COLORS: Record<HealingCategory, string> = {

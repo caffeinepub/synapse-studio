@@ -6,6 +6,7 @@ import GeneratorPage, { type SubliminalContext } from "./pages/GeneratorPage";
 import HealingMethodsPage from "./pages/HealingMethodsPage";
 import JournalPage from "./pages/JournalPage";
 import KinesisArchivePage from "./pages/KinesisArchivePage";
+import ManifestationSignsPage from "./pages/ManifestationSignsPage";
 import ReligionsPage from "./pages/ReligionsPage";
 import RitualsPage from "./pages/RitualsPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -32,7 +33,8 @@ type Page =
   | "videoeditor"
   | "sigils"
   | "journal"
-  | "vault";
+  | "vault"
+  | "signs";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("generator");
@@ -92,6 +94,7 @@ export default function App() {
               injectedTopic={wikiInjectedTopic}
               onInjectedTopicConsumed={() => setWikiInjectedTopic("")}
               onSubliminalUpdate={setSubliminalCtx}
+              onNavigate={handleNavigate}
             />
           )}
           {currentPage === "energy" && <EnergyLibraryPage />}
@@ -154,6 +157,7 @@ export default function App() {
           {currentPage === "videoeditor" && (
             <VideoEditorPage subliminalCtx={subliminalCtx} />
           )}
+          {currentPage === "signs" && <ManifestationSignsPage />}
         </main>
 
         <footer className="text-center py-4 sm:py-6 text-muted-foreground text-xs border-t border-border/40 mt-8 sm:mt-12 px-4">

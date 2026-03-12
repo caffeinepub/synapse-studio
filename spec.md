@@ -1,37 +1,35 @@
 # Synapse Studio
 
 ## Current State
-Version 44 production app with: Generator (advanced functions: deity, spell, soul contract, shadow work, reality scripting, frequency attunement, sigil activation), Kinesis Archive (51 entries), Sigil Codex, Spiritual Entities (94 entries), Spells, Healing Methods, Religions, Wiki Search, Video Editor, YouTube Page, Journal, Vault.
-
-Kinesis types are NOT yet selectable in the Generator — they only exist as a reference page.
-Connection links between kinesis ↔ sigils/spells/entities are pending.
+The Protection panel has a rich UI (14 protection types, strength, entity, sacred geometry, auric layers, duration, boost toggle) but none of these sub-panel values are passed to the affirmation engine. The `generateAffirmations` function only receives `protectionEnabled: boolean` and generates 8 generic lines. The PersonalSubliminal, MultiStack, Advanced Functions, Wiki, and reference library pages have solid content but can be expanded further.
 
 ## Requested Changes (Diff)
 
 ### Add
-- **Kinesis Power Integration** in Generator Advanced Functions: a new toggleable panel that lets users pick a kinesis type from the full archive to weave into affirmations (e.g. "Pyrokinesis" -> "I am a conduit of fire... my pyrokinetic power flows naturally")
-- **Cross-connection links** on KinesisArchivePage: show related entities and sigils as clickable chips inside each expanded entry
-- **More content** across all reference pages:
-  - 10 more kinesis types (e.g. Vitakinesis, Metallokinesis, Photokinesis, Sonokinesis, Nanokinesis, Biokinesis, Plasmakinesis, Magnetokinesis, Chronokinesis, Spatiokinesis)
-  - 8 more sigils with connected entities/spells
-  - 10 more spiritual entities (gods, demons, angels, nature spirits)
-  - 5 more healing methods
-  - More wealth/manifestation affirmation presets in Generator
+- Protection sub-panel params to `generateAffirmations` signature: `protectionConfig?: ProtectionConfig` object containing types[], strength, entity, geometry[], duration, boost
+- Per-type affirmation generation logic: each selected protection type (Energetic Shield, Auric Seal, Psychic Protection, Cord Cutting, etc.) gets 2-3 unique lines
+- Strength modifier: Minimal/Moderate/Strong/Absolute/Divine multiplies intensity language
+- Entity invocation line when protectionEntity is set
+- Sacred geometry lines when geometry chips are selected
+- Duration language woven into lines (Permanent / Until Released / Renewable)
+- More content to Personal Subliminal panel: 3 additional affirmation style options, 3 new advanced toggles (Soul Retrieval, DNA Reprogramming, Inner Child Protection)
+- More items to Wiki Search page: additional fandom wikis across anime/gaming
+- More items to Spells, Kinesis, Sigils, Healing Methods pages
 
 ### Modify
-- KinesisArchivePage: add entity/sigil connection chips inside each entry card
-- GeneratorPage: add Kinesis Integration panel inside Advanced Functions section, with a kinesis type selector (searchable dropdown or pill grid) and toggle
-- Affirmation engine: when kinesis is selected, weave kinesis-specific vocabulary into affirmation lines
+- `affirmationUtils.ts`: extend `generateAffirmations` to accept and use `ProtectionConfig`
+- `GeneratorPage.tsx`: pass protection sub-panel state to both local and AI affirmation calls
+- `aiGenerate.ts`: include protection config in AI prompt
 
 ### Remove
 - Nothing removed
 
 ## Implementation Plan
-1. Add 10 new kinesis entries to KinesisArchivePage with connection metadata
-2. Add 8 new sigils to SigilsPage with connected entity/spell arrays
-3. Add 10 new spiritual entities to SpiritualEntitiesPage
-4. Add 5 new healing methods to HealingMethodsPage
-5. Add kinesis connection chips (entities/sigils) to KinesisArchivePage expanded view
-6. Add Kinesis Integration panel to GeneratorPage Advanced Functions section (state: kinesisEnabled, selectedKinesis)
-7. Update affirmation generation logic to weave selected kinesis type into output lines
-8. Add 6 more wealth/manifestation preset buttons in the GeneratorPage wealth presets area
+1. Define `ProtectionConfig` interface in `affirmationUtils.ts`
+2. Add per-type protection affirmation maps (14 types × 3 lines each)
+3. Extend `generateAffirmations` to accept `protectionConfig` as last param and generate enriched protection lines
+4. Update both call sites in `GeneratorPage.tsx` to pass protection state
+5. Update `aiGenerate.ts` prompt builder to include protection config context
+6. Add Soul Retrieval, DNA Reprogramming, Inner Child Protection toggles to Personal Subliminal panel in GeneratorPage
+7. Expand Spells page with 8 more entries, Kinesis with 10 more types, Healing Methods with 5 more, Sigils with 5 more
+8. Add 15+ more fandom wikis to WikiSearchPage

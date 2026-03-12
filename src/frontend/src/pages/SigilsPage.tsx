@@ -835,6 +835,44 @@ const SIGILS: Sigil[] = [
     subliminalUse:
       "Use for subliminals about the triple goddess, integration of mind/body/spirit, Wiccan practice, and sacred feminine power.",
   },
+  {
+    name: "Sigil of Metatron",
+    symbol: "✡",
+    category: "Sacred Geometry",
+    meaning:
+      "Metatron's Cube is the blueprint of creation — derived from the Fruit of Life, it contains every shape that exists within creation: the five Platonic solids, the Merkaba, and the seed patterns of all geometric forms. It represents the cosmic order underlying all manifest reality and the divine blueprint held by the angelic archivist Metatron.",
+    origin: "Kabbalistic tradition, Sacred Geometry, Jewish mysticism",
+    connectedEntities: ["Metatron", "Enoch"],
+    connectedSpells: ["Sacred Union Ceremony", "Reality Scripting"],
+    subliminalUse:
+      "Use for subliminals about cosmic order, divine blueprints, sacred geometry activation, and aligning with the universe's master pattern.",
+  },
+  {
+    name: "Sacred Spiral",
+    symbol: "🌀",
+    category: "Sacred Geometry",
+    meaning:
+      "The Sacred Spiral is found in galaxies, DNA, seashells, and plant growth — it is the universal pattern of infinite growth through cyclical return. It represents evolution that builds on itself, the eternal return with expansion, and the divine pattern of organic development.",
+    origin:
+      "Universal natural pattern, Celtic tradition, Indigenous cosmologies, Sacred Geometry",
+    connectedEntities: ["Pachamama", "The Green Man"],
+    connectedSpells: ["Ancestor Altar Ritual", "Silver Thread Manifestation"],
+    subliminalUse:
+      "Use for subliminals about personal evolution, growth cycles, returning to your true nature with expanded awareness, and alignment with natural cycles.",
+  },
+  {
+    name: "Sigil of Azrael",
+    symbol: "🌑",
+    category: "Chaos/Left-Hand",
+    meaning:
+      "The Sigil of Azrael represents the angel of death and transition — not as an end but as the escort through transformation. It is the symbol of conscious release, soul passage, and the courageous willingness to let something die so that something truer can be born.",
+    origin:
+      "Islamic angelology, cross-cultural death/transition traditions, modern chaos magic",
+    connectedEntities: ["Azrael", "Hades"],
+    connectedSpells: ["Phoenix Rising Ritual", "Shadow Integration Ritual"],
+    subliminalUse:
+      "Use for subliminals about releasing the old self, death-rebirth transformations, accepting endings, and courageously stepping into a new chapter.",
+  },
 ];
 
 const CATEGORY_COLORS: Record<SigilCategory, string> = {

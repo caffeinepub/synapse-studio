@@ -1264,6 +1264,70 @@ const POWER_WIKIS: WikiInfo[] = [
     domain: "thebandghost.fandom.com",
     hub: "Music",
   },
+  // New Anime additions
+  {
+    id: "onepunchman",
+    name: "One Punch Man Wiki",
+    domain: "onepunchman.fandom.com",
+    hub: "Anime",
+  },
+  {
+    id: "mobpsycho",
+    name: "Mob Psycho 100 Wiki",
+    domain: "mob-psycho-100.fandom.com",
+    hub: "Anime",
+  },
+  {
+    id: "danganronpa",
+    name: "Danganronpa Wiki",
+    domain: "danganronpa.fandom.com",
+    hub: "Anime",
+  },
+  // New Gaming additions
+  {
+    id: "pathofexile",
+    name: "Path of Exile Wiki",
+    domain: "pathofexile.fandom.com",
+    hub: "Gaming",
+  },
+  // New TV/Film additions
+  {
+    id: "hannibal",
+    name: "Hannibal Wiki",
+    domain: "hannibal.fandom.com",
+    hub: "TV",
+  },
+  {
+    id: "arcane",
+    name: "Arcane Wiki",
+    domain: "leagueoflegends.fandom.com",
+    hub: "TV",
+  },
+  {
+    id: "witcher-netflix",
+    name: "The Witcher (Netflix) Wiki",
+    domain: "witcher.fandom.com",
+    hub: "TV",
+  },
+  // New Comics additions
+  {
+    id: "sonic-archie",
+    name: "Sonic the Hedgehog (Archie) Wiki",
+    domain: "sonic.fandom.com",
+    hub: "Comics",
+  },
+  {
+    id: "myLittlePony",
+    name: "My Little Pony Wiki",
+    domain: "mlp.fandom.com",
+    hub: "Animation",
+  },
+  {
+    id: "dragonprince",
+    name: "The Dragon Prince Wiki",
+    domain: "thedragonprince.fandom.com",
+    hub: "Animation",
+  },
 ];
 
 // ── Tag-scoped search utilities ─────────────────────────────────────────────

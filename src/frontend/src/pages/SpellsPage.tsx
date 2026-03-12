@@ -146,6 +146,38 @@ const SPELL_CONNECTIONS: Record<
     relatedEntities: ["Raphael", "Isis", "The Serpent"],
     relatedSigils: ["Caduceus", "Ankh", "Seed of Life"],
   },
+  "Astral Gate Opening": {
+    relatedEntities: ["Hermes", "Hecate"],
+    relatedSigils: ["Sigil of the Abyss"],
+  },
+  "Shadow Integration Ritual": {
+    relatedEntities: ["Lilith", "The Morrigan"],
+    relatedSigils: ["Black Sun"],
+  },
+  "Silver Thread Manifestation": {
+    relatedEntities: ["Ariadne", "Fate"],
+    relatedSigils: ["Vegvisir"],
+  },
+  "Storm Calling": {
+    relatedEntities: ["Thor", "Raijin", "Zeus"],
+    relatedSigils: ["Helm of Awe"],
+  },
+  "Eye of Truth Ritual": {
+    relatedEntities: ["Thoth", "Ma'at", "Athena"],
+    relatedSigils: ["Eye of Horus", "Sigil of Horus"],
+  },
+  "Sacred Union Ceremony": {
+    relatedEntities: ["Isis", "Osiris"],
+    relatedSigils: ["Ouroboros"],
+  },
+  "Void Dissolution": {
+    relatedEntities: ["Nyx", "Kali"],
+    relatedSigils: ["Sigil of the Abyss"],
+  },
+  "Phoenix Rising Ritual": {
+    relatedEntities: ["Ra", "Sekhmet"],
+    relatedSigils: ["Fire Triangle"],
+  },
 };
 
 const SPELLS: Spell[] = [
@@ -782,6 +814,142 @@ const SPELLS: Spell[] = [
       "The red thread appears in Kabbalah as a protective talisman against the evil eye, in Chinese mythology as the invisible thread connecting destined soulmates, and across Eurasian traditions as a protective boundary marker.",
     affirmationConversion:
       "The red thread becomes connection and protection: 'I am connected to every destined soul and experience meant for me. I am protected from all forces that do not serve my highest good. My sacred bonds are strong, lasting, and meaningful.'",
+  },
+  {
+    name: "Astral Gate Opening",
+    tradition: "Ceremonial",
+    purpose:
+      "Open an astral portal for travel, lucid dreaming, or communication with entities and guides across dimensional boundaries. This ritual creates a stable threshold between the physical and astral planes, allowing safe passage of consciousness and intentional contact with higher realms.",
+    components: [
+      "Clear quartz or obsidian as gateway stone",
+      "Incense for dimensional thinning (sandalwood, frankincense)",
+      "Sigil of the Abyss drawn on paper or carved in wax",
+      "Darkened space with a reflective surface",
+      "Written intention for the gate's purpose",
+    ],
+    symbolicMeaning:
+      "The gate is one of humanity's oldest symbols — the threshold between worlds appears in every culture from Egyptian pylons to Greek underworld crossings. Opening a gate is an act of conscious bridge-building between realities.",
+    affirmationConversion:
+      "The gate becomes your inner bridge: 'I travel freely between dimensions of consciousness. My awareness transcends physical boundaries. Every door I open leads me deeper into truth and wisdom.'",
+  },
+  {
+    name: "Shadow Integration Ritual",
+    tradition: "Sigil Work",
+    purpose:
+      "Lovingly reclaim and integrate shadow aspects of the self into conscious wholeness. Rather than banishing darkness, this ritual invites all rejected, suppressed, and shamed parts of the self into the light of acceptance, transforming their energy into strength.",
+    components: [
+      "Black Sun or Dark Moon sigil",
+      "Journal for shadow dialogue writing",
+      "Mirror for confrontation work",
+      "Dark-colored candle (black or deep purple)",
+      "Willingness to witness without judgment",
+    ],
+    symbolicMeaning:
+      "The shadow, as defined by Jung, is the sum of all we disown in ourselves. Integration does not mean becoming darkness — it means reclaiming the power stored within it. Lilith and The Morrigan embody this sovereign dark-feminine integration.",
+    affirmationConversion:
+      "Shadow work becomes reclamation: 'I welcome all parts of myself home. My darkness contains my greatest power. I integrate, I accept, I am whole.'",
+  },
+  {
+    name: "Silver Thread Manifestation",
+    tradition: "Folk Magic",
+    purpose:
+      "Weave the silver thread of intention into the fabric of physical reality using visualization, breath, and symbolic knotting. This practice draws from fate-weaving mythology, connecting your desire to the already-woven tapestry of destiny.",
+    components: [
+      "Silver thread or cord",
+      "Vegvisir sigil for navigation toward the outcome",
+      "Clear visualization of the desired outcome as already real",
+      "Seven breath cycles woven into the cord",
+      "Moon phase timing (Full or New)",
+    ],
+    symbolicMeaning:
+      "The silver thread connects to Ariadne's thread of fate and the Norns who weave destiny in Norse mythology. To hold the silver thread is to participate consciously in the weaving of your own reality.",
+    affirmationConversion:
+      "Thread-weaving becomes destiny alignment: 'My intentions are woven into the fabric of reality. What I visualize clearly, the universe delivers completely. I am a co-creator weaving my destiny with precision.'",
+  },
+  {
+    name: "Storm Calling",
+    tradition: "Elemental",
+    purpose:
+      "Invoke the raw, clearing power of storms for energetic purification, massive change, and the dissolution of stagnant or blocked energy. This ritual calls upon the unified force of thunder, lightning, and wind to break through what conventional energetic work cannot move.",
+    components: [
+      "Helm of Awe sigil for protection and storm power",
+      "Drum or percussion for storm rhythm",
+      "Outdoor setting or open window during stormy weather",
+      "Declaration to the storm entities (Thor, Raijin, Zeus)",
+      "Grounding practice after the calling",
+    ],
+    symbolicMeaning:
+      "Across cultures, the storm deity represents sovereign power over transformation — Thor's hammer, Zeus's thunderbolts, and Raijin's drums all embody the divine right to shatter what must fall so new life can rise. The storm is not destruction; it is dramatic renewal.",
+    affirmationConversion:
+      "Storm power becomes inner force: 'I am the eye of every storm in my life. I am an unstoppable force of change. Old structures crumble before my will and new realities rise in their place.'",
+  },
+  {
+    name: "Eye of Truth Ritual",
+    tradition: "Ceremonial",
+    purpose:
+      "Activate the inner eye of truth to pierce illusions, reveal hidden information, expose deception, and align with what is real versus what only appears to be. This ritual calls upon wisdom deities to open the faculty of discernment.",
+    components: [
+      "Eye of Horus or Sigil of Horus drawn or printed",
+      "Lapis lazuli or labradorite crystal for truth-sight",
+      "Blue or indigo candle",
+      "Invocation to Thoth, Ma'at, or Athena",
+      "Written question you seek the truth about",
+    ],
+    symbolicMeaning:
+      "The Eye of Horus is one of the oldest symbols of divine perception — the eye that sees beyond the veil, that cannot be deceived. Ma'at's feather weighs the heart against truth. To perform this ritual is to align yourself with the cosmic principle of clarity.",
+    affirmationConversion:
+      "Truth-seeing becomes clarity: 'I see clearly what is real. My intuition is a precision instrument. I am aligned with truth at every level — no illusion can deceive me.'",
+  },
+  {
+    name: "Sacred Union Ceremony",
+    tradition: "Ceremonial",
+    purpose:
+      "Merge twin energies, invoke hieros gamos (sacred marriage), or integrate divine masculine and feminine principles within oneself. This ceremony creates the sacred inner marriage that precedes outer union and unlocks creative power through integrated polarity.",
+    components: [
+      "Ouroboros sigil for cyclical unity",
+      "Dual-colored candles (gold and silver, or red and white)",
+      "Invocation to Isis and Osiris or Shiva and Shakti",
+      "Mirror work for self-union",
+      "Sacred vow of integration spoken aloud",
+    ],
+    symbolicMeaning:
+      "The hieros gamos — sacred marriage — is the alchemical unification of opposite principles. In Hermeticism, the marriage of sulfur and mercury creates the philosopher's stone. In Tantra, the union of Shiva and Shakti creates all creation. The ceremony is both inner and cosmic.",
+    affirmationConversion:
+      "Sacred union becomes integration: 'I have united all parts of myself. My inner masculine and feminine are in perfect sacred union. I am whole, complete, and overflowing with creative power.'",
+  },
+  {
+    name: "Void Dissolution",
+    tradition: "Sigil Work",
+    purpose:
+      "Enter the void — the formless state before creation — and dissolve blocks, limiting beliefs, and accumulated energy that resists release. The void is the ultimate solvent: in its nothingness, all crystallized limitation dissolves completely.",
+    components: [
+      "Sigil of the Abyss as a focus point",
+      "Complete darkness and silence",
+      "Deep breathwork to enter the theta state",
+      "Clear naming of what is to be dissolved",
+      "Intentional emergence from the void as the new self",
+    ],
+    symbolicMeaning:
+      "The void is pre-creation potential — the Ain Soph of Kabbalah, the Buddhist sunyata, the Chaos before cosmos. Nyx and Kali both embody the transformative power of void-entering: to dissolve is to prepare for rebirth at the highest level.",
+    affirmationConversion:
+      "Void dissolution becomes rebirth: 'I release all that does not serve my highest expression. In the void, I am free. I emerge renewed, light, and open to what is next.'",
+  },
+  {
+    name: "Phoenix Rising Ritual",
+    tradition: "Elemental",
+    purpose:
+      "Invoke a full death-and-rebirth transformation — the complete dissolution of the old self and the emergence of an entirely new identity, life chapter, or level of being. This is the most complete transformation ritual: nothing is preserved from the old; everything rises anew.",
+    components: [
+      "Fire Triangle sigil for transformation fire",
+      "Burning of written lists of what is dying",
+      "Invocation of Ra, Sekhmet, or the Phoenix",
+      "Red and orange candles for the rising flame",
+      "New declaration of who rises from the ash",
+    ],
+    symbolicMeaning:
+      "The phoenix mythology appears across Egyptian, Greek, Arabic, and Chinese traditions as the ultimate symbol of cyclical transformation. Ra's daily death and rebirth in the solar barque, Sekhmet's destructive-healing fire, and the classic phoenix all teach: complete destruction is the prerequisite for complete renewal.",
+    affirmationConversion:
+      "Phoenix rising becomes transformation: 'I rise from every ending more powerful than before. My rebirth is complete. I am the phoenix — I cannot be permanently diminished. Every fire I walk through reveals more of who I truly am.'",
   },
 ];
 

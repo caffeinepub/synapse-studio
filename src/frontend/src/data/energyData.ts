@@ -1350,4 +1350,165 @@ export const KINESIS_DATA: KinesisEntry[] = [
     psychologicalMetaphor:
       "The capacity to hold space for intense emotional or situational storms — to be the eye of chaos, fully present and unshaken while transformation happens all around you.",
   },
+  {
+    name: "Neokinesis",
+    suffix: "kinesis",
+    element: "Energy",
+    fictionalOrigins:
+      "Neokinesis represents control over new and emerging matter — the ability to shape nascent possibilities and ideas before they crystallize into fixed form. It appears in theories of quantum consciousness and creative-field manipulation.",
+    mediaReferences: [
+      "Reality Warpers — various comics",
+      "Creation deities — mythology",
+    ],
+    symbolicMeaning:
+      "To control what is new is to stand at the edge of creation itself. Neokinesis is the power of pure potential — nothing yet decided, everything still possible.",
+    psychologicalMetaphor:
+      "The capacity to engage with novel situations without forcing them into familiar patterns — to remain in creative openness rather than defaulting to old reactions.",
+  },
+  {
+    name: "Myokinesis",
+    suffix: "kinesis",
+    element: "Bio",
+    fictionalOrigins:
+      "Myokinesis is the psychic control of muscle tissue — the ability to enhance, direct, or manipulate muscular function in oneself or others. It connects to stories of superhuman physical feats, berserker legends, and martial arts energy cultivation.",
+    mediaReferences: [
+      "Captain America — Marvel",
+      "Might Guy — Naruto",
+      "Berserkers — Norse mythology",
+    ],
+    symbolicMeaning:
+      "Muscle is will made physical. Myokinesis represents the mastery of effort itself — the alignment of intention with the body's raw capacity for action and endurance.",
+    psychologicalMetaphor:
+      "The ability to override physical limitations through sheer focused intention — the mind's sovereignty over the body's perceived constraints.",
+  },
+  {
+    name: "Seismokinesis",
+    suffix: "kinesis",
+    element: "Earth",
+    fictionalOrigins:
+      "Control of seismic energy and earthquakes — the ability to generate, direct, or absorb the primal shaking force of tectonic movement. It appears in earth-shaker mythologies and geological-superpower characters.",
+    mediaReferences: [
+      "Toph — Avatar: The Last Airbender",
+      "Terra — DC Comics",
+      "Geb — Egyptian mythology",
+      "Poseidon (Earth-Shaker) — Greek mythology",
+    ],
+    symbolicMeaning:
+      "Earthquakes are the earth's way of releasing accumulated tension and reshaping itself. Seismokinesis represents the power of fundamental structural change — the ability to shake things to their core.",
+    psychologicalMetaphor:
+      "The willingness to allow deep structural changes in your life and psychology — to let old foundations crack so that more stable ground can emerge.",
+  },
+  {
+    name: "Vitakinesis",
+    suffix: "kinesis",
+    element: "Life",
+    fictionalOrigins:
+      "Vitakinesis is the control of life force and vitality — healing, regeneration, and the direct manipulation of the vital energy that distinguishes living from non-living matter. It is distinct from biokinesis in its focus on vitality and restoration rather than biological structure.",
+    mediaReferences: [
+      "Tsunade — Naruto",
+      "The White Witch — Chronicles of Narnia",
+      "Isis — Egyptian mythology",
+    ],
+    symbolicMeaning:
+      "Life force is the animating spark — that which makes matter alive rather than merely material. To control vitality is to work with the most fundamental power in nature.",
+    psychologicalMetaphor:
+      "The capacity to direct and amplify your own energy reserves — to choose consciously where your life force flows rather than allowing it to drain through unconscious patterns.",
+  },
+  {
+    name: "Psyllokinesis",
+    suffix: "kinesis",
+    element: "Psi",
+    fictionalOrigins:
+      "The transmission of thoughts and intentions across distance without physical medium — advanced telepathic projection that can imprint ideas, feelings, or commands into another mind without direct communication. It goes beyond reading to active thought-sending.",
+    mediaReferences: [
+      "Professor X — X-Men",
+      "The Caster — Beautiful Creatures",
+      "Mentalists — various fiction",
+    ],
+    symbolicMeaning:
+      "Thought transmission represents the ultimate recognition that minds are not isolated islands — consciousness is a field, and intention travels through it. To send thought deliberately is to work with reality's mental substrate.",
+    psychologicalMetaphor:
+      "The impact of focused, clear intention on others — the way a truly aligned person changes the mental atmosphere of a room simply by being in it.",
+  },
+  {
+    name: "Spectrokinesis",
+    suffix: "kinesis",
+    element: "Light",
+    fictionalOrigins:
+      "Manipulation of the full light spectrum — bending, splitting, and generating specific wavelengths of visible and invisible light. It includes control of infrared, ultraviolet, and all colors of visible light, enabling invisibility, laser-like beams, and dazzling light effects.",
+    mediaReferences: [
+      "Prism — various comics",
+      "Rainbow Raider — DC",
+      "Light users — various anime",
+    ],
+    symbolicMeaning:
+      "Light contains all colors within its apparent unity — to split light is to reveal the hidden spectrum within apparent simplicity. Spectrokinesis is the power of revealing what lies within the whole.",
+    psychologicalMetaphor:
+      "The ability to perceive the full spectrum of possibility within any situation — to see the full range of options rather than just the obvious path forward.",
+  },
+  {
+    name: "Keratinokinesis",
+    suffix: "kinesis",
+    element: "Bio",
+    fictionalOrigins:
+      "Control of keratin — the protein that forms skin, hair, nails, horns, and feathers. Keratinokinesis enables manipulation of these structures for defense, expression, or transformation. It appears in characters who can grow armor-like skin or weaponized nails and hair.",
+    mediaReferences: [
+      "Wolverine (claws related) — Marvel",
+      "Medusa — Inhumans",
+      "Various transformation characters",
+    ],
+    symbolicMeaning:
+      "Keratin is the body's outer expression — the interface between inner vitality and outer world. To control it is to master the boundary between self and environment.",
+    psychologicalMetaphor:
+      "The conscious management of your outer presentation — understanding that how you present yourself to the world is a form of self-expression and protection.",
+  },
+  {
+    name: "Metallokinesis",
+    suffix: "kinesis",
+    element: "Metal",
+    fictionalOrigins:
+      "The psychic control of metals and metallic compounds — attracting, repelling, reshaping, and transmuting metallic matter. It connects to alchemy, the mastery of iron and steel in magical traditions, and the control of conductive substances.",
+    mediaReferences: [
+      "Magneto — X-Men (magnetic metals)",
+      "Metal Benders — Avatar",
+      "Colossus — X-Men",
+    ],
+    symbolicMeaning:
+      "Metal represents permanence, endurance, and forged strength. In Chinese philosophy, Metal is the element of precision, cutting clarity, and refined judgment. To control metal is to master the hardest, most enduring aspects of physical reality.",
+    psychologicalMetaphor:
+      "The ability to hold firm in values and decisions — the refined capacity to cut through confusion to the essential truth, and to endure pressure without bending.",
+  },
+  {
+    name: "Chromokinesis",
+    suffix: "kinesis",
+    element: "Light",
+    fictionalOrigins:
+      "The direct manipulation of color in objects and environments — changing hues, saturating or bleaching, and projecting colors without light sources. Chromokinesis goes beyond spectrokinesis in targeting the color property of matter itself rather than light waves.",
+    mediaReferences: [
+      "Color manipulation characters — various comics",
+      "Chroma — original concept",
+      "Color-magic traditions — folklore",
+    ],
+    symbolicMeaning:
+      "Color carries meaning across every culture and psychological system. To control color is to control the emotional and symbolic field of any environment — shaping how reality is perceived and felt.",
+    psychologicalMetaphor:
+      "The awareness of how you color your perception of reality — the ability to shift the emotional tone through which you interpret events.",
+  },
+  {
+    name: "Sonokinesis",
+    suffix: "kinesis",
+    element: "Sound",
+    fictionalOrigins:
+      "Precise manipulation of sound waves and frequencies — beyond simple sound generation to the fine control of resonance, harmonics, and frequency as a tool for healing, destruction, communication, and reality-shaping. It connects to cymatics, sacred sound traditions, and acoustic physics.",
+    mediaReferences: [
+      "Black Canary — DC Comics",
+      "Banshee — Marvel",
+      "Diva Plavalaguna — The Fifth Element",
+      "Mantis — Guardians of the Galaxy",
+    ],
+    symbolicMeaning:
+      "Sound is vibration made audible — and all matter vibrates at specific frequencies. To master sonokinesis is to work with reality at its most fundamental resonant level, recognizing that form follows frequency.",
+    psychologicalMetaphor:
+      "The ability to tune your inner state to frequencies that are coherent and powerful — to use voice, breath, and sound intentionally as tools for inner and outer transformation.",
+  },
 ];

@@ -28,6 +28,7 @@ interface JournalEntry {
   selectedChakras: string[];
   affirmationCount: number;
   notes: string;
+  signsNoticed: string;
   tags: string[];
 }
 
@@ -111,6 +112,7 @@ export default function JournalPage({ onUseForSubliminal }: JournalPageProps) {
   // Form state
   const [formTopic, setFormTopic] = useState("");
   const [formNotes, setFormNotes] = useState("");
+  const [formSignsNoticed, setFormSignsNoticed] = useState("");
   const [formCount, setFormCount] = useState(100);
   const [formTags, setFormTags] = useState<string[]>([]);
   const [formChakras, setFormChakras] = useState<string[]>([]);
@@ -145,6 +147,7 @@ export default function JournalPage({ onUseForSubliminal }: JournalPageProps) {
       selectedChakras: [...formChakras],
       affirmationCount: formCount,
       notes: formNotes.trim(),
+      signsNoticed: formSignsNoticed.trim(),
       tags: [...formTags],
     };
     const updated = [newEntry, ...entries];
@@ -153,6 +156,7 @@ export default function JournalPage({ onUseForSubliminal }: JournalPageProps) {
     // reset
     setFormTopic("");
     setFormNotes("");
+    setFormSignsNoticed("");
     setFormCount(100);
     setFormTags([]);
     setFormChakras([]);
@@ -380,6 +384,25 @@ export default function JournalPage({ onUseForSubliminal }: JournalPageProps) {
                   rows={4}
                   className="bg-secondary/30 border-border/50 resize-none"
                   data-ocid="journal.textarea"
+                />
+              </div>
+              {/* Signs Noticed */}
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="flex gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-violet-400" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                  </span>
+                  Signs Noticed (Optional)
+                </Label>
+                <Textarea
+                  value={formSignsNoticed}
+                  onChange={(e) => setFormSignsNoticed(e.target.value)}
+                  placeholder="Any physical, spiritual, or mental signs you noticed during or after this sessionu2026"
+                  rows={3}
+                  className="bg-secondary/30 border-border/50 resize-none"
+                  data-ocid="journal.signs_noticed.textarea"
                 />
               </div>
 
@@ -665,6 +688,21 @@ export default function JournalPage({ onUseForSubliminal }: JournalPageProps) {
                           <p className="text-sm text-muted-foreground/50 italic">
                             No notes recorded for this session.
                           </p>
+                        )}
+                        {entry.signsNoticed && (
+                          <div>
+                            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                              <span className="flex gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-violet-400" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                              </span>
+                              Signs Noticed
+                            </p>
+                            <p className="text-sm text-foreground/80 whitespace-pre-wrap leading-relaxed font-display italic">
+                              "{entry.signsNoticed}"
+                            </p>
+                          </div>
                         )}
 
                         <div className="flex flex-wrap gap-2 pt-2">
